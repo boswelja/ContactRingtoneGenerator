@@ -34,6 +34,9 @@ class MainActivity :
     private lateinit var messageTextLayout: TextInputLayout
     private lateinit var messageTextField: AppCompatEditText
 
+    private lateinit var generateButton: MaterialButton
+    private lateinit var previewButton: MaterialButton
+
     private lateinit var contacts: List<Contact>
     private lateinit var selectedContacts: BooleanArray
 
@@ -52,15 +55,6 @@ class MainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        ttsManager = TtsManager(this)
-        ttsManager.registerTtsReadyListener(object : TtsManager.TtsReadyListener {
-            override fun ttsReady() {
-                setupVoicePickerSpinner()
-            }
-        })
-        ttsManager.registerUtteranceListener(this)
-        ttsManager.initTts()
-
         contacts = ContactManager.getContacts(this)
         selectedContacts = BooleanArray(contacts.size)
         Log.d("MainActivity", "Found ${contacts.size} contacts")
@@ -71,17 +65,33 @@ class MainActivity :
 
         setupVoiceSpeedSlider()
 
-        findViewById<MaterialButton>(R.id.preview_button).setOnClickListener {
-            ttsManager.preview()
-        }
-
         setupContactsPicker()
 
-        findViewById<MaterialButton>(R.id.generate_button).setOnClickListener {
-            ttsManager.useNicknames = useNicknamesView.isChecked
-            ttsManager.setContacts(contacts.filterIndexed { index, _ -> selectedContacts[index] })
-            ttsManager.startSynthesizing()
+        generateButton = findViewById<MaterialButton>(R.id.generate_button).apply {
+            setOnClickListener {
+                ttsManager.useNicknames = useNicknamesView.isChecked
+                ttsManager.setContacts(contacts.filterIndexed { index, _ -> selectedContacts[index] })
+                ttsManager.startSynthesizing()
+            }
         }
+
+        previewButton = findViewById<MaterialButton>(R.id.preview_button).apply {
+            setOnClickListener {
+                ttsManager.preview()
+            }
+        }
+
+        ttsManager = TtsManager(this)
+        ttsManager.registerTtsReadyListener(object : TtsManager.TtsReadyListener {
+            override fun ttsReady() {
+                setupVoicePickerSpinner()
+                generateButton.isEnabled = true
+                previewButton.isEnabled = true
+            }
+        })
+        ttsManager.registerUtteranceListener(this)
+        ttsManager.initTts()
+
     }
 
     override fun onDestroy() {
