@@ -61,11 +61,6 @@ class MainActivity :
 
         setContentView(R.layout.activity_main)
         useNicknamesView = findViewById(R.id.use_nicknames_checkbox)
-        setupMessageTextField()
-
-        setupVoiceSpeedSlider()
-
-        setupContactsPicker()
 
         generateButton = findViewById<MaterialButton>(R.id.generate_button).apply {
             setOnClickListener {
@@ -92,6 +87,9 @@ class MainActivity :
         ttsManager.registerUtteranceListener(this)
         ttsManager.initTts()
 
+        setupMessageTextField()
+        setupVoiceSpeedSlider()
+        setupContactsPicker()
     }
 
     override fun onDestroy() {
