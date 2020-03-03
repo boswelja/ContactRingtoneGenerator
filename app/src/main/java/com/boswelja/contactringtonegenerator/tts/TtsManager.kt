@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator
+package com.boswelja.contactringtonegenerator.tts
 
 import android.content.Context
 import android.os.Environment
@@ -8,6 +8,9 @@ import android.speech.tts.TextToSpeech.SUCCESS
 import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
 import android.util.Log
+import com.boswelja.contactringtonegenerator.contacts.Contact
+import com.boswelja.contactringtonegenerator.contacts.ContactRingtone
+import com.boswelja.contactringtonegenerator.mediastore.MediaStoreManager
 import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
@@ -54,7 +57,10 @@ class TtsManager(private val context: Context) :
         if (ttsUtterance != null) {
             utteranceJobs.remove(ttsUtterance)
             if (utteranceJobs.isEmpty()) {
-                MediaStoreManager.scanNewFiles(context, contactRingtones)
+                MediaStoreManager.scanNewFiles(
+                    context,
+                    contactRingtones
+                )
                 for (listener in utteranceListeners) {
                     listener.onComplete()
                 }
@@ -159,7 +165,9 @@ class TtsManager(private val context: Context) :
 
     fun preview() {
         if (isReady) {
-            tts!!.speak("This is the voice your ring tones will use", QUEUE_FLUSH, null, PREVIEW_UTTERANCE_ID)
+            tts!!.speak("This is the voice your ring tones will use", QUEUE_FLUSH, null,
+                PREVIEW_UTTERANCE_ID
+            )
         }
     }
 
@@ -173,9 +181,20 @@ class TtsManager(private val context: Context) :
             } else {
                 contact.contactName
             }
-            val ttsUtterance = TtsUtterance(utteranceId, generatePersonalisedMessage(contactName)!!, contact, getOutFile(utteranceId))
+            val ttsUtterance =
+                TtsUtterance(
+                    utteranceId,
+                    generatePersonalisedMessage(contactName)!!,
+                    contact,
+                    getOutFile(utteranceId)
+                )
             utteranceJobs.add(ttsUtterance)
-            contactRingtones.add(ContactRingtone(contact, ttsUtterance.file.absolutePath))
+            contactRingtones.add(
+                ContactRingtone(
+                    contact,
+                    ttsUtterance.file.absolutePath
+                )
+            )
         }
     }
 

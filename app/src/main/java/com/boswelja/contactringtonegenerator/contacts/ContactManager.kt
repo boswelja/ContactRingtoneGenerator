@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator
+package com.boswelja.contactringtonegenerator.contacts
 
 import android.content.ContentValues
 import android.content.Context
@@ -22,19 +22,24 @@ object ContactManager {
 
     fun getContacts(context: Context): List<Contact> {
         val contacts = ArrayList<Contact>()
-        val cursor = context.contentResolver.query(ContactsContract.Contacts.CONTENT_URI, CONTACTS_PROJECTION, null, null, null)
+        val cursor = context.contentResolver.query(ContactsContract.Contacts.CONTENT_URI,
+            CONTACTS_PROJECTION, null, null, null)
         if (cursor != null) {
             val idColumn = cursor.getColumnIndex(ContactsContract.Contacts._ID)
             val lookupKeyColumn = cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)
             val displayNameColumn = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Identity.DISPLAY_NAME)
             while (cursor.moveToNext()) {
                 val lookupKey = cursor.getString(lookupKeyColumn)
-                val contact = Contact(
-                    cursor.getLong(idColumn),
-                    lookupKey,
-                    cursor.getString(displayNameColumn),
-                    getContactNickname(context, lookupKey)
-                )
+                val contact =
+                    Contact(
+                        cursor.getLong(idColumn),
+                        lookupKey,
+                        cursor.getString(displayNameColumn),
+                        getContactNickname(
+                            context,
+                            lookupKey
+                        )
+                    )
                 if (!contacts.any { it.id == contact.id }) {
                     contacts.add(contact)
                 }
@@ -45,7 +50,8 @@ object ContactManager {
     }
 
     private fun getContactNickname(context: Context, lookupKey: String): String? {
-        val cursor = context.contentResolver.query(ContactsContract.Data.CONTENT_URI, CONTACT_NICKNAME_PROJECTION, "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.Nickname.MIMETYPE} = ?", arrayOf(lookupKey, ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE), null)
+        val cursor = context.contentResolver.query(ContactsContract.Data.CONTENT_URI,
+            CONTACT_NICKNAME_PROJECTION, "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.Nickname.MIMETYPE} = ?", arrayOf(lookupKey, ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE), null)
 
         var nickname: String? = null
         if (cursor != null) {

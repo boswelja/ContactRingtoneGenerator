@@ -1,9 +1,11 @@
-package com.boswelja.contactringtonegenerator
+package com.boswelja.contactringtonegenerator.mediastore
 
 import android.content.Context
 import android.media.MediaScannerConnection
 import android.net.Uri
 import android.util.Log
+import com.boswelja.contactringtonegenerator.contacts.ContactManager
+import com.boswelja.contactringtonegenerator.contacts.ContactRingtone
 
 object MediaStoreManager {
 

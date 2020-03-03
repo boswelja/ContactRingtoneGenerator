@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator
+package com.boswelja.contactringtonegenerator.ui
 
 import android.content.Context
 import android.database.DataSetObserver
@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.SpinnerAdapter
 import androidx.appcompat.widget.AppCompatTextView
+import com.boswelja.contactringtonegenerator.R
 
 class VoiceSpinnerAdapter(context: Context, private val voices: List<Voice>) : SpinnerAdapter {
 

@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator
+package com.boswelja.contactringtonegenerator.contacts
 
 data class Contact(
     val id: Long,

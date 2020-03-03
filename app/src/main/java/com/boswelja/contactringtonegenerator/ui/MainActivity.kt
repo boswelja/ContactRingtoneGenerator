@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator
+package com.boswelja.contactringtonegenerator.ui
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,6 +10,10 @@ import android.widget.SeekBar
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.*
 import androidx.core.widget.doOnTextChanged
+import com.boswelja.contactringtonegenerator.*
+import com.boswelja.contactringtonegenerator.contacts.Contact
+import com.boswelja.contactringtonegenerator.contacts.ContactManager
+import com.boswelja.contactringtonegenerator.tts.TtsManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
 import java.util.*
@@ -56,7 +60,8 @@ class MainActivity :
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        contacts = ContactManager.getContacts(this)
+        contacts =
+            ContactManager.getContacts(this)
         selectedContacts = BooleanArray(contacts.size)
         Log.d("MainActivity", "Found ${contacts.size} contacts")
 
@@ -78,7 +83,8 @@ class MainActivity :
         }
 
         ttsManager = TtsManager(this)
-        ttsManager.registerTtsReadyListener(object : TtsManager.TtsReadyListener {
+        ttsManager.registerTtsReadyListener(object :
+            TtsManager.TtsReadyListener {
             override fun ttsReady() {
                 setupVoicePickerSpinner()
                 generateButton.isEnabled = true
@@ -162,7 +168,11 @@ class MainActivity :
         if (voices.isNotEmpty()) {
             voicePickerSpinner.apply {
                 Log.d("VoicePickerSpinner", "Found ${voices.count()} voices")
-                adapter = VoiceSpinnerAdapter(context, voices)
+                adapter =
+                    VoiceSpinnerAdapter(
+                        context,
+                        voices
+                    )
                 onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(
                         parent: AdapterView<*>?,

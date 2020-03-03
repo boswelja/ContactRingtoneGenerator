@@ -1,5 +1,6 @@
-package com.boswelja.contactringtonegenerator
+package com.boswelja.contactringtonegenerator.tts
 
+import com.boswelja.contactringtonegenerator.contacts.Contact
 import java.io.File
 
 data class TtsUtterance(
