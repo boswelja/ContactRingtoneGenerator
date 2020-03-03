@@ -23,13 +23,14 @@ class MainActivity :
     private lateinit var contactSelectorView: RelativeLayout
     private lateinit var contactsSelectedView: AppCompatTextView
 
+    private lateinit var useNicknamesView: AppCompatCheckBox
+
+    private lateinit var voicePickerView: LinearLayoutCompat
     private lateinit var voicePickerSpinner: AppCompatSpinner
 
     private lateinit var voiceSpeedSlider: AppCompatSeekBar
     private lateinit var voiceSpeedText: AppCompatTextView
     private lateinit var voiceSpeedReset: AppCompatImageView
-
-    private lateinit var useNicknamesView: AppCompatCheckBox
 
     private lateinit var messageTextLayout: TextInputLayout
     private lateinit var messageTextField: AppCompatEditText
@@ -60,9 +61,9 @@ class MainActivity :
         Log.d("MainActivity", "Found ${contacts.size} contacts")
 
         setContentView(R.layout.activity_main)
-        useNicknamesView = findViewById(R.id.use_nicknames_checkbox)
+        initViews()
 
-        generateButton = findViewById<MaterialButton>(R.id.generate_button).apply {
+        generateButton.apply {
             setOnClickListener {
                 ttsManager.useNicknames = useNicknamesView.isChecked
                 ttsManager.setContacts(contacts.filterIndexed { index, _ -> selectedContacts[index] })
@@ -70,7 +71,7 @@ class MainActivity :
             }
         }
 
-        previewButton = findViewById<MaterialButton>(R.id.preview_button).apply {
+        previewButton.apply {
             setOnClickListener {
                 ttsManager.preview()
             }
@@ -97,9 +98,29 @@ class MainActivity :
         ttsManager.destroy()
     }
 
+    private fun initViews() {
+        contactsSelectedView = findViewById(R.id.contact_selector_summary)
+        contactSelectorView = findViewById(R.id.contact_selector)
+
+        useNicknamesView = findViewById(R.id.use_nicknames_checkbox)
+
+        voicePickerView = findViewById(R.id.voice_picker_view)
+        voicePickerSpinner = findViewById(R.id.voice_picker_spinner)
+
+        voiceSpeedText = findViewById(R.id.voice_speed_slider_text)
+        voiceSpeedSlider = findViewById(R.id.voice_speed_slider)
+        voiceSpeedReset = findViewById(R.id.voice_speed_reset)
+
+        messageTextLayout = findViewById(R.id.message_input_layout)
+        messageTextField = findViewById(R.id.message_input_field)
+
+        generateButton = findViewById(R.id.generate_button)
+        previewButton = findViewById(R.id.preview_button)
+    }
+
     private fun setupContactsPicker() {
-        contactsSelectedView = findViewById(R.id.contact_counter)
-        contactSelectorView = findViewById<RelativeLayout>(R.id.contact_selector).apply {
+        contactsSelectedView.text = "${selectedContacts.count { it }} contacts selected"
+        contactSelectorView.apply {
             setOnClickListener {
                 AlertDialog.Builder(this@MainActivity).apply {
                     setTitle("Pick Contacts")
@@ -122,8 +143,7 @@ class MainActivity :
     }
 
     private fun setupMessageTextField() {
-        messageTextLayout = findViewById(R.id.message_input_layout)
-        messageTextField = findViewById<AppCompatEditText>(R.id.message_input_field).apply {
+        messageTextField.apply {
             doOnTextChanged { text, _, _, _ ->
                 if (text.toString().contains("%NAME", true)) {
                     messageTextLayout.isErrorEnabled = false
@@ -138,30 +158,36 @@ class MainActivity :
     }
 
     private fun setupVoicePickerSpinner() {
-        voicePickerSpinner = findViewById<AppCompatSpinner>(R.id.voice_picker_spinner).apply {
-            val voices = ttsManager.getAvailableVoices(Locale.getDefault())!!
-            Log.d("VoicePickerSpinner", "Found ${voices.count()} voices")
-            adapter = VoiceSpinnerAdapter(context, voices)
-            onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-                override fun onItemSelected(
-                    parent: AdapterView<*>?,
-                    view: View?,
-                    position: Int,
-                    id: Long
-                ) {
-                    val voice = voices[position]
-                    ttsManager.setVoice(voice)
-                }
+        val voices = ttsManager.getAvailableVoices(Locale.getDefault())!!
+        if (voices.isNotEmpty()) {
+            voicePickerSpinner.apply {
+                Log.d("VoicePickerSpinner", "Found ${voices.count()} voices")
+                adapter = VoiceSpinnerAdapter(context, voices)
+                onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                    override fun onItemSelected(
+                        parent: AdapterView<*>?,
+                        view: View?,
+                        position: Int,
+                        id: Long
+                    ) {
+                        val voice = voices[position]
+                        ttsManager.setVoice(voice)
+                    }
 
-                override fun onNothingSelected(parent: AdapterView<*>?) {}
+                    override fun onNothingSelected(parent: AdapterView<*>?) {}
+                }
+                setSelection(0)
             }
-            setSelection(0)
+            voicePickerView.visibility = View.VISIBLE
+        } else {
+            voicePickerView.visibility = View.GONE
         }
+
     }
 
     private fun setupVoiceSpeedSlider() {
-        voiceSpeedText = findViewById(R.id.voice_speed_slider_text)
-        voiceSpeedSlider = findViewById<AppCompatSeekBar>(R.id.voice_speed_slider).apply {
+        voiceSpeedSliderChange(1.0f)
+        voiceSpeedSlider.apply {
             setOnSeekBarChangeListener(object: SeekBar.OnSeekBarChangeListener {
                 override fun onProgressChanged(
                     seekBar: SeekBar?,
@@ -178,7 +204,7 @@ class MainActivity :
 
             })
         }
-        voiceSpeedReset = findViewById<AppCompatImageView>(R.id.voice_speed_reset).apply {
+        voiceSpeedReset.apply {
             setOnClickListener {
                 voiceSpeedSlider.progress = 5
                 voiceSpeedSliderChange(1.0f)
