@@ -7,20 +7,25 @@ import android.view.View
 import android.widget.AdapterView
 import android.widget.RelativeLayout
 import android.widget.SeekBar
-import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.widget.*
+import androidx.appcompat.widget.AppCompatCheckBox
+import androidx.appcompat.widget.AppCompatEditText
+import androidx.appcompat.widget.AppCompatImageView
+import androidx.appcompat.widget.AppCompatSeekBar
+import androidx.appcompat.widget.AppCompatSpinner
+import androidx.appcompat.widget.AppCompatTextView
+import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.widget.doOnTextChanged
-import com.boswelja.contactringtonegenerator.*
+import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
-import com.boswelja.contactringtonegenerator.contacts.ContactManager
 import com.boswelja.contactringtonegenerator.tts.TtsManager
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
-import java.util.*
+import java.util.Locale
 
 class MainActivity :
     AppCompatActivity(),
-    TtsManager.UtteranceJobListener {
+    TtsManager.UtteranceJobListener,
+    ContactPickerDialog.DialogEventListener {
 
     private lateinit var ttsManager: TtsManager
 
@@ -42,8 +47,7 @@ class MainActivity :
     private lateinit var generateButton: MaterialButton
     private lateinit var previewButton: MaterialButton
 
-    private lateinit var contacts: List<Contact>
-    private lateinit var selectedContacts: BooleanArray
+    private lateinit var contactPickerDialog: ContactPickerDialog
 
     override fun onComplete() {
         Log.d("MainActivity", "Job completed")
@@ -57,22 +61,27 @@ class MainActivity :
         Log.d("MainActivity", "Job starting")
     }
 
+    override fun onContactsSelected(selectedContacts: List<Contact>) {
+        contactsSelectedView.text = resources.getQuantityString(R.plurals.selected_contacts_summary, 0, contactPickerDialog.getSelectedContacts().count())
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        contacts =
-            ContactManager.getContacts(this)
-        selectedContacts = BooleanArray(contacts.size)
-        Log.d("MainActivity", "Found ${contacts.size} contacts")
+        contactPickerDialog = ContactPickerDialog()
+        contactPickerDialog.dialogEventListeners.add(this)
 
         setContentView(R.layout.activity_main)
         initViews()
 
         generateButton.apply {
             setOnClickListener {
-                ttsManager.useNicknames = useNicknamesView.isChecked
-                ttsManager.setContacts(contacts.filterIndexed { index, _ -> selectedContacts[index] })
-                ttsManager.startSynthesizing()
+                val selectedContacts = contactPickerDialog.getSelectedContacts()
+                if (!selectedContacts.isNullOrEmpty()) {
+                    ttsManager.useNicknames = useNicknamesView.isChecked
+                    ttsManager.setContacts(selectedContacts)
+                    ttsManager.startSynthesizing()
+                }
             }
         }
 
@@ -102,6 +111,7 @@ class MainActivity :
     override fun onDestroy() {
         super.onDestroy()
         ttsManager.destroy()
+        contactPickerDialog.dialogEventListeners.remove(this)
     }
 
     private fun initViews() {
@@ -125,25 +135,10 @@ class MainActivity :
     }
 
     private fun setupContactsPicker() {
-        contactsSelectedView.text = "${selectedContacts.count { it }} contacts selected"
+        contactsSelectedView.text = resources.getQuantityString(R.plurals.selected_contacts_summary, 0, contactPickerDialog.getSelectedContacts().count())
         contactSelectorView.apply {
             setOnClickListener {
-                AlertDialog.Builder(this@MainActivity).apply {
-                    setTitle("Pick Contacts")
-                    setPositiveButton("Done") { _, _ -> }
-                    setMultiChoiceItems(contacts.map {
-                        if (useNicknamesView.isChecked) {
-                            it.contactNickname ?: it.contactName
-                        } else {
-                            it.contactName
-                        }
-                    }.toTypedArray(), selectedContacts) { _, which, isChecked ->
-                        selectedContacts[which] = isChecked
-                        contactsSelectedView.text = "${selectedContacts.count { it }} contacts selected"
-                    }
-                }.also {
-                    it.show()
-                }
+                contactPickerDialog.show(supportFragmentManager)
             }
         }
     }
@@ -223,7 +218,7 @@ class MainActivity :
     }
 
     private fun voiceSpeedSliderChange(actualMultiplier: Float) {
-        voiceSpeedText.text = "${actualMultiplier}x"
+        voiceSpeedText.text = getString(R.string.speech_rate_multiplier_text, actualMultiplier)
         ttsManager.setSpeechRate(actualMultiplier)
     }
 }
