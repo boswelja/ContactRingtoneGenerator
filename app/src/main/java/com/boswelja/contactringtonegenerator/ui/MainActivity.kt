@@ -1,5 +1,7 @@
 package com.boswelja.contactringtonegenerator.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -114,6 +116,20 @@ class MainActivity :
         contactPickerDialog.dialogEventListeners.remove(this)
     }
 
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>, grantResults: IntArray) {
+        when (requestCode) {
+            CONTACT_PICKER_PERMISSION_REQUEST_CODE -> {
+                when (grantResults[0]) {
+                    PackageManager.PERMISSION_GRANTED -> contactPickerDialog.show(supportFragmentManager)
+                    PackageManager.PERMISSION_DENIED -> {
+                        // Permission denied, explain why we need it
+                    }
+                }
+            }
+            else -> super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        }
+    }
+
     private fun initViews() {
         contactsSelectedView = findViewById(R.id.contact_selector_summary)
         contactSelectorView = findViewById(R.id.contact_selector)
@@ -138,7 +154,11 @@ class MainActivity :
         contactsSelectedView.text = resources.getQuantityString(R.plurals.selected_contacts_summary, 0, contactPickerDialog.getSelectedContacts().count())
         contactSelectorView.apply {
             setOnClickListener {
-                contactPickerDialog.show(supportFragmentManager)
+                if (checkSelfPermission(Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+                    requestPermissions(arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS), CONTACT_PICKER_PERMISSION_REQUEST_CODE)
+                } else {
+                    contactPickerDialog.show(supportFragmentManager)
+                }
             }
         }
     }
@@ -220,5 +240,9 @@ class MainActivity :
     private fun voiceSpeedSliderChange(actualMultiplier: Float) {
         voiceSpeedText.text = getString(R.string.speech_rate_multiplier_text, actualMultiplier)
         ttsManager.setSpeechRate(actualMultiplier)
+    }
+
+    companion object {
+        private const val CONTACT_PICKER_PERMISSION_REQUEST_CODE = 1000
     }
 }
