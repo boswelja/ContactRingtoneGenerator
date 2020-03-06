@@ -35,7 +35,7 @@ class TtsManager(private val context: Context) :
     private val utteranceListeners = ArrayList<UtteranceJobListener>()
     private val ttsReadyListeners = ArrayList<TtsReadyListener>()
 
-    private var isReady: Boolean = false
+    var isReady: Boolean = false
 
     override fun onInit(status: Int) {
         ttsEngineReady = status == SUCCESS

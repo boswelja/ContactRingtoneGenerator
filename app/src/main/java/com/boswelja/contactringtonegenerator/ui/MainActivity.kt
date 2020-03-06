@@ -64,7 +64,9 @@ class MainActivity :
     }
 
     override fun onContactsSelected(selectedContacts: List<Contact>) {
-        contactsSelectedView.text = resources.getQuantityString(R.plurals.selected_contacts_summary, 0, contactPickerDialog.getSelectedContacts().count())
+        val selectedContactCount = selectedContacts.count()
+        contactsSelectedView.text = resources.getQuantityString(R.plurals.selected_contacts_summary, 0, selectedContactCount)
+        generateButton.isEnabled = ttsManager.isReady && selectedContactCount > 0
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,7 +100,6 @@ class MainActivity :
             TtsManager.TtsReadyListener {
             override fun ttsReady() {
                 setupVoicePickerSpinner()
-                generateButton.isEnabled = true
                 previewButton.isEnabled = true
             }
         })
