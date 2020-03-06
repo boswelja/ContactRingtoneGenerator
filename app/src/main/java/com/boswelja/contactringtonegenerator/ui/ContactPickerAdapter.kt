@@ -40,7 +40,11 @@ class ContactPickerAdapter : RecyclerView.Adapter<ContactPickerAdapter.ContactVi
             }
         }
 
-        holder.contactNameView.text = contact.contactNickname ?: contact.contactName
+        holder.contactNameView.text = if (useNicknames) {
+            contact.contactNickname ?: contact.contactName
+        } else {
+            contact.contactName
+        }
     }
 
     private fun sortContacts() {
@@ -73,6 +77,5 @@ class ContactPickerAdapter : RecyclerView.Adapter<ContactPickerAdapter.ContactVi
     class ContactViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val checkbox: AppCompatCheckBox = itemView.findViewById(R.id.checkbox)
         val contactNameView: AppCompatTextView = itemView.findViewById(R.id.contact_name)
-        val contactInfoView: AppCompatTextView = itemView.findViewById(R.id.contact_info)
     }
 }

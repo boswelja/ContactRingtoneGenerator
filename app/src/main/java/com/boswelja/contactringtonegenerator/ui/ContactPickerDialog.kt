@@ -15,17 +15,21 @@ import com.boswelja.contactringtonegenerator.contacts.ContactManager
 
 class ContactPickerDialog : DialogFragment() {
 
-    val dialogEventListeners = ArrayList<DialogEventListener>()
-
     private var contactsRecyclerView: RecyclerView? = null
+    private var useNicknames: Boolean = true
+
     private lateinit var noContactsView: View
     private lateinit var loadingIndicator: ProgressBar
+
+    val dialogEventListeners = ArrayList<DialogEventListener>()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         val view = View.inflate(context, R.layout.contact_picker_dialog, null)
         contactsRecyclerView = view.findViewById<RecyclerView>(R.id.contacts_recyclerview).apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-            adapter = ContactPickerAdapter()
+            adapter = ContactPickerAdapter().apply {
+                setUseNicknames(useNicknames)
+            }
         }
         noContactsView = view.findViewById(R.id.no_contacts_view)
         loadingIndicator = view.findViewById(R.id.loading_indicator)
@@ -48,23 +52,6 @@ class ContactPickerDialog : DialogFragment() {
         setLoading(false)
     }
 
-    fun show(fragmentManager: FragmentManager) {
-        show(fragmentManager, "ContactPickerDialog")
-    }
-
-    private fun updateContacts() {
-        (contactsRecyclerView!!.adapter as ContactPickerAdapter)
-            .setContacts(ContactManager.getContacts(context!!))
-    }
-
-    fun getSelectedContacts(): List<Contact> {
-        return if (contactsRecyclerView != null) {
-            (contactsRecyclerView?.adapter as ContactPickerAdapter).selectedContacts
-        } else {
-            ArrayList()
-        }
-    }
-
     private fun setLoading(isLoading: Boolean) {
         if (isLoading) {
             loadingIndicator.visibility = View.VISIBLE
@@ -79,6 +66,30 @@ class ContactPickerDialog : DialogFragment() {
                 noContactsView.visibility = View.VISIBLE
                 contactsRecyclerView!!.visibility = View.GONE
             }
+        }
+    }
+
+    private fun updateContacts() {
+        (contactsRecyclerView!!.adapter as ContactPickerAdapter)
+            .setContacts(ContactManager.getContacts(context!!))
+    }
+
+    fun show(fragmentManager: FragmentManager) {
+        show(fragmentManager, "ContactPickerDialog")
+    }
+
+    fun getSelectedContacts(): List<Contact> {
+        return if (contactsRecyclerView != null) {
+            (contactsRecyclerView?.adapter as ContactPickerAdapter).selectedContacts
+        } else {
+            ArrayList()
+        }
+    }
+
+    fun setUseNicknames(useNicknames: Boolean) {
+        this.useNicknames = useNicknames
+        if (contactsRecyclerView != null) {
+            (contactsRecyclerView!!.adapter as ContactPickerAdapter).setUseNicknames(useNicknames)
         }
     }
 

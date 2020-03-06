@@ -82,11 +82,15 @@ class MainActivity :
             setOnClickListener {
                 val selectedContacts = contactPickerDialog.getSelectedContacts()
                 if (!selectedContacts.isNullOrEmpty()) {
-                    ttsManager.useNicknames = useNicknamesView.isChecked
                     ttsManager.setContacts(selectedContacts)
                     ttsManager.startSynthesizing()
                 }
             }
+        }
+
+        useNicknamesView.setOnCheckedChangeListener { _, isChecked ->
+            ttsManager.useNicknames = isChecked
+            contactPickerDialog.setUseNicknames(isChecked)
         }
 
         previewButton.apply {
