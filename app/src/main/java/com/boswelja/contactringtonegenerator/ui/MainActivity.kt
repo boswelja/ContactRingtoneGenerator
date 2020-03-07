@@ -115,6 +115,11 @@ class MainActivity :
         setupContactsPicker()
     }
 
+    override fun onResume() {
+        super.onResume()
+        contactPickerDialog.wantsContactUpdate = true
+    }
+
     override fun onDestroy() {
         super.onDestroy()
         ttsManager.destroy()

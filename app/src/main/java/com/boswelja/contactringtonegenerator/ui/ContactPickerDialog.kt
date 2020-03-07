@@ -16,6 +16,7 @@ import com.boswelja.contactringtonegenerator.contacts.ContactManager
 class ContactPickerDialog : DialogFragment() {
 
     private var contactsRecyclerView: RecyclerView? = null
+    private var dialog: AlertDialog? = null
     private var useNicknames: Boolean = true
 
     private lateinit var noContactsView: View
@@ -23,7 +24,24 @@ class ContactPickerDialog : DialogFragment() {
 
     val dialogEventListeners = ArrayList<DialogEventListener>()
 
+    var wantsContactUpdate = true
+
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
+        if (dialog == null) {
+            createDialog()
+        }
+        return dialog!!
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        setLoading(true)
+        updateContacts()
+        setLoading(false)
+    }
+
+    private fun createDialog() {
         val view = View.inflate(context, R.layout.contact_picker_dialog, null)
         contactsRecyclerView = view.findViewById<RecyclerView>(R.id.contacts_recyclerview).apply {
             layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
@@ -33,7 +51,7 @@ class ContactPickerDialog : DialogFragment() {
         }
         noContactsView = view.findViewById(R.id.no_contacts_view)
         loadingIndicator = view.findViewById(R.id.loading_indicator)
-        return AlertDialog.Builder(context!!).apply {
+        dialog = AlertDialog.Builder(context!!).apply {
             setTitle(R.string.contact_picker_dialog_title)
             setPositiveButton(R.string.dialog_button_done) { _, _ ->
                 for (listener in dialogEventListeners) {
@@ -42,14 +60,6 @@ class ContactPickerDialog : DialogFragment() {
             }
             setView(view)
         }.create()
-    }
-
-    override fun onResume() {
-        super.onResume()
-
-        setLoading(true)
-        updateContacts()
-        setLoading(false)
     }
 
     private fun setLoading(isLoading: Boolean) {
@@ -70,8 +80,11 @@ class ContactPickerDialog : DialogFragment() {
     }
 
     private fun updateContacts() {
-        (contactsRecyclerView!!.adapter as ContactPickerAdapter)
-            .setContacts(ContactManager.getContacts(context!!))
+        if (wantsContactUpdate) {
+            wantsContactUpdate = false
+            (contactsRecyclerView!!.adapter as ContactPickerAdapter)
+                .setContacts(ContactManager.getContacts(context!!))
+        }
     }
 
     fun show(fragmentManager: FragmentManager) {

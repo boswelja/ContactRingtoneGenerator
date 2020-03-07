@@ -1,6 +1,5 @@
 package com.boswelja.contactringtonegenerator.ui
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -66,10 +65,14 @@ class ContactPickerAdapter : RecyclerView.Adapter<ContactPickerAdapter.ContactVi
     }
 
     fun setContacts(newContacts: List<Contact>) {
-        contacts.clear()
-        selectedContacts.clear()
-        contacts.addAll(newContacts)
-        Log.d("ContactPickerAdapter", "Found ${contacts.count()} contacts")
+        ArrayList(newContacts).apply {
+            contacts.retainAll(this)
+            selectedContacts.retainAll(this)
+            removeAll(contacts)
+            forEach {
+                contacts.add(it)
+            }
+        }
         sortContacts()
         notifyDataSetChanged()
     }
