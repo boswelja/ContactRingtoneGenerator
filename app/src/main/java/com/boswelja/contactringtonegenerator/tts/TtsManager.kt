@@ -19,7 +19,7 @@ class TtsManager(private val context: Context) :
     TextToSpeech.OnInitListener,
     UtteranceProgressListener() {
 
-    private val outDirectory = File(Environment.getExternalStorageDirectory(), "/Ringtones/")
+    private val outDirectory = context.getExternalFilesDir(Environment.DIRECTORY_RINGTONES)!!
 
     private var tts: TextToSpeech? = null
 
