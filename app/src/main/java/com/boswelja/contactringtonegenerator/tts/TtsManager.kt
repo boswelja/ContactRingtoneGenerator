@@ -1,17 +1,13 @@
 package com.boswelja.contactringtonegenerator.tts
 
 import android.content.Context
-import android.os.Environment
 import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.QUEUE_FLUSH
 import android.speech.tts.TextToSpeech.SUCCESS
 import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
-import android.util.Log
-import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactRingtone
 import com.boswelja.contactringtonegenerator.mediastore.MediaStoreManager
-import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -19,23 +15,13 @@ class TtsManager(private val context: Context) :
     TextToSpeech.OnInitListener,
     UtteranceProgressListener() {
 
-    private val outDirectory = context.getExternalFilesDir(Environment.DIRECTORY_RINGTONES)!!
-
     private var tts: TextToSpeech? = null
 
-    private var message: String = ""
-    private var ttsEngineReady: Boolean = false
-    private var messageSet: Boolean = false
-
-    var useNicknames: Boolean = true
-
     private val contactRingtones = ArrayList<ContactRingtone>()
-
     private val utteranceJobs = ArrayList<TtsUtterance>()
-    private val utteranceListeners = ArrayList<UtteranceJobListener>()
-    private val ttsReadyListeners = ArrayList<TtsReadyListener>()
+    private val ttsInterfaces = ArrayList<TtsManagerInterface>()
 
-    var isReady: Boolean = false
+    var ttsEngineReady: Boolean = false
 
     override fun onInit(status: Int) {
         ttsEngineReady = status == SUCCESS
@@ -46,75 +32,52 @@ class TtsManager(private val context: Context) :
     }
 
     override fun onStart(utteranceId: String?) {
-        for (listener in utteranceListeners) {
-            listener.onJobStart()
+        val utteranceJob = utteranceJobs.firstOrNull { it.utteranceId == utteranceId }
+        if (utteranceJob != null) {
+            for (listener in ttsInterfaces) {
+                listener.onJobStart(utteranceJob)
+            }
         }
     }
 
     override fun onDone(utteranceId: String?) {
-        val ttsUtterance = utteranceJobs.firstOrNull { it.utteranceId == utteranceId }
+        val utteranceJob = utteranceJobs.firstOrNull { it.utteranceId == utteranceId }
 
-        if (ttsUtterance != null) {
-            utteranceJobs.remove(ttsUtterance)
+        if (utteranceJob != null) {
+            for (listener in ttsInterfaces) {
+                listener.onJobFinished(utteranceJob)
+            }
+            utteranceJobs.remove(utteranceJob)
             if (utteranceJobs.isEmpty()) {
                 MediaStoreManager.scanNewFiles(
                     context,
                     contactRingtones
                 )
-                for (listener in utteranceListeners) {
-                    listener.onComplete()
+                for (listener in ttsInterfaces) {
+                    listener.onSynthesisComplete()
                 }
             }
         }
     }
 
     override fun onError(utteranceId: String?) {
-        val ttsUtterance = utteranceJobs.first { it.utteranceId == utteranceId }
-        utteranceJobs.remove(ttsUtterance)
-        if (ttsUtterance.file.exists()) {
-            ttsUtterance.file.delete()
-        }
-        for (listener in utteranceListeners) {
-            listener.onJobError()
-        }
-    }
-
-    init {
-        initDirectory()
-    }
-
-    private fun generatePersonalisedMessage(name: String): String? {
-        return if (messageSet) {
-            message.replace("%NAME", name)
-        } else {
-            null
-        }
-    }
-
-    private fun generateUtteranceId(name: String): String {
-        return name.replace(" ", "_")
-    }
-
-    private fun getOutFile(utteranceId: String): File {
-        return File(outDirectory, "$utteranceId.ogg").also {
-            Log.d("TtsManager", "Saving to ${it.absolutePath}")
-            it.createNewFile()
-        }
-    }
-
-    private fun setIsReady() {
-        isReady = ttsEngineReady and messageSet
-        Log.d("TtsManager", "isReady = $isReady")
-        if (isReady) {
-            for (listener in ttsReadyListeners) {
-                listener.ttsReady()
+        val utteranceJob = utteranceJobs.firstOrNull { it.utteranceId == utteranceId }
+        if (utteranceJob != null) {
+            utteranceJobs.remove(utteranceJob)
+            if (utteranceJob.ringtoneFile.exists()) {
+                utteranceJob.ringtoneFile.delete()
+            }
+            for (listener in ttsInterfaces) {
+                listener.onJobError(utteranceJob)
             }
         }
     }
 
-    private fun initDirectory() {
-        if (!outDirectory.exists()) {
-            outDirectory.mkdirs()
+    private fun setIsReady() {
+        if (ttsEngineReady) {
+            for (listener in ttsInterfaces) {
+                listener.onTtsReady()
+            }
         }
     }
 
@@ -122,86 +85,51 @@ class TtsManager(private val context: Context) :
         tts = TextToSpeech(context, this)
     }
 
-    fun setUtteranceProgressListener(utteranceProgressListener: UtteranceProgressListener): Boolean {
-        if (isReady) {
-            return tts!!.setOnUtteranceProgressListener(utteranceProgressListener) == SUCCESS
-        }
-        return false
-    }
-
     fun getAvailableVoices(locale: Locale): List<Voice>? {
-        if (isReady) {
-            return tts!!.voices.filter { it.locale == locale &&
-                    (it.name.contains("language") ||
-                            it.name.contains("female") ||
-                            it.name.contains("male")) }.sortedBy { it.name }
+        if (ttsEngineReady) {
+            return tts?.voices?.filter { it.locale == locale }?.sortedBy { it.name }
         }
         return null
     }
 
     fun setVoice(voice: Voice): Boolean {
-        if (isReady) {
+        if (ttsEngineReady) {
             return tts!!.setVoice(voice) == SUCCESS
         }
         return false
     }
 
-    fun setMessage(message: String): Boolean {
-        if (message.contains("%NAME")) {
-            this.message = message
-            messageSet = true
-            setIsReady()
-            return true
-        }
-        return false
-    }
-
     fun setSpeechRate(speechRate: Float): Boolean {
-        if (isReady) {
+        if (ttsEngineReady) {
             return tts!!.setSpeechRate(speechRate) == SUCCESS
         }
         return false
     }
 
-    fun preview() {
-        if (isReady) {
-            tts!!.speak("This is the voice your ring tones will use", QUEUE_FLUSH, null,
+    fun preview(message: String) {
+        if (ttsEngineReady) {
+            tts!!.speak(message, QUEUE_FLUSH, null,
                 PREVIEW_UTTERANCE_ID
             )
         }
     }
 
-    fun setContacts(contacts: List<Contact>) {
-        utteranceJobs.clear()
-        contactRingtones.clear()
-        for (contact in contacts) {
-            val utteranceId = generateUtteranceId(contact.contactName)
-            val contactName = if (useNicknames) {
-                contact.contactNickname ?: contact.contactName
-            } else {
-                contact.contactName
-            }
-            val ttsUtterance =
-                TtsUtterance(
-                    utteranceId,
-                    generatePersonalisedMessage(contactName)!!,
-                    contact,
-                    getOutFile(utteranceId)
-                )
-            utteranceJobs.add(ttsUtterance)
-            contactRingtones.add(
-                ContactRingtone(
-                    contact,
-                    ttsUtterance.file.absolutePath
-                )
-            )
-        }
+    fun addToQueue(contactRingtone: ContactRingtone, message: String) {
+        val utteranceJob = TtsUtterance(
+                contactRingtone,
+                message
+        )
+        utteranceJobs.add(utteranceJob)
     }
 
     fun startSynthesizing(): Boolean {
-        if (isReady) {
+        if (ttsEngineReady) {
+            val jobCount = utteranceJobs.count() * 3
+            for (listener in ttsInterfaces) {
+                listener.onStartSynthesizing(jobCount)
+            }
             for (ttsUtterance in utteranceJobs) {
-                tts!!.synthesizeToFile(ttsUtterance.personalisedMessage, null, ttsUtterance.file, ttsUtterance.utteranceId)
+                tts!!.synthesizeToFile(ttsUtterance.personalisedMessage, null, ttsUtterance.ringtoneFile, ttsUtterance.utteranceId)
             }
             return true
         }
@@ -209,35 +137,27 @@ class TtsManager(private val context: Context) :
     }
 
     fun destroy() {
-        utteranceListeners.clear()
-        ttsReadyListeners.clear()
+        ttsInterfaces.clear()
         tts?.shutdown()
     }
 
-    fun registerUtteranceListener(utteranceProgressListener: UtteranceJobListener) {
-        utteranceListeners.add(utteranceProgressListener)
+    fun addTtsManagerInterface(ttsManagerInterface: TtsManagerInterface) {
+        ttsInterfaces.add(ttsManagerInterface)
     }
 
-    fun unregisterUtteranceListener(utteranceProgressListener: UtteranceJobListener) {
-        utteranceListeners.remove(utteranceProgressListener)
+    fun removeTtsManagerInterface(ttsManagerInterface: TtsManagerInterface) {
+        ttsInterfaces.remove(ttsManagerInterface)
     }
 
-    fun registerTtsReadyListener(listener: TtsReadyListener) {
-        ttsReadyListeners.add(listener)
-    }
+    interface TtsManagerInterface {
+        fun onTtsReady()
 
-    fun unregisterTtsReadyListener(listener: TtsReadyListener) {
-        ttsReadyListeners.remove(listener)
-    }
+        fun onStartSynthesizing(jobCount: Int)
+        fun onSynthesisComplete()
 
-    interface UtteranceJobListener {
-        fun onJobStart()
-        fun onComplete()
-        fun onJobError()
-    }
-
-    interface TtsReadyListener {
-        fun ttsReady()
+        fun onJobStart(ttsUtterance: TtsUtterance)
+        fun onJobFinished(ttsUtterance: TtsUtterance)
+        fun onJobError(ttsUtterance: TtsUtterance)
     }
 
     companion object {

@@ -1,8 +1,9 @@
 package com.boswelja.contactringtonegenerator.contacts
 
-import com.boswelja.contactringtonegenerator.contacts.Contact
+import java.io.File
 
 data class ContactRingtone(
-    val contact: Contact,
-    val ringtonePath: String
+        val contact: Contact,
+        val id: String,
+        val ringtoneFile: File
 )

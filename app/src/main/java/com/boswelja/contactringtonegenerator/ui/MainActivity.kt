@@ -19,17 +19,16 @@ import androidx.appcompat.widget.LinearLayoutCompat
 import androidx.core.widget.doOnTextChanged
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
-import com.boswelja.contactringtonegenerator.tts.TtsManager
+import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.textfield.TextInputLayout
 import java.util.Locale
 
 class MainActivity :
     AppCompatActivity(),
-    TtsManager.UtteranceJobListener,
     ContactPickerDialog.DialogEventListener {
 
-    private lateinit var ttsManager: TtsManager
+    private lateinit var ringtoneGenerator: RingtoneGenerator
 
     private lateinit var contactSelectorView: RelativeLayout
     private lateinit var contactsSelectedView: AppCompatTextView
@@ -51,22 +50,11 @@ class MainActivity :
 
     private lateinit var contactPickerDialog: ContactPickerDialog
 
-    override fun onComplete() {
-        Log.d("MainActivity", "Job completed")
-    }
-
-    override fun onJobError() {
-        Log.d("MainActivity", "Job failed")
-    }
-
-    override fun onJobStart() {
-        Log.d("MainActivity", "Job starting")
-    }
-
     override fun onContactsSelected(selectedContacts: List<Contact>) {
         val selectedContactCount = selectedContacts.count()
         contactsSelectedView.text = resources.getQuantityString(R.plurals.selected_contacts_summary, 0, selectedContactCount)
-        generateButton.isEnabled = ttsManager.isReady && selectedContactCount > 0
+        ringtoneGenerator.setContacts(selectedContacts)
+        generateButton.isEnabled = ringtoneGenerator.isReady && selectedContactCount > 0
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -82,33 +70,31 @@ class MainActivity :
             setOnClickListener {
                 val selectedContacts = contactPickerDialog.getSelectedContacts()
                 if (!selectedContacts.isNullOrEmpty()) {
-                    ttsManager.setContacts(selectedContacts)
-                    ttsManager.startSynthesizing()
+                    ringtoneGenerator.setContacts(selectedContacts)
+                    ringtoneGenerator.generate()
                 }
             }
         }
 
         useNicknamesView.setOnCheckedChangeListener { _, isChecked ->
-            ttsManager.useNicknames = isChecked
+            ringtoneGenerator.useNicknames = isChecked
             contactPickerDialog.setUseNicknames(isChecked)
         }
 
         previewButton.apply {
             setOnClickListener {
-                ttsManager.preview()
+                ringtoneGenerator.preview()
             }
         }
 
-        ttsManager = TtsManager(this)
-        ttsManager.registerTtsReadyListener(object :
-            TtsManager.TtsReadyListener {
-            override fun ttsReady() {
+        ringtoneGenerator = RingtoneGenerator(this)
+        ringtoneGenerator.addEventListener(object : RingtoneGenerator.EventListener {
+            override fun onReady() {
                 setupVoicePickerSpinner()
                 previewButton.isEnabled = true
             }
         })
-        ttsManager.registerUtteranceListener(this)
-        ttsManager.initTts()
+        ringtoneGenerator.init()
 
         setupMessageTextField()
         setupVoiceSpeedSlider()
@@ -122,7 +108,7 @@ class MainActivity :
 
     override fun onDestroy() {
         super.onDestroy()
-        ttsManager.destroy()
+        ringtoneGenerator.destroy()
         contactPickerDialog.dialogEventListeners.remove(this)
     }
 
@@ -176,28 +162,23 @@ class MainActivity :
     private fun setupMessageTextField() {
         messageTextField.apply {
             doOnTextChanged { text, _, _, _ ->
-                if (text.toString().contains("%NAME", true)) {
+                if (ringtoneGenerator.setRingtoneMessage(text.toString())) {
                     messageTextLayout.isErrorEnabled = false
-                    ttsManager.setMessage(messageTextField.text.toString())
                 } else {
                     messageTextLayout.isErrorEnabled = true
                     messageTextLayout.error = "Message should contain '%NAME' to use the name of the contact."
                 }
             }
         }
-        ttsManager.setMessage(messageTextField.text.toString())
+        ringtoneGenerator.setRingtoneMessage(messageTextField.text.toString())
     }
 
     private fun setupVoicePickerSpinner() {
-        val voices = ttsManager.getAvailableVoices(Locale.getDefault())!!
+        val voices = ringtoneGenerator.getAvailableVoices(Locale.getDefault())!!
         if (voices.isNotEmpty()) {
             voicePickerSpinner.apply {
                 Log.d("VoicePickerSpinner", "Found ${voices.count()} voices")
-                adapter =
-                    VoiceSpinnerAdapter(
-                        context,
-                        voices
-                    )
+                adapter = VoiceSpinnerAdapter(context, voices)
                 onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                     override fun onItemSelected(
                         parent: AdapterView<*>?,
@@ -206,12 +187,13 @@ class MainActivity :
                         id: Long
                     ) {
                         val voice = voices[position]
-                        ttsManager.setVoice(voice)
+                        ringtoneGenerator.setVoice(voice)
                     }
 
                     override fun onNothingSelected(parent: AdapterView<*>?) {}
                 }
                 setSelection(0)
+                visibility = View.VISIBLE
             }
             voicePickerView.visibility = View.VISIBLE
         } else {
@@ -249,7 +231,7 @@ class MainActivity :
 
     private fun voiceSpeedSliderChange(actualMultiplier: Float) {
         voiceSpeedText.text = getString(R.string.speech_rate_multiplier_text, actualMultiplier)
-        ttsManager.setSpeechRate(actualMultiplier)
+        ringtoneGenerator.setSpeechRate(actualMultiplier)
     }
 
     companion object {

@@ -10,7 +10,7 @@ import com.boswelja.contactringtonegenerator.contacts.ContactRingtone
 object MediaStoreManager {
 
     fun scanNewFiles(context: Context, contactRingtones: List<ContactRingtone>) {
-        val outFiles = contactRingtones.map { it.ringtonePath }.toTypedArray()
+        val outFiles = contactRingtones.map { it.ringtoneFile.absolutePath }.toTypedArray()
         Log.d("MediaStoreManager", "Scanning ${outFiles.size} new files..")
         if (!outFiles.isNullOrEmpty()) {
             MediaScannerConnection(context, object : MediaScannerConnection.MediaScannerConnectionClient {
@@ -25,7 +25,7 @@ object MediaStoreManager {
 
                 override fun onScanCompleted(path: String?, uri: Uri?) {
                     if (uri != null) {
-                        val contact = contactRingtones.firstOrNull { it.ringtonePath == path }?.contact
+                        val contact = contactRingtones.firstOrNull { it.ringtoneFile.absolutePath == path }?.contact
                         if (contact != null) {
                             ContactManager.setContactRingtone(context, contact, uri)
                         }
