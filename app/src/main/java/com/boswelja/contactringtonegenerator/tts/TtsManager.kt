@@ -1,11 +1,15 @@
 package com.boswelja.contactringtonegenerator.tts
 
+import android.content.ContentValues
 import android.content.Context
+import android.os.Build
+import android.provider.MediaStore
 import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.QUEUE_FLUSH
 import android.speech.tts.TextToSpeech.SUCCESS
 import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
+import com.boswelja.contactringtonegenerator.contacts.ContactManager
 import com.boswelja.contactringtonegenerator.contacts.ContactRingtone
 import com.boswelja.contactringtonegenerator.mediastore.MediaStoreManager
 import java.util.*
@@ -120,6 +124,7 @@ class TtsManager(private val context: Context) :
                 message
         )
         utteranceJobs.add(utteranceJob)
+        contactRingtones.add(contactRingtone)
     }
 
     fun startSynthesizing(): Boolean {

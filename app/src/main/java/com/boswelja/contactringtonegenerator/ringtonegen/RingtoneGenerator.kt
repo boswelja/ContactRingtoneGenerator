@@ -1,6 +1,7 @@
 package com.boswelja.contactringtonegenerator.ringtonegen
 
 import android.content.Context
+import android.os.Build
 import android.os.Environment
 import android.speech.tts.Voice
 import com.boswelja.contactringtonegenerator.contacts.Contact
@@ -11,10 +12,15 @@ import java.io.File
 import java.util.*
 import kotlin.collections.ArrayList
 
-class RingtoneGenerator(private val context: Context) :
+class RingtoneGenerator(context: Context) :
     TtsManager.TtsManagerInterface {
 
-    private val ringtoneDirectory: File = context.getExternalFilesDir(Environment.DIRECTORY_RINGTONES)!!
+    private val ringtoneDirectory: File = if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+        context.getExternalFilesDir(Environment.DIRECTORY_RINGTONES)!!
+    } else {
+        File(Environment.getExternalStorageDirectory(), "Ringtones")
+    }
+
     private val ttsManager = TtsManager(context)
     private val contactRingtones = ArrayList<ContactRingtone>()
     private val progressListeners = ArrayList<ProgressListener>()
