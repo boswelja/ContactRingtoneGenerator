@@ -1,13 +1,12 @@
 package com.boswelja.contactringtonegenerator.ui
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatCheckBox
-import androidx.appcompat.widget.AppCompatTextView
+import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
+import com.boswelja.contactringtonegenerator.databinding.ContactPickerItemBinding
 
 class ContactPickerAdapter : RecyclerView.Adapter<ContactPickerAdapter.ContactViewHolder>() {
 
@@ -23,26 +22,29 @@ class ContactPickerAdapter : RecyclerView.Adapter<ContactPickerAdapter.ContactVi
         if (layoutInflater == null) {
             layoutInflater = LayoutInflater.from(parent.context)
         }
-        return ContactViewHolder(layoutInflater!!.inflate(R.layout.contact_picker_item, parent, false))
+
+        return ContactViewHolder(DataBindingUtil.inflate(layoutInflater!!,
+            R.layout.contact_picker_item, parent, false))
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         val contact = contacts[position]
-        holder.checkbox.isChecked = selectedContacts.contains(contact)
+        holder.bind(
+            if (useNicknames) {
+                contact.contactNickname ?: contact.contactName
+            } else {
+                contact.contactName
+            },
+            selectedContacts.contains(contact)
+        )
         holder.itemView.setOnClickListener {
-            if (holder.checkbox.isChecked) {
+            if (holder.isChecked) {
                 selectedContacts.remove(contact)
-                holder.checkbox.isChecked = false
+                holder.isChecked = false
             } else {
                 selectedContacts.add(contact)
-                holder.checkbox.isChecked = true
+                holder.isChecked = true
             }
-        }
-
-        holder.contactNameView.text = if (useNicknames) {
-            contact.contactNickname ?: contact.contactName
-        } else {
-            contact.contactName
         }
     }
 
@@ -77,8 +79,16 @@ class ContactPickerAdapter : RecyclerView.Adapter<ContactPickerAdapter.ContactVi
         notifyDataSetChanged()
     }
 
-    class ContactViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        val checkbox: AppCompatCheckBox = itemView.findViewById(R.id.checkbox)
-        val contactNameView: AppCompatTextView = itemView.findViewById(R.id.contact_name)
+    class ContactViewHolder(private val binding: ContactPickerItemBinding) : RecyclerView.ViewHolder(binding.root) {
+
+        var isChecked: Boolean get() = binding.checkbox.isChecked
+        set(value) { binding.checkbox.isChecked = value }
+
+        fun bind(contactNameString: String, selected: Boolean) {
+            binding.apply {
+                contactName.text = contactNameString
+                checkbox.isChecked = selected
+            }
+        }
     }
 }
