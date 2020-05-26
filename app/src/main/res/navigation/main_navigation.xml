@@ -13,10 +13,18 @@
         tools:layout="@layout/fragment_get_started" >
         <action
             android:id="@+id/to_contactPickerFragment"
-            app:destination="@id/contactPickerFragment" />
+            app:destination="@id/contactPickerFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/to_advancedModeFragment"
-            app:destination="@id/advancedModeFragment" />
+            app:destination="@id/advancedModeFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/contactPickerFragment"
@@ -25,7 +33,11 @@
         tools:layout="@layout/fragment_contact_picker" >
         <action
             android:id="@+id/to_ringtoneCreatorFragment"
-            app:destination="@id/ringtoneCreatorFragment" />
+            app:destination="@id/ringtoneCreatorFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/ringtoneCreatorFragment"
@@ -33,7 +45,11 @@
         android:label="RingtoneCreatorFragment" >
         <action
             android:id="@+id/to_loadingFragment"
-            app:destination="@id/loadingFragment" />
+            app:destination="@id/loadingFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/errorFragment"
@@ -49,10 +65,18 @@
         android:label="LoadingFragment" >
         <action
             android:id="@+id/to_successFragment"
-            app:destination="@id/successFragment" />
+            app:destination="@id/successFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popExitAnim="@anim/slide_out_right" />
         <action
             android:id="@+id/to_errorFragment"
-            app:destination="@id/errorFragment" />
+            app:destination="@id/errorFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/advancedModeFragment"
