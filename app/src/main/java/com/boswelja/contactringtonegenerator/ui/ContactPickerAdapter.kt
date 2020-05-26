@@ -2,9 +2,7 @@ package com.boswelja.contactringtonegenerator.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ContactPickerItemBinding
 
@@ -23,8 +21,7 @@ class ContactPickerAdapter : RecyclerView.Adapter<ContactPickerAdapter.ContactVi
             layoutInflater = LayoutInflater.from(parent.context)
         }
 
-        return ContactViewHolder(DataBindingUtil.inflate(layoutInflater!!,
-            R.layout.contact_picker_item, parent, false))
+        return ContactViewHolder(ContactPickerItemBinding.inflate(layoutInflater!!, parent, false))
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {

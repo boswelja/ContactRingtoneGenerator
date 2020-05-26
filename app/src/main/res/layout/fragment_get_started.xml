@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_margin="@dimen/content_side_margins">
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/welcome_to_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:textAlignment="center"
+        android:text="@string/welcome_to"
+        android:textColor="?android:textColorSecondary"
+        app:layout_constraintTop_toTopOf="parent"
+        style="@style/TextAppearance.MaterialComponents.Headline5" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/app_name_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textAlignment="center"
+        android:text="@string/app_name"
+        android:textColor="?android:textColorPrimary"
+        app:layout_constraintTop_toBottomOf="@id/welcome_to_view"
+        style="@style/TextAppearance.MaterialComponents.Headline4" />
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/get_started_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/navigate_forward_desc"
+        app:srcCompat="@drawable/ic_navigate_forward"
+        app:layout_constraintTop_toBottomOf="@id/app_name_view"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/get_started_view"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"/>
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/get_started_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="16dp"
+        android:text="@string/get_started"
+        app:layout_constraintTop_toTopOf="@id/get_started_button"
+        app:layout_constraintBottom_toBottomOf="@id/get_started_button"
+        app:layout_constraintEnd_toStartOf="@id/get_started_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        style="@style/TextAppearance.MaterialComponents.Headline5" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/advanced_mode_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Advanced Mode"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toEndOf="@id/advanced_mode_text"
+        app:layout_constraintEnd_toEndOf="parent"
+        style="@style/Widget.MaterialComponents.Button.TextButton" />
+
+    <androidx.appcompat.widget.AppCompatTextView
+        android:id="@+id/advanced_mode_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:text="Or continue in"
+        app:layout_constraintTop_toTopOf="@id/advanced_mode_button"
+        app:layout_constraintBottom_toBottomOf="@id/advanced_mode_button"
+        app:layout_constraintEnd_toStartOf="@id/advanced_mode_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        style="@style/TextAppearance.MaterialComponents.Body1" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

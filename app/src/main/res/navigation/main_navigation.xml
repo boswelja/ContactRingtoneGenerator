@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main_navigation"
+    app:startDestination="@id/getStartedFragment">
+
+    <fragment
+        android:id="@+id/getStartedFragment"
+        android:name="com.boswelja.contactringtonegenerator.ui.GetStartedFragment"
+        android:label="GetStartedFragment"
+        tools:layout="@layout/fragment_get_started" >
+        <action
+            android:id="@+id/to_contactPickerFragment"
+            app:destination="@id/contactPickerFragment" />
+        <action
+            android:id="@+id/to_advancedModeFragment"
+            app:destination="@id/advancedModeFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/contactPickerFragment"
+        android:name="com.boswelja.contactringtonegenerator.ui.ContactPickerFragment"
+        android:label="ContactPickerFragment"
+        tools:layout="@layout/fragment_contact_picker" >
+        <action
+            android:id="@+id/to_ringtoneCreatorFragment"
+            app:destination="@id/ringtoneCreatorFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/ringtoneCreatorFragment"
+        android:name="com.boswelja.contactringtonegenerator.ui.RingtoneCreatorFragment"
+        android:label="RingtoneCreatorFragment" >
+        <action
+            android:id="@+id/to_loadingFragment"
+            app:destination="@id/loadingFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/errorFragment"
+        android:name="com.boswelja.contactringtonegenerator.ui.ErrorFragment"
+        android:label="ErrorFragment" />
+    <fragment
+        android:id="@+id/successFragment"
+        android:name="com.boswelja.contactringtonegenerator.ui.SuccessFragment"
+        android:label="SuccessFragment" />
+    <fragment
+        android:id="@+id/loadingFragment"
+        android:name="com.boswelja.contactringtonegenerator.ui.LoadingFragment"
+        android:label="LoadingFragment" >
+        <action
+            android:id="@+id/to_successFragment"
+            app:destination="@id/successFragment" />
+        <action
+            android:id="@+id/to_errorFragment"
+            app:destination="@id/errorFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/advancedModeFragment"
+        android:name="com.boswelja.contactringtonegenerator.ui.AdvancedModeFragment"
+        android:label="AdvancedModeFragment"
+        tools:layout="@layout/fragment_advanced_mode" />
+</navigation>

@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">Contact Ringtone Generator</string>
 
+    <string name="welcome_to">Welcome to</string>
+    <string name="get_started">Let\'s get started</string>
+    <string name="navigate_forward_desc">Continue</string>
+
+    <string name="contact_picker_missing_permission">We need your permission to see your contacts, and set their ringtone</string>
     <string name="selected_contacts_title">Select Contacts</string>
 
     <string name="contact_picker_dialog_title">@string/selected_contacts_title</string>
