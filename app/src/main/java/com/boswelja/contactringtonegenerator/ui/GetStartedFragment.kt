@@ -1,11 +1,14 @@
 package com.boswelja.contactringtonegenerator.ui
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.Navigation
+import androidx.navigation.fragment.findNavController
 import com.boswelja.contactringtonegenerator.databinding.FragmentGetStartedBinding
 
 class GetStartedFragment : Fragment() {
@@ -19,7 +22,15 @@ class GetStartedFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.apply {
-            getStartedButton.setOnClickListener(Navigation.createNavigateOnClickListener(GetStartedFragmentDirections.toContactPickerFragment()))
+            getStartedButton.setOnClickListener {
+                val action = if (context?.checkSelfPermission(Manifest.permission.WRITE_CONTACTS)
+                        == PackageManager.PERMISSION_GRANTED){
+                    GetStartedFragmentDirections.toContactPickerFragment()
+                } else {
+                    GetStartedFragmentDirections.toPermissionFragment(Manifest.permission.WRITE_CONTACTS)
+                }
+                findNavController().navigate(action)
+            }
             advancedModeButton.setOnClickListener(Navigation.createNavigateOnClickListener(GetStartedFragmentDirections.toAdvancedModeFragment()))
         }
     }
