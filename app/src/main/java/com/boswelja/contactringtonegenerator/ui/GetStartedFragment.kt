@@ -23,11 +23,11 @@ class GetStartedFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.apply {
             getStartedButton.setOnClickListener {
-                val action = if (context?.checkSelfPermission(Manifest.permission.WRITE_CONTACTS)
+                val action = if (context?.checkSelfPermission(Manifest.permission.READ_CONTACTS)
                         == PackageManager.PERMISSION_GRANTED){
                     GetStartedFragmentDirections.toContactPickerFragment()
                 } else {
-                    GetStartedFragmentDirections.toPermissionFragment(Manifest.permission.WRITE_CONTACTS)
+                    GetStartedFragmentDirections.toPermissionFragment(Manifest.permission.READ_CONTACTS)
                 }
                 findNavController().navigate(action)
             }

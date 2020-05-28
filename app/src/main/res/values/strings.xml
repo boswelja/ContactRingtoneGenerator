@@ -6,8 +6,10 @@
     <string name="navigate_forward_desc">Continue</string>
 
     <string name="grant">Grant</string>
+    <string name="next">Next</string>
+    <string name="change_selection">Change Selection</string>
 
-    <string name="contact_picker_missing_permission">We need your permission to see your contacts, and set their personal ringtone</string>
+    <string name="contact_picker_missing_permission">We need your permission to see your contacts, so we can retrieve information about them and create a personalised ringtone for them.</string>
     <string name="selected_contacts_title">Select Contacts</string>
 
     <string name="contact_picker_dialog_title">@string/selected_contacts_title</string>

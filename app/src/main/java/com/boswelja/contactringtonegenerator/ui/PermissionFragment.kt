@@ -32,7 +32,7 @@ class PermissionFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.apply {
             when (permission) {
-                Manifest.permission.WRITE_CONTACTS -> {
+                Manifest.permission.READ_CONTACTS -> {
                     permissionDescriptionView.setText(R.string.contact_picker_missing_permission)
                 }
             }
@@ -48,7 +48,7 @@ class PermissionFragment : Fragment() {
                 val granted = grantResults[0] == PackageManager.PERMISSION_GRANTED
                 if (granted) {
                     when (permission) {
-                        Manifest.permission.WRITE_CONTACTS -> {
+                        Manifest.permission.READ_CONTACTS -> {
                             val action = PermissionFragmentDirections.toContactPickerFragment()
                             findNavController().navigate(action)
                         }
