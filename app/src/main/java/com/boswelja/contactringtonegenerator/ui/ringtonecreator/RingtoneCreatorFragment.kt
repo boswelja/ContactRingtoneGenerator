@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ui
+package com.boswelja.contactringtonegenerator.ui.ringtonecreator
 
 import androidx.fragment.app.Fragment
 

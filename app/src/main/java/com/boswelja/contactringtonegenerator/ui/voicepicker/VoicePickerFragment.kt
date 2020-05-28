@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ui
+package com.boswelja.contactringtonegenerator.ui.voicepicker
 
 import android.os.Bundle
 import android.view.LayoutInflater

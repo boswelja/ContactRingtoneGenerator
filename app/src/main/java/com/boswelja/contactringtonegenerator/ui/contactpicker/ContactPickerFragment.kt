@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ui
+package com.boswelja.contactringtonegenerator.ui.contactpicker
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -9,6 +9,8 @@ import androidx.navigation.fragment.findNavController
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.FragmentContactPickerBinding
+import com.boswelja.contactringtonegenerator.ui.ContactPickerFragmentDirections
+import com.boswelja.contactringtonegenerator.ui.advanced.ContactPickerDialog
 
 class ContactPickerFragment : Fragment(), ContactPickerDialog.DialogEventListener {
 
