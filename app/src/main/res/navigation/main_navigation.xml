@@ -9,7 +9,6 @@
     <fragment
         android:id="@+id/getStartedFragment"
         android:name="com.boswelja.contactringtonegenerator.ui.GetStartedFragment"
-        android:label="GetStartedFragment"
         tools:layout="@layout/fragment_get_started" >
         <action
             android:id="@+id/to_contactPickerFragment"
@@ -36,7 +35,6 @@
     <fragment
         android:id="@+id/contactPickerFragment"
         android:name="com.boswelja.contactringtonegenerator.ui.ContactPickerFragment"
-        android:label="ContactPickerFragment"
         tools:layout="@layout/fragment_contact_picker" >
         <action
             android:id="@+id/to_ringtoneCreatorFragment"
@@ -48,8 +46,7 @@
     </fragment>
     <fragment
         android:id="@+id/ringtoneCreatorFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.RingtoneCreatorFragment"
-        android:label="RingtoneCreatorFragment" >
+        android:name="com.boswelja.contactringtonegenerator.ui.RingtoneCreatorFragment" >
         <action
             android:id="@+id/to_loadingFragment"
             app:destination="@id/loadingFragment"
@@ -67,16 +64,13 @@
     </fragment>
     <fragment
         android:id="@+id/errorFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.ErrorFragment"
-        android:label="ErrorFragment" />
+        android:name="com.boswelja.contactringtonegenerator.ui.ErrorFragment" />
     <fragment
         android:id="@+id/successFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.SuccessFragment"
-        android:label="SuccessFragment" />
+        android:name="com.boswelja.contactringtonegenerator.ui.SuccessFragment" />
     <fragment
         android:id="@+id/loadingFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.LoadingFragment"
-        android:label="LoadingFragment" >
+        android:name="com.boswelja.contactringtonegenerator.ui.LoadingFragment" >
         <action
             android:id="@+id/to_successFragment"
             app:destination="@id/successFragment"
@@ -95,12 +89,10 @@
     <fragment
         android:id="@+id/advancedModeFragment"
         android:name="com.boswelja.contactringtonegenerator.ui.AdvancedModeFragment"
-        android:label="AdvancedModeFragment"
         tools:layout="@layout/fragment_advanced_mode" />
     <fragment
         android:id="@+id/permissionFragment"
         android:name="com.boswelja.contactringtonegenerator.ui.PermissionFragment"
-        android:label="PermissionFragment"
         tools:layout="@layout/fragment_permission" >
         <argument
             android:name="permission"
