@@ -100,9 +100,17 @@
     <fragment
         android:id="@+id/permissionFragment"
         android:name="com.boswelja.contactringtonegenerator.ui.PermissionFragment"
-        android:label="PermissionFragment" >
+        android:label="PermissionFragment"
+        tools:layout="@layout/fragment_permission" >
         <argument
-            android:name="permision"
+            android:name="permission"
             app:argType="string" />
+        <action
+            android:id="@+id/to_contactPickerFragment"
+            app:destination="@id/contactPickerFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:exitAnim="@anim/slide_out_left"
+            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
 </navigation>
