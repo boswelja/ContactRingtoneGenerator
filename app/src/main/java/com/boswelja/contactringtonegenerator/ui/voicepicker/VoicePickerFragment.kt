@@ -9,7 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.databinding.FragmentVoicePickerBinding
+import com.boswelja.contactringtonegenerator.databinding.FragmentEasyModeListBinding
 import com.boswelja.contactringtonegenerator.tts.TtsManager
 import com.boswelja.contactringtonegenerator.ui.MainActivity
 import com.boswelja.contactringtonegenerator.ui.common.SectionedAdapter
@@ -19,7 +19,7 @@ class VoicePickerFragment : Fragment(), VoiceSelectedCallback {
 
     private var selectedVoice: Voice? = null
 
-    private lateinit var binding: FragmentVoicePickerBinding
+    private lateinit var binding: FragmentEasyModeListBinding
 
     override fun onPreview(item: Voice) {
         (activity as MainActivity).ttsManager.previewVoice(item, "This is what this voice sounds like")
@@ -29,13 +29,13 @@ class VoicePickerFragment : Fragment(), VoiceSelectedCallback {
         selectedVoice = item
     }
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentVoicePickerBinding.inflate(inflater, container, false)
+        binding = FragmentEasyModeListBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val voices = getVoices((activity as MainActivity).ttsManager)
-        binding.voicesRecyclerView.apply {
+        binding.recyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             adapter = VoicePickerAdapter(requireContext(), voices!!, this@VoicePickerFragment)
         }
