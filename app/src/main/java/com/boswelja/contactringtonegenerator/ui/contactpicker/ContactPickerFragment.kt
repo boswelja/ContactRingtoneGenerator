@@ -41,6 +41,7 @@ class ContactPickerFragment : Fragment(), ContactPickerDialog.DialogEventListene
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         updateSelectedContactsView()
+        updateNextEnabled()
         binding.selectContactsButton.setOnClickListener {
             contactPicker.show(parentFragmentManager)
         }
