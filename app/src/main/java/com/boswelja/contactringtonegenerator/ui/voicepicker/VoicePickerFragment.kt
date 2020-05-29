@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.databinding.FragmentVoicePickerBinding
@@ -37,6 +38,9 @@ class VoicePickerFragment : Fragment(), VoiceSelectedCallback {
         binding.voicesRecyclerView.apply {
             layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             adapter = VoicePickerAdapter(requireContext(), voices!!, this@VoicePickerFragment)
+        }
+        binding.nextButton.setOnClickListener {
+            findNavController().navigate(VoicePickerFragmentDirections.toRingtoneCreatorFragment())
         }
     }
 
