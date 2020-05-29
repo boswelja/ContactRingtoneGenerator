@@ -35,12 +35,16 @@ class VoicePickerFragment : Fragment(), VoiceSelectedCallback {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val voices = getVoices((activity as MainActivity).ttsManager)
-        binding.recyclerView.apply {
-            layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-            adapter = VoicePickerAdapter(requireContext(), voices!!, this@VoicePickerFragment)
-        }
-        binding.nextButton.setOnClickListener {
-            findNavController().navigate(VoicePickerFragmentDirections.toRingtoneCreatorFragment())
+        binding.apply {
+            recyclerView.apply {
+                layoutManager = LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
+                adapter = VoicePickerAdapter(requireContext(), voices!!, this@VoicePickerFragment)
+            }
+            nextButton.setOnClickListener {
+                findNavController().navigate(VoicePickerFragmentDirections.toRingtoneCreatorFragment())
+            }
+            titleView.setText(R.string.voice_picker_title)
+            subtitleView.visibility = View.GONE
         }
     }
 
