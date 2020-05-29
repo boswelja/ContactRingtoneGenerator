@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ui.advanced
+package com.boswelja.contactringtonegenerator.ui.contactpicker
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -6,7 +6,8 @@ import androidx.recyclerview.widget.RecyclerView
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ContactPickerItemBinding
 
-class ContactPickerAdapter : RecyclerView.Adapter<ContactPickerAdapter.ContactViewHolder>() {
+class ContactPickerAdapter(private val listener: ContactSelectionListener? = null) :
+        RecyclerView.Adapter<ContactPickerAdapter.ContactViewHolder>() {
 
     private var layoutInflater: LayoutInflater? = null
     private var useNicknames: Boolean = true
@@ -38,9 +39,11 @@ class ContactPickerAdapter : RecyclerView.Adapter<ContactPickerAdapter.ContactVi
             if (holder.isChecked) {
                 selectedContacts.remove(contact)
                 holder.isChecked = false
+                listener?.onContactDeselected(contact)
             } else {
                 selectedContacts.add(contact)
                 holder.isChecked = true
+                listener?.onContactSelected(contact)
             }
         }
     }

@@ -11,6 +11,7 @@ import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactManager
 import com.boswelja.contactringtonegenerator.databinding.ContactPickerDialogBinding
+import com.boswelja.contactringtonegenerator.ui.contactpicker.ContactPickerAdapter
 
 class ContactPickerDialog : DialogFragment() {
 
@@ -76,7 +77,6 @@ class ContactPickerDialog : DialogFragment() {
                 }
             }
         }
-
     }
 
     private fun updateContacts() {

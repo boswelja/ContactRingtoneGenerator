@@ -35,7 +35,7 @@
     <fragment
         android:id="@+id/contactPickerFragment"
         android:name="com.boswelja.contactringtonegenerator.ui.contactpicker.ContactPickerFragment"
-        tools:layout="@layout/fragment_contact_picker" >
+        tools:layout="@layout/fragment_easy_mode_list" >
         <action
             android:id="@+id/to_voicePickerFragment"
             app:destination="@id/voicePickerFragment"
@@ -107,7 +107,8 @@
     </fragment>
     <fragment
         android:id="@+id/voicePickerFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.voicepicker.VoicePickerFragment" >
+        android:name="com.boswelja.contactringtonegenerator.ui.voicepicker.VoicePickerFragment"
+        tools:layout="@layout/fragment_easy_mode_list" >
         <action
             android:id="@+id/to_ringtoneCreatorFragment"
             app:destination="@id/ringtoneCreatorFragment"
