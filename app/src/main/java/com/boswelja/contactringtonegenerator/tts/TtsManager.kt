@@ -16,6 +16,7 @@ class TtsManager(private val context: Context) :
     UtteranceProgressListener() {
 
     private var tts: TextToSpeech? = null
+    private var restoreVoice: Voice? = null
 
     private val contactRingtones = ArrayList<ContactRingtone>()
     private val utteranceJobs = ArrayList<TtsUtterance>()
@@ -44,6 +45,10 @@ class TtsManager(private val context: Context) :
         val utteranceJob = utteranceJobs.firstOrNull { it.utteranceId == utteranceId }
 
         if (utteranceJob != null) {
+            if (utteranceId == PREVIEW_UTTERANCE_ID && restoreVoice != null) {
+                tts!!.voice = restoreVoice
+                restoreVoice = null
+            }
             for (listener in ttsInterfaces) {
                 listener.onJobFinished(utteranceJob)
             }
@@ -107,9 +112,17 @@ class TtsManager(private val context: Context) :
     }
 
     fun preview(message: String) {
+        previewVoice(tts!!.voice, message)
+    }
+
+    fun previewVoice(voice: Voice, message: String) {
         if (ttsEngineReady) {
+            if (voice != tts!!.voice) {
+                restoreVoice = tts!!.voice
+                tts!!.voice = voice
+            }
             tts!!.speak(message, QUEUE_FLUSH, null,
-                PREVIEW_UTTERANCE_ID
+                    PREVIEW_UTTERANCE_ID
             )
         }
     }

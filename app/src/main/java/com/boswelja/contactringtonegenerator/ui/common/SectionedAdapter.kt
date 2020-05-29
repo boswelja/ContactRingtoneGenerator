@@ -43,7 +43,7 @@ abstract class SectionedAdapter<T>(
     }
 
     abstract fun onCreateItemViewHolder(layoutInflater: LayoutInflater, parent: ViewGroup): RecyclerView.ViewHolder
-    abstract fun onBindItemViewHolder(holder: RecyclerView.ViewHolder, item: T)
+    abstract fun onBindItemViewHolder(holder: RecyclerView.ViewHolder, item: T, position: Int)
 
     override fun getItemCount(): Int =
             sectionCount + itemCount
@@ -75,7 +75,7 @@ abstract class SectionedAdapter<T>(
                     }
                 }
             }
-            else -> onBindItemViewHolder(holder, getItem(position)!!)
+            else -> onBindItemViewHolder(holder, getItem(position)!!, position)
         }
     }
 

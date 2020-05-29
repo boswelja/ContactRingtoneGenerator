@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="@dimen/recyclerview_item_section_height"
+    android:layout_height="48dp"
     android:id="@+id/recyclerview_section_header">
 
     <View
@@ -19,9 +19,9 @@
         android:layout_height="wrap_content"
         android:textColor="@color/colorPrimary"
         android:gravity="center_vertical"
-        android:layout_marginStart="@dimen/recyclerview_item_horizontal_padding"
-        android:paddingStart="@dimen/recyclerview_section_header_text_inset"
-        android:paddingEnd="@dimen/recyclerview_item_horizontal_padding"
+        android:layout_marginStart="16dp"
+        android:paddingStart="48dp"
+        android:paddingEnd="16dp"
         android:layout_marginTop="16dp"
         android:layout_marginBottom="8dp"
         android:maxLines="1"

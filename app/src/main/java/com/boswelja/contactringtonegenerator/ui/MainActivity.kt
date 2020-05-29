@@ -7,14 +7,40 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.databinding.ActivityMainBinding
+import com.boswelja.contactringtonegenerator.tts.TtsManager
+import com.boswelja.contactringtonegenerator.tts.TtsUtterance
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(), TtsManager.TtsManagerInterface {
 
     private lateinit var binding: ActivityMainBinding
+    lateinit var ttsManager: TtsManager
+
+    override fun onTtsReady() {
+    }
+
+    override fun onSynthesisComplete() {
+    }
+
+    override fun onStartSynthesizing(jobCount: Int) {
+    }
+
+    override fun onJobStart(ttsUtterance: TtsUtterance) {
+    }
+
+    override fun onJobFinished(ttsUtterance: TtsUtterance) {
+    }
+
+    override fun onJobError(ttsUtterance: TtsUtterance) {
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        ttsManager = TtsManager(this).also {
+            it.addTtsManagerInterface(this)
+            it.initTts()
+        }
         binding = ActivityMainBinding.inflate(layoutInflater)
+
         setContentView(binding.root)
         setSupportActionBar(binding.toolbar)
         supportActionBar?.apply {

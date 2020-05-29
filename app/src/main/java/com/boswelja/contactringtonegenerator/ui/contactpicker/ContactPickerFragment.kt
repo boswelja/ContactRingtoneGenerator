@@ -9,7 +9,6 @@ import androidx.navigation.fragment.findNavController
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.FragmentContactPickerBinding
-import com.boswelja.contactringtonegenerator.ui.ContactPickerFragmentDirections
 import com.boswelja.contactringtonegenerator.ui.advanced.ContactPickerDialog
 
 class ContactPickerFragment : Fragment(), ContactPickerDialog.DialogEventListener {
@@ -46,7 +45,7 @@ class ContactPickerFragment : Fragment(), ContactPickerDialog.DialogEventListene
             contactPicker.show(parentFragmentManager)
         }
         binding.nextButton.setOnClickListener {
-            findNavController().navigate(ContactPickerFragmentDirections.toRingtoneCreatorFragment())
+            findNavController().navigate(ContactPickerFragmentDirections.toVoicePickerFragment())
         }
     }
 

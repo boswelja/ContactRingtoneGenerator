@@ -97,7 +97,6 @@ class VoiceSpinnerAdapter(context: Context, private val voices: List<Voice>) : S
                 name
             }
         }
-
     }
 
     override fun registerDataSetObserver(observer: DataSetObserver?) {}
