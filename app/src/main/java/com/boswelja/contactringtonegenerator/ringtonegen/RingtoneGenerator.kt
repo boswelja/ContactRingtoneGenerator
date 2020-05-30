@@ -9,7 +9,7 @@ import com.boswelja.contactringtonegenerator.contacts.ContactRingtone
 import com.boswelja.contactringtonegenerator.tts.TtsManager
 import com.boswelja.contactringtonegenerator.tts.TtsUtterance
 import java.io.File
-import java.util.*
+import java.util.Locale
 import kotlin.collections.ArrayList
 
 class RingtoneGenerator(context: Context) :
