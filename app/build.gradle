@@ -61,7 +61,7 @@ spotless {
     kotlin {
         target '**/*.kt'
 
-        ktlint()
+        ktfmt()
         endWithNewline()
 
         licenseHeaderFile '../LICENSE'
