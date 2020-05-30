@@ -4,7 +4,6 @@ plugins {
     id 'kotlin-android-extensions'
     id 'kotlin-kapt'
     id 'androidx.navigation.safeargs.kotlin'
-    id "com.diffplug.gradle.spotless" version "4.0.1"
 }
 
 android {
@@ -55,29 +54,4 @@ dependencies {
     androidTestImplementation "androidx.navigation:navigation-testing:$nav_version"
     androidTestImplementation 'androidx.test.ext:junit:1.1.1'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-}
-
-spotless {
-    kotlin {
-        target '**/*.kt'
-
-        ktfmt()
-        endWithNewline()
-
-        licenseHeaderFile '../LICENSE'
-    }
-    format 'misc', {
-        target '**/*.gradle', '**/.gitignore'
-
-        trimTrailingWhitespace()
-        indentWithSpaces()
-        endWithNewline()
-    }
-    format 'xml', {
-        target '**/*.xml'
-
-        trimTrailingWhitespace()
-        indentWithSpaces()
-        endWithNewline()
-    }
 }
