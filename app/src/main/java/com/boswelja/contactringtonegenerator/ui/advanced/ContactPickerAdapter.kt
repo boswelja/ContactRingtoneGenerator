@@ -4,7 +4,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.boswelja.contactringtonegenerator.contacts.Contact
-import com.boswelja.contactringtonegenerator.databinding.ContactPickerItemBinding
+import com.boswelja.contactringtonegenerator.databinding.ContactPickerDialogItemBinding
 
 class ContactPickerAdapter : RecyclerView.Adapter<ContactPickerAdapter.ContactViewHolder>() {
 
@@ -21,7 +21,7 @@ class ContactPickerAdapter : RecyclerView.Adapter<ContactPickerAdapter.ContactVi
             layoutInflater = LayoutInflater.from(parent.context)
         }
 
-        return ContactViewHolder(ContactPickerItemBinding.inflate(layoutInflater!!, parent, false))
+        return ContactViewHolder(ContactPickerDialogItemBinding.inflate(layoutInflater!!, parent, false))
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
@@ -76,7 +76,7 @@ class ContactPickerAdapter : RecyclerView.Adapter<ContactPickerAdapter.ContactVi
         notifyDataSetChanged()
     }
 
-    class ContactViewHolder(private val binding: ContactPickerItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ContactViewHolder(private val binding: ContactPickerDialogItemBinding) : RecyclerView.ViewHolder(binding.root) {
 
         var isChecked: Boolean get() = binding.checkbox.isChecked
         set(value) { binding.checkbox.isChecked = value }

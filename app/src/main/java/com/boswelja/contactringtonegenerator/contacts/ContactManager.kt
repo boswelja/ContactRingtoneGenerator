@@ -1,10 +1,12 @@
 package com.boswelja.contactringtonegenerator.contacts
 
+import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
 import android.provider.ContactsContract
 import androidx.core.database.getStringOrNull
+
 
 object ContactManager {
 
@@ -63,6 +65,17 @@ object ContactManager {
         }
 
         return nickname
+    }
+
+    fun getContactPhotoUri(context: Context, contactId: Long) : Uri? {
+        val contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId)
+        val photoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
+        val cursor = context.contentResolver.query(photoUri, arrayOf(ContactsContract.Contacts.Photo.PHOTO), null, null, null)
+        if (cursor == null || !cursor.moveToFirst()) {
+            return null
+        }
+        cursor.close()
+        return photoUri
     }
 
     fun setContactRingtone(context: Context, contact: Contact, ringtoneUri: Uri) {

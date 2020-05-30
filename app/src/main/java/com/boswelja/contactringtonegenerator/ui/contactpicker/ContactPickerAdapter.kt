@@ -3,8 +3,10 @@ package com.boswelja.contactringtonegenerator.ui.contactpicker
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
-import com.boswelja.contactringtonegenerator.databinding.ContactPickerItemBinding
+import com.boswelja.contactringtonegenerator.contacts.ContactManager
+import com.boswelja.contactringtonegenerator.databinding.ContactPickerRecyclerviewItemBinding
 
 class ContactPickerAdapter(private val listener: ContactSelectionListener? = null) :
         RecyclerView.Adapter<ContactPickerAdapter.ContactViewHolder>() {
@@ -13,7 +15,7 @@ class ContactPickerAdapter(private val listener: ContactSelectionListener? = nul
     private var useNicknames: Boolean = true
 
     private val contacts = ArrayList<Contact>()
-    val selectedContacts = ArrayList<Contact>()
+    private val selectedContacts = ArrayList<Contact>()
 
     override fun getItemCount(): Int = contacts.count()
 
@@ -22,28 +24,35 @@ class ContactPickerAdapter(private val listener: ContactSelectionListener? = nul
             layoutInflater = LayoutInflater.from(parent.context)
         }
 
-        return ContactViewHolder(ContactPickerItemBinding.inflate(layoutInflater!!, parent, false))
+        return ContactViewHolder(ContactPickerRecyclerviewItemBinding.inflate(layoutInflater!!, parent, false))
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         val contact = contacts[position]
-        holder.bind(
-            if (useNicknames) {
+        val selected = selectedContacts.contains(contact)
+        holder.apply {
+            contactName.text = if (useNicknames) {
                 contact.contactNickname ?: contact.contactName
             } else {
                 contact.contactName
-            },
-            selectedContacts.contains(contact)
-        )
-        holder.itemView.setOnClickListener {
-            if (holder.isChecked) {
-                selectedContacts.remove(contact)
-                holder.isChecked = false
-                listener?.onContactDeselected(contact)
+            }
+            itemView.setOnClickListener {
+                if (holder.isChecked) {
+                    selectedContacts.remove(contact)
+                    holder.isChecked = false
+                    listener?.onContactDeselected(contact)
+                } else {
+                    selectedContacts.add(contact)
+                    holder.isChecked = true
+                    listener?.onContactSelected(contact)
+                }
+            }
+            checkbox.isChecked = selected
+            val photoUri = ContactManager.getContactPhotoUri(holder.itemView.context, contact.id)
+            if (photoUri != null) {
+                contactIcon.setImageURI(photoUri)
             } else {
-                selectedContacts.add(contact)
-                holder.isChecked = true
-                listener?.onContactSelected(contact)
+                contactIcon.setImageResource(R.drawable.ic_default_contact)
             }
         }
     }
@@ -79,16 +88,13 @@ class ContactPickerAdapter(private val listener: ContactSelectionListener? = nul
         notifyDataSetChanged()
     }
 
-    class ContactViewHolder(private val binding: ContactPickerItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ContactViewHolder(private val binding: ContactPickerRecyclerviewItemBinding) : RecyclerView.ViewHolder(binding.root) {
+
+        val contactName = binding.contactName
+        val contactIcon = binding.contactIcon
+        val checkbox = binding.checkbox
 
         var isChecked: Boolean get() = binding.checkbox.isChecked
         set(value) { binding.checkbox.isChecked = value }
-
-        fun bind(contactNameString: String, selected: Boolean) {
-            binding.apply {
-                contactName.text = contactNameString
-                checkbox.isChecked = selected
-            }
-        }
     }
 }
