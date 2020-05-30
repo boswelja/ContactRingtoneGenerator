@@ -39,7 +39,7 @@ class VoiceSpinnerAdapter(context: Context, private val voices: List<Voice>) : S
 
     override fun getDropDownView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val voice = voices[position]
-        val view = convertView ?: layoutInflater.inflate(R.layout.voice_dropdown_view, parent, false)
+        val view = convertView ?: layoutInflater.inflate(R.layout.voice_spinner_dropdown_view, parent, false)
         view.findViewById<AppCompatTextView>(R.id.voice_name).text = getVoiceName(voice)
 
         val qualityString = when (voice.quality) {
@@ -64,7 +64,7 @@ class VoiceSpinnerAdapter(context: Context, private val voices: List<Voice>) : S
 
     override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
         val voice = voices[position]
-        val view = convertView ?: layoutInflater.inflate(R.layout.voice_view, parent, false)
+        val view = convertView ?: layoutInflater.inflate(R.layout.voice_spinner_item_view, parent, false)
         view.findViewById<AppCompatTextView>(R.id.voice_name).text = getVoiceName(voice)
         return view
     }

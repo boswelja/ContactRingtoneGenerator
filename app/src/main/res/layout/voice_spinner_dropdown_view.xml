@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="8dp">
@@ -18,8 +19,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/voice_name"
         android:layout_alignParentStart="true"
-        android:text="Quality: Unknown"
         android:textColor="?android:textColorSecondary"
+        tools:text="Quality: Unknown"
         style="@style/TextAppearance.MaterialComponents.Subtitle1" />
 
     <androidx.appcompat.widget.AppCompatTextView
@@ -28,8 +29,8 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/voice_quality"
         android:layout_alignParentStart="true"
-        android:text="Latency: Unknown"
         android:textColor="?android:textColorSecondary"
+        tools:text="Latency: Unknown"
         style="@style/TextAppearance.MaterialComponents.Subtitle1" />
 
 </RelativeLayout>

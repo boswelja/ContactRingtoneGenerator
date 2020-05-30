@@ -8,7 +8,7 @@ import androidx.appcompat.widget.AppCompatImageButton
 import androidx.appcompat.widget.AppCompatTextView
 import androidx.recyclerview.widget.RecyclerView
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.databinding.VoiceItemViewBinding
+import com.boswelja.contactringtonegenerator.databinding.VoiceRecyclerviewItemViewBinding
 import com.boswelja.contactringtonegenerator.ui.common.SectionedAdapter
 import com.google.android.material.radiobutton.MaterialRadioButton
 
@@ -30,7 +30,7 @@ class VoicePickerAdapter(
     private var selectedItemPosition: Int = 0
 
     override fun onCreateItemViewHolder(layoutInflater: LayoutInflater, parent: ViewGroup): RecyclerView.ViewHolder {
-        val binding = VoiceItemViewBinding.inflate(layoutInflater, parent, false)
+        val binding = VoiceRecyclerviewItemViewBinding.inflate(layoutInflater, parent, false)
         return VoiceViewHolder(binding)
     }
 
@@ -75,7 +75,7 @@ class VoicePickerAdapter(
         listener.onSelected(item)
     }
 
-    class VoiceViewHolder(binding: VoiceItemViewBinding) :
+    class VoiceViewHolder(binding: VoiceRecyclerviewItemViewBinding) :
             RecyclerView.ViewHolder(binding.root) {
 
         val voiceNameView: AppCompatTextView = binding.voiceNameView
