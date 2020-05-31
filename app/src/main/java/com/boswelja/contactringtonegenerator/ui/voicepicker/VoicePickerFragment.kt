@@ -67,12 +67,15 @@ class VoicePickerFragment : Fragment(), VoiceSelectedCallback {
 
     private fun updateVoices(tts: TtsManager) {
         coroutineScope.launch(Dispatchers.IO) {
+            val result = ArrayList<Pair<String, ArrayList<Voice>>>()
+            val defaultSection = Pair<String, ArrayList<Voice>>(SectionedAdapter.SECTION_HEADER_HIDDEN, ArrayList())
+            val defaultVoice = tts.getDefaultVoice()
+                    ?: throw IllegalStateException("TTS engine not initialized")
+            defaultSection.second.add(defaultVoice)
+            result.add(defaultSection)
+
             val voices = tts.getAvailableVoices(Locale.getDefault())
-            if (voices != null) {
-                val defaultSection = Pair<String, ArrayList<Voice>>(SectionedAdapter.SECTION_HEADER_HIDDEN, ArrayList())
-                val defaultVoice = tts.getDefaultVoice()
-                        ?: throw IllegalStateException("TTS engine not initialized")
-                defaultSection.second.add(defaultVoice)
+            if (!voices.isNullOrEmpty()) {
                 val maleSection = Pair<String, ArrayList<Voice>>(getString(R.string.voice_name_male), ArrayList())
                 val femaleSection = Pair<String, ArrayList<Voice>>(getString(R.string.voice_name_female), ArrayList())
                 val undefinedSection = Pair<String, ArrayList<Voice>>("Undefined", ArrayList())
@@ -90,21 +93,19 @@ class VoicePickerFragment : Fragment(), VoiceSelectedCallback {
                         }
                     }
                 }
-                val result = ArrayList<Pair<String, ArrayList<Voice>>>()
-                result.add(defaultSection)
                 if (maleSection.second.isNotEmpty()) result.add(maleSection)
                 if (femaleSection.second.isNotEmpty()) result.add(femaleSection)
                 //result.add(undefinedSection)
-                withContext(Dispatchers.Main) {
-                    binding.recyclerView.adapter =
-                            VoicePickerAdapter(requireContext(), result, this@VoicePickerFragment)
-                    setLoading(false)
-                }
             } else {
                 // Voices list null, engine likely not initialized
 //                withContext(Dispatchers.Main) {
 //                    findNavController().navigate(VoicePickerFragmentDirections.toRingtoneCreatorFragment())
 //                }
+            }
+            withContext(Dispatchers.Main) {
+                binding.recyclerView.adapter =
+                        VoicePickerAdapter(requireContext(), result, this@VoicePickerFragment)
+                setLoading(false)
             }
         }
     }
