@@ -97,6 +97,13 @@ class TtsManager(private val context: Context) :
         return null
     }
 
+    fun getDefaultVoice(): Voice? {
+        if (ttsEngineReady) {
+            return tts?.defaultVoice
+        }
+        return null
+    }
+
     fun setVoice(voice: Voice): Boolean {
         if (ttsEngineReady) {
             return tts!!.setVoice(voice) == SUCCESS
