@@ -31,16 +31,17 @@ object ContactManager {
             val lookupKeyColumn = cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)
             val displayNameColumn = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Identity.DISPLAY_NAME)
             while (cursor.moveToNext()) {
+                val id = cursor.getLong(idColumn)
                 val lookupKey = cursor.getString(lookupKeyColumn)
                 val contact =
                     Contact(
-                        cursor.getLong(idColumn),
-                        lookupKey,
-                        cursor.getString(displayNameColumn),
-                        getContactNickname(
-                            context,
-                            lookupKey
-                        )
+                            id,
+                            lookupKey,
+                            getContactPhotoUri(context, id),
+                            cursor.getString(displayNameColumn),
+                            getContactNickname(
+                                    context,
+                                    lookupKey)
                     )
                 if (!contacts.any { it.id == contact.id }) {
                     contacts.add(contact)
