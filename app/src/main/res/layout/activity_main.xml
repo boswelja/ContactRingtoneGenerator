@@ -17,6 +17,7 @@
             android:layout_width="match_parent"
             android:layout_height="?actionBarSize"
             android:animateLayoutChanges="true"
+            android:background="@color/windowBackground"
             style="@style/Widget.MaterialComponents.Toolbar.Surface" />
 
     </com.google.android.material.appbar.AppBarLayout>
