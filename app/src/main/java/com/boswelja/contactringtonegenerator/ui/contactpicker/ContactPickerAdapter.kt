@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
-import com.boswelja.contactringtonegenerator.contacts.ContactManager
 import com.boswelja.contactringtonegenerator.databinding.ContactPickerRecyclerviewItemBinding
 
 class ContactPickerAdapter(private val listener: ContactSelectionListener? = null) :
@@ -48,9 +47,8 @@ class ContactPickerAdapter(private val listener: ContactSelectionListener? = nul
                 }
             }
             checkbox.isChecked = selected
-            val photoUri = ContactManager.getContactPhotoUri(holder.itemView.context, contact.id)
-            if (photoUri != null) {
-                contactIcon.setImageURI(photoUri)
+            if (contact.photoUri != null) {
+                contactIcon.setImageURI(contact.photoUri)
             } else {
                 contactIcon.setImageResource(R.drawable.ic_default_contact)
             }

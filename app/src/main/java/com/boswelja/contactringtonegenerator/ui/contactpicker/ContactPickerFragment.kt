@@ -11,12 +11,18 @@ import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactManager
 import com.boswelja.contactringtonegenerator.databinding.FragmentEasyModeListBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ContactPickerFragment : Fragment(), ContactSelectionListener {
 
     private val selectedContacts = ArrayList<Contact>()
+    private val coroutineScope = MainScope()
 
     private lateinit var binding: FragmentEasyModeListBinding
+    private val adapter = ContactPickerAdapter(this)
 
     override fun onContactDeselected(contact: Contact) {
         selectedContacts.remove(contact)
@@ -36,6 +42,7 @@ class ContactPickerFragment : Fragment(), ContactSelectionListener {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        setLoading(true)
         updateSelectedContactsView()
         updateNextEnabled()
         binding.apply {
@@ -45,7 +52,7 @@ class ContactPickerFragment : Fragment(), ContactSelectionListener {
             }
             recyclerView.apply {
                 layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-                adapter = ContactPickerAdapter(this@ContactPickerFragment).apply {
+                adapter = this@ContactPickerFragment.adapter.apply {
                     setUseNicknames(true)
                 }
             }
@@ -53,9 +60,26 @@ class ContactPickerFragment : Fragment(), ContactSelectionListener {
         updateContacts()
     }
 
+    private fun setLoading(loading: Boolean) {
+        binding.apply {
+            if (loading) {
+                loadingSpinner.visibility = View.VISIBLE
+                recyclerView.visibility = View.INVISIBLE
+            } else {
+                loadingSpinner.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+            }
+        }
+    }
+
     private fun updateContacts() {
-        (binding.recyclerView.adapter as ContactPickerAdapter)
-                .setContacts(ContactManager.getContacts(requireContext()))
+        coroutineScope.launch(Dispatchers.IO) {
+            val contacts = ContactManager.getContacts(requireContext())
+            withContext(Dispatchers.Main) {
+                adapter.setContacts(contacts)
+                setLoading(false)
+            }
+        }
     }
 
     private fun updateSelectedContactsView() {
