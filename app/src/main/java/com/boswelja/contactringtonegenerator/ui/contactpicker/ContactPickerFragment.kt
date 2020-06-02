@@ -11,6 +11,7 @@ import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactManager
 import com.boswelja.contactringtonegenerator.databinding.FragmentEasyModeListBinding
+import com.boswelja.contactringtonegenerator.ui.MainActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -46,7 +47,6 @@ class ContactPickerFragment : Fragment(), ContactSelectionListener {
         updateSelectedContactsView()
         updateNextEnabled()
         binding.apply {
-            titleView.setText(R.string.contact_picker_title)
             nextButton.setOnClickListener {
                 findNavController().navigate(ContactPickerFragmentDirections.toVoicePickerFragment())
             }
@@ -58,6 +58,11 @@ class ContactPickerFragment : Fragment(), ContactSelectionListener {
             }
         }
         updateContacts()
+    }
+
+    override fun onStop() {
+        super.onStop()
+        removeSubtitle()
     }
 
     private fun setLoading(loading: Boolean) {
@@ -84,8 +89,17 @@ class ContactPickerFragment : Fragment(), ContactSelectionListener {
 
     private fun updateSelectedContactsView() {
         val count = selectedContacts.count()
-        binding.subtitleView.text =
-                resources.getQuantityString(R.plurals.selected_contacts_summary, count, count)
+        val activity = requireActivity()
+        if (activity is MainActivity) {
+            activity.setSubtitle(resources.getQuantityString(R.plurals.selected_contacts_summary, count, count))
+        }
+    }
+
+    private fun removeSubtitle() {
+        val activity = requireActivity()
+        if (activity is MainActivity) {
+            activity.setSubtitle(null)
+        }
     }
 
     private fun updateNextEnabled() {

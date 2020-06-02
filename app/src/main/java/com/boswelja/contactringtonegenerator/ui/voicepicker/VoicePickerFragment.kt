@@ -47,8 +47,6 @@ class VoicePickerFragment : Fragment(), VoiceSelectedCallback {
             nextButton.setOnClickListener {
                 findNavController().navigate(VoicePickerFragmentDirections.toRingtoneCreatorFragment())
             }
-            titleView.setText(R.string.voice_picker_title)
-            subtitleView.visibility = View.GONE
         }
         updateVoices((activity as MainActivity).ttsManager)
     }

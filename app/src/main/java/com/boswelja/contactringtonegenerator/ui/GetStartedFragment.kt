@@ -33,5 +33,9 @@ class GetStartedFragment : Fragment() {
             }
             advancedModeButton.setOnClickListener(Navigation.createNavigateOnClickListener(GetStartedFragmentDirections.toAdvancedModeFragment()))
         }
+        val activity = requireActivity()
+        if (activity is MainActivity) {
+            activity.removeTitle()
+        }
     }
 }
