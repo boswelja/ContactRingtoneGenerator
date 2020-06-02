@@ -1,5 +1,6 @@
 package com.boswelja.contactringtonegenerator.ui
 
+import android.animation.LayoutTransition
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
@@ -51,6 +52,17 @@ class MainActivity : AppCompatActivity(), TtsManager.TtsManagerInterface {
         if (navController != null) {
             val appBarConfiguration = AppBarConfiguration(navController.graph)
             binding.toolbar.setupWithNavController(navController, appBarConfiguration)
+        }
+    }
+
+    fun removeTitle() {
+        binding.toolbar.title = null
+    }
+
+    fun setSubtitle(subtitle: String?) {
+        binding.toolbar.apply {
+            this.subtitle = subtitle
+            layoutTransition = LayoutTransition()
         }
     }
 }
