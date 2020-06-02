@@ -27,7 +27,7 @@ class AdapterGestureHelper(val adapter: RingtoneCreatorAdapter) :
 
     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
         val position = viewHolder.adapterPosition
-        adapter.removeitem(position)
+        adapter.removeItem(position)
     }
 
     override fun onSelectedChanged(viewHolder: RecyclerView.ViewHolder?, actionState: Int) {

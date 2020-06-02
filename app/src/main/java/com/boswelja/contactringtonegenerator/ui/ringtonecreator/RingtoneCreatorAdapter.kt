@@ -7,7 +7,8 @@ import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorItemBind
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.BaseItem
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.ID
 
-class RingtoneCreatorAdapter : RecyclerView.Adapter<BaseViewHolder>() {
+class RingtoneCreatorAdapter(private val listener: ItemEventListener) :
+        RecyclerView.Adapter<BaseViewHolder>() {
 
     private val items: ArrayList<BaseItem> = ArrayList()
 
@@ -41,6 +42,7 @@ class RingtoneCreatorAdapter : RecyclerView.Adapter<BaseViewHolder>() {
 
     fun addItem(item: BaseItem) {
         if (items.add(item)) {
+            listener.onItemAdded()
             notifyItemInserted(items.lastIndex)
         }
     }
@@ -51,8 +53,14 @@ class RingtoneCreatorAdapter : RecyclerView.Adapter<BaseViewHolder>() {
         notifyItemMoved(fromPosition, toPosition)
     }
 
-    fun removeitem(position: Int) {
+    fun removeItem(position: Int) {
         items.removeAt(position)
         notifyItemRemoved(position)
+        listener.onItemRemoved(items.isEmpty())
+    }
+
+    interface ItemEventListener {
+        fun onItemAdded()
+        fun onItemRemoved(isEmpty: Boolean)
     }
 }

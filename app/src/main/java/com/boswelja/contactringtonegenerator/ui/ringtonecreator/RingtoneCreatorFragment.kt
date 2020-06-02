@@ -12,9 +12,9 @@ import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorAvailabl
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.Utils.ALL_ITEMS
 import com.google.android.material.chip.Chip
 
-class RingtoneCreatorFragment : Fragment() {
+class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.ItemEventListener {
 
-    private val adapter = RingtoneCreatorAdapter()
+    private val adapter = RingtoneCreatorAdapter(this)
 
     private val onAvailableItemClickListener = View.OnClickListener {
         if (it is Chip) {
@@ -25,6 +25,14 @@ class RingtoneCreatorFragment : Fragment() {
     }
 
     private lateinit var binding: FragmentRingtoneCreatorBinding
+
+    override fun onItemAdded() {
+        setMessageHasContent(true)
+    }
+
+    override fun onItemRemoved(isEmpty: Boolean) {
+        setMessageHasContent(!isEmpty)
+    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
         binding = FragmentRingtoneCreatorBinding.inflate(inflater, container, false)
