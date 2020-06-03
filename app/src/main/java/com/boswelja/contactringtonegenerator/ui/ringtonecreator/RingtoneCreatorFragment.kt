@@ -28,6 +28,7 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.ItemEventList
 
     override fun onItemAdded() {
         setMessageHasContent(true)
+        binding.messageBuilderView.smoothScrollToPosition(adapter.itemCount - 1)
     }
 
     override fun onItemRemoved(isEmpty: Boolean) {
