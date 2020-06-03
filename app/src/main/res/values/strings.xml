@@ -39,4 +39,5 @@
     <string name="average">Average</string>
     <string name="low">Low</string>
     <string name="very_low">Very Low</string>
+    <string name="ringtone_creator_no_content">Choose an item below to start building your ringtone</string>
 </resources>
