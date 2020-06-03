@@ -9,6 +9,10 @@ import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.BaseItem
 
 class ContactNameViewHolder(binding: RingtoneCreatorItemBinding) : BaseViewHolder(binding) {
 
+    init {
+        initWidgetView()
+    }
+
     override fun createWidgetView(): View {
         return AppCompatTextView(itemView.context).apply {
             layoutParams = ViewGroup.LayoutParams(
@@ -19,7 +23,6 @@ class ContactNameViewHolder(binding: RingtoneCreatorItemBinding) : BaseViewHolde
 
 
     override fun bind(item: BaseItem) {
-        super.bind(item)
         (widgetView as AppCompatTextView).text = item.getLabel()
     }
 }

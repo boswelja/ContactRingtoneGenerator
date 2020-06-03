@@ -28,7 +28,7 @@ class RingtoneCreatorAdapter(private val listener: ItemEventListener) :
                 ContactNameViewHolder(itemBinding)
             }
             ID.TEXT_ITEM.id.toInt() -> {
-                CustomTextViewHolder(itemBinding)
+                CustomTextViewHolder(this, itemBinding)
             }
             else -> throw Exception("Invalid item in adapter")
         }
