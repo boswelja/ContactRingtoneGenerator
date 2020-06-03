@@ -50,7 +50,11 @@ class MainActivity : AppCompatActivity(), TtsManager.TtsManagerInterface {
 
         val navController = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container)?.findNavController()
         if (navController != null) {
-            val appBarConfiguration = AppBarConfiguration(navController.graph)
+            val appBarConfiguration = AppBarConfiguration(setOf(
+                    R.id.getStartedFragment,
+                    R.id.loadingFragment
+            ))
+
             binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         }
     }
