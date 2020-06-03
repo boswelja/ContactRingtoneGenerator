@@ -32,6 +32,13 @@ class CustomTextViewHolder(
                         InputType.TYPE_TEXT_FLAG_CAP_SENTENCES or
                         InputType.TYPE_TEXT_FLAG_MULTI_LINE or
                         InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
+                doAfterTextChanged {
+                    val item = adapter.getItem(adapterPosition)
+                    if (item is TextItem) {
+                        item.text = it.toString()
+                        adapter.setIsDataValid(adapterPosition, item.text.isNotBlank())
+                    }
+                }
             }.also {
                 addView(it)
             }

@@ -15,7 +15,7 @@ import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.TextItem
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.Utils.ALL_ITEMS
 import com.google.android.material.chip.Chip
 
-class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.ItemEventListener {
+class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventListener {
 
     private val adapter = RingtoneCreatorAdapter(this)
 
@@ -39,6 +39,10 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.ItemEventList
 
     override fun onItemRemoved(isEmpty: Boolean) {
         setMessageHasContent(!isEmpty)
+    }
+
+    override fun onDataValidityChanged(isDataValid: Boolean) {
+        binding.nextButton.isEnabled = isDataValid
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -77,10 +81,8 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.ItemEventList
         binding.apply {
             if (hasContent) {
                 messageNoContentView.visibility = View.GONE
-                nextButton.isEnabled = true
             } else {
                 messageNoContentView.visibility = View.VISIBLE
-                nextButton.isEnabled = false
             }
         }
     }
