@@ -9,6 +9,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.databinding.FragmentRingtoneCreatorBinding
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorAvailableItemBinding
+import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.ContactName
+import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.ID
+import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.TextItem
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.Utils.ALL_ITEMS
 import com.google.android.material.chip.Chip
 
@@ -18,7 +21,10 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.ItemEventList
 
     private val onAvailableItemClickListener = View.OnClickListener {
         if (it is Chip) {
-            val item = ALL_ITEMS.first { item -> item.getLabel() == it.text }
+            val item = when (ALL_ITEMS.first { item -> item.getLabel() == it.text }.id) {
+                ID.CONTACT_NAME -> ContactName()
+                ID.TEXT_ITEM -> TextItem()
+            }
             adapter.addItem(item)
             setMessageHasContent(true)
         }
