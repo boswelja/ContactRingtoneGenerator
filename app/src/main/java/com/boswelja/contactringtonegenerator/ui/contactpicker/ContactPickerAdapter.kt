@@ -2,21 +2,26 @@ package com.boswelja.contactringtonegenerator.ui.contactpicker
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Filter
+import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ContactPickerRecyclerviewItemBinding
+import java.util.Locale
 
 class ContactPickerAdapter(private val listener: ContactSelectionListener? = null) :
-        RecyclerView.Adapter<ContactPickerAdapter.ContactViewHolder>() {
+        RecyclerView.Adapter<ContactPickerAdapter.ContactViewHolder>(), Filterable {
 
     private var layoutInflater: LayoutInflater? = null
     private var useNicknames: Boolean = true
 
-    private val contacts = ArrayList<Contact>()
+    private val allContacts = ArrayList<Contact>()
+    private val filteredContacts = ArrayList<Contact>(allContacts)
     private val selectedContacts = ArrayList<Contact>()
+    private val filter = ItemFilter()
 
-    override fun getItemCount(): Int = contacts.count()
+    override fun getItemCount(): Int = filteredContacts.count()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         if (layoutInflater == null) {
@@ -27,7 +32,7 @@ class ContactPickerAdapter(private val listener: ContactSelectionListener? = nul
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
-        val contact = contacts[position]
+        val contact = filteredContacts[position]
         val selected = selectedContacts.contains(contact)
         holder.apply {
             contactName.text = if (useNicknames) {
@@ -56,7 +61,7 @@ class ContactPickerAdapter(private val listener: ContactSelectionListener? = nul
     }
 
     private fun sortContacts() {
-        contacts.sortBy {
+        filteredContacts.sortBy {
             if (useNicknames) {
                 it.contactNickname ?: it.contactName
             } else {
@@ -64,6 +69,8 @@ class ContactPickerAdapter(private val listener: ContactSelectionListener? = nul
             }
         }
     }
+
+    override fun getFilter(): Filter = filter
 
     fun setUseNicknames(useNicknames: Boolean) {
         if (this.useNicknames != useNicknames) {
@@ -75,18 +82,21 @@ class ContactPickerAdapter(private val listener: ContactSelectionListener? = nul
 
     fun setContacts(newContacts: List<Contact>) {
         ArrayList(newContacts).apply {
-            contacts.retainAll(this)
+            allContacts.retainAll(this)
             selectedContacts.retainAll(this)
-            removeAll(contacts)
+            removeAll(allContacts)
             forEach {
-                contacts.add(it)
+                allContacts.add(it)
             }
         }
+        filteredContacts.clear()
+        filteredContacts.addAll(newContacts)
         sortContacts()
         notifyDataSetChanged()
     }
 
-    class ContactViewHolder(private val binding: ContactPickerRecyclerviewItemBinding) : RecyclerView.ViewHolder(binding.root) {
+    class ContactViewHolder(private val binding: ContactPickerRecyclerviewItemBinding) :
+            RecyclerView.ViewHolder(binding.root) {
 
         val contactName = binding.contactName
         val contactIcon = binding.contactIcon
@@ -94,5 +104,35 @@ class ContactPickerAdapter(private val listener: ContactSelectionListener? = nul
 
         var isChecked: Boolean get() = binding.checkbox.isChecked
         set(value) { binding.checkbox.isChecked = value }
+    }
+
+    inner class ItemFilter : Filter() {
+        override fun performFiltering(constraint: CharSequence?): FilterResults {
+            val defaultData = allContacts
+            val results = FilterResults()
+            if (constraint != null) {
+                val search = constraint.toString().toLowerCase(Locale.ROOT)
+                val filteredData = defaultData.filter {
+                    it.contactName.toLowerCase(Locale.ROOT).contains(search) ||
+                            it.contactNickname?.toLowerCase(Locale.ROOT)?.contains(search) ?: false
+                }
+                results.values = filteredData
+            } else {
+                results.values = defaultData
+            }
+            return results
+        }
+
+        override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
+            if (results != null) {
+                val list = results.values
+                if (list is List<*>) {
+                    val values = list.filterIsInstance<Contact>()
+                    filteredContacts.clear()
+                    filteredContacts.addAll(values)
+                    notifyDataSetChanged()
+                }
+            }
+        }
     }
 }
