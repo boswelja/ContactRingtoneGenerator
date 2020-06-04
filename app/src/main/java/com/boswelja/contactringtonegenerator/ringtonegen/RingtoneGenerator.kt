@@ -28,7 +28,7 @@ class RingtoneGenerator(context: Context) :
 
     private var message: String = ""
 
-    val isReady: Boolean get() = ttsManager.ttsEngineReady && message.isNotEmpty() && contactRingtones.isNotEmpty()
+    val isReady: Boolean get() = ttsManager.isEngineReady && message.isNotEmpty() && contactRingtones.isNotEmpty()
     var useNicknames: Boolean = true
 
     init {

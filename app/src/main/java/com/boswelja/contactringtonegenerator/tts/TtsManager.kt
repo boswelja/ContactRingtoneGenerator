@@ -22,11 +22,11 @@ class TtsManager(private val context: Context) :
     private val utteranceJobs = ArrayList<TtsUtterance>()
     private val ttsInterfaces = ArrayList<TtsManagerInterface>()
 
-    var ttsEngineReady: Boolean = false
+    var isEngineReady: Boolean = false
 
     override fun onInit(status: Int) {
-        ttsEngineReady = status == SUCCESS
-        if (ttsEngineReady) {
+        isEngineReady = status == SUCCESS
+        if (isEngineReady) {
             tts!!.setOnUtteranceProgressListener(this)
         }
         setIsReady()
@@ -79,7 +79,7 @@ class TtsManager(private val context: Context) :
     }
 
     private fun setIsReady() {
-        if (ttsEngineReady) {
+        if (isEngineReady) {
             for (listener in ttsInterfaces) {
                 listener.onTtsReady()
             }
@@ -91,28 +91,28 @@ class TtsManager(private val context: Context) :
     }
 
     fun getAvailableVoices(locale: Locale): List<Voice>? {
-        if (ttsEngineReady) {
+        if (isEngineReady) {
             return tts?.voices?.filter { it.locale == locale }?.sortedBy { it.name }
         }
         return null
     }
 
     fun getDefaultVoice(): Voice? {
-        if (ttsEngineReady) {
+        if (isEngineReady) {
             return tts?.defaultVoice
         }
         return null
     }
 
     fun setVoice(voice: Voice): Boolean {
-        if (ttsEngineReady) {
+        if (isEngineReady) {
             return tts!!.setVoice(voice) == SUCCESS
         }
         return false
     }
 
     fun setSpeechRate(speechRate: Float): Boolean {
-        if (ttsEngineReady) {
+        if (isEngineReady) {
             return tts!!.setSpeechRate(speechRate) == SUCCESS
         }
         return false
@@ -123,7 +123,7 @@ class TtsManager(private val context: Context) :
     }
 
     fun previewVoice(voice: Voice, message: String) {
-        if (ttsEngineReady) {
+        if (isEngineReady) {
             if (voice != tts!!.voice) {
                 restoreVoice = tts!!.voice
                 tts!!.voice = voice
@@ -144,7 +144,7 @@ class TtsManager(private val context: Context) :
     }
 
     fun startSynthesizing(): Boolean {
-        if (ttsEngineReady) {
+        if (isEngineReady) {
             val jobCount = utteranceJobs.count() * 3
             for (listener in ttsInterfaces) {
                 listener.onStartSynthesizing(jobCount)
