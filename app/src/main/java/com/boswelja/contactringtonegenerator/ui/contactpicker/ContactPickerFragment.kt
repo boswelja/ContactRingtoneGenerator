@@ -85,11 +85,13 @@ class ContactPickerFragment : Fragment(), ContactSelectionListener {
             setBackgroundResource(R.drawable.search_background)
             setHint(R.string.search_hint)
             doAfterTextChanged {
+                setLoading(true)
                 adapter.filter.filter(it.toString())
+                setLoading(false)
             }
         }.also {
             ViewCompat.setElevation(it, 2.dp)
-            binding.widgetContainer.addView(it)
+            binding.widgetContainer.addView(it, 0)
         }
     }
 
@@ -97,10 +99,10 @@ class ContactPickerFragment : Fragment(), ContactSelectionListener {
         binding.apply {
             if (loading) {
                 loadingSpinner.visibility = View.VISIBLE
-                recyclerView.visibility = View.INVISIBLE
+                recyclerView.isEnabled = false
             } else {
-                loadingSpinner.visibility = View.GONE
-                recyclerView.visibility = View.VISIBLE
+                loadingSpinner.visibility = View.INVISIBLE
+                recyclerView.isEnabled = true
             }
         }
     }
