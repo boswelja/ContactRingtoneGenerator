@@ -1,35 +1,32 @@
 package com.boswelja.contactringtonegenerator.ui.contactpicker
 
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.view.ViewCompat
 import androidx.core.view.setPadding
 import androidx.core.widget.doAfterTextChanged
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.Extensions.dp
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactManager
-import com.boswelja.contactringtonegenerator.databinding.FragmentEasyModeListBinding
 import com.boswelja.contactringtonegenerator.ui.MainActivity
+import com.boswelja.contactringtonegenerator.ui.common.FragmentEasyModeList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ContactPickerFragment : Fragment(), ContactSelectionListener {
+class ContactPickerFragment : FragmentEasyModeList(), ContactSelectionListener {
 
     private val selectedContacts = ArrayList<Contact>()
     private val coroutineScope = MainScope()
     private val adapter = ContactPickerAdapter(this)
 
     private lateinit var searchBox: AppCompatEditText
-    private lateinit var binding: FragmentEasyModeListBinding
 
     override fun onContactDeselected(contact: Contact) {
         selectedContacts.remove(contact)
@@ -43,10 +40,27 @@ class ContactPickerFragment : Fragment(), ContactSelectionListener {
         updateNextEnabled()
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentEasyModeListBinding.inflate(inflater, container, false)
-        createSearchWidget()
-        return binding.root
+    override fun onCreateWidgetView(): View? {
+        val widgetPadding = 8.dp.toInt()
+        searchBox = AppCompatEditText(context).apply {
+            layoutParams = ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT)
+            setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_search, 0, 0, 0)
+            compoundDrawablePadding = widgetPadding
+            setPadding(widgetPadding)
+            isSingleLine = true
+            setBackgroundResource(R.drawable.search_background)
+            setHint(R.string.search_hint)
+            doAfterTextChanged {
+                setLoading(true)
+                adapter.filter.filter(it.toString())
+                setLoading(false)
+            }
+        }.also {
+            ViewCompat.setElevation(it, 2.dp)
+        }
+        return searchBox
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -70,41 +84,6 @@ class ContactPickerFragment : Fragment(), ContactSelectionListener {
     override fun onStop() {
         super.onStop()
         removeSubtitle()
-    }
-
-    private fun createSearchWidget() {
-        val widgetPadding = 8.dp.toInt()
-        searchBox = AppCompatEditText(context).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT)
-            setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_search, 0, 0, 0)
-            compoundDrawablePadding = widgetPadding
-            setPadding(widgetPadding)
-            isSingleLine = true
-            setBackgroundResource(R.drawable.search_background)
-            setHint(R.string.search_hint)
-            doAfterTextChanged {
-                setLoading(true)
-                adapter.filter.filter(it.toString())
-                setLoading(false)
-            }
-        }.also {
-            ViewCompat.setElevation(it, 2.dp)
-            binding.widgetContainer.addView(it, 0)
-        }
-    }
-
-    private fun setLoading(loading: Boolean) {
-        binding.apply {
-            if (loading) {
-                loadingSpinner.visibility = View.VISIBLE
-                recyclerView.isEnabled = false
-            } else {
-                loadingSpinner.visibility = View.INVISIBLE
-                recyclerView.isEnabled = true
-            }
-        }
     }
 
     private fun updateContacts() {
