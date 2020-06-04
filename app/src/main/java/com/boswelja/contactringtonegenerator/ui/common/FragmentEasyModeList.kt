@@ -9,7 +9,7 @@ import com.boswelja.contactringtonegenerator.databinding.FragmentEasyModeListBin
 
 abstract class FragmentEasyModeList : Fragment() {
 
-    private lateinit var binding: FragmentEasyModeListBinding
+    protected lateinit var binding: FragmentEasyModeListBinding
 
     open fun onCreateWidgetView(): View? = null
 
