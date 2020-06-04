@@ -55,10 +55,10 @@ class VoicePickerFragment : Fragment(), VoiceSelectedCallback {
         binding.apply {
             if (loading) {
                 loadingSpinner.visibility = View.VISIBLE
-                recyclerView.visibility = View.INVISIBLE
+                recyclerView.isEnabled = false
             } else {
-                loadingSpinner.visibility = View.GONE
-                recyclerView.visibility = View.VISIBLE
+                loadingSpinner.visibility = View.INVISIBLE
+                recyclerView.isEnabled = false
             }
         }
     }
@@ -94,11 +94,6 @@ class VoicePickerFragment : Fragment(), VoiceSelectedCallback {
                 if (maleSection.second.isNotEmpty()) result.add(maleSection)
                 if (femaleSection.second.isNotEmpty()) result.add(femaleSection)
                 //result.add(undefinedSection)
-            } else {
-                // Voices list null, engine likely not initialized
-//                withContext(Dispatchers.Main) {
-//                    findNavController().navigate(VoicePickerFragmentDirections.toRingtoneCreatorFragment())
-//                }
             }
             withContext(Dispatchers.Main) {
                 binding.recyclerView.adapter =
