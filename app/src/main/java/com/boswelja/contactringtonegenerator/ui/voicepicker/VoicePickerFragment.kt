@@ -2,16 +2,13 @@ package com.boswelja.contactringtonegenerator.ui.voicepicker
 
 import android.os.Bundle
 import android.speech.tts.Voice
-import android.view.LayoutInflater
 import android.view.View
-import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.databinding.FragmentEasyModeListBinding
 import com.boswelja.contactringtonegenerator.tts.TtsManager
 import com.boswelja.contactringtonegenerator.ui.MainActivity
+import com.boswelja.contactringtonegenerator.ui.common.FragmentEasyModeList
 import com.boswelja.contactringtonegenerator.ui.common.SectionedAdapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -19,13 +16,11 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-class VoicePickerFragment : Fragment(), VoiceSelectedCallback {
+class VoicePickerFragment : FragmentEasyModeList(), VoiceSelectedCallback {
 
     private val coroutineScope = MainScope()
 
     private var selectedVoice: Voice? = null
-
-    private lateinit var binding: FragmentEasyModeListBinding
 
     override fun onPreview(item: Voice) {
         (activity as MainActivity).ttsManager.previewVoice(item, "This is what this voice sounds like")
@@ -33,10 +28,6 @@ class VoicePickerFragment : Fragment(), VoiceSelectedCallback {
 
     override fun onSelected(item: Voice) {
         selectedVoice = item
-    }
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentEasyModeListBinding.inflate(inflater, container, false)
-        return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -49,18 +40,6 @@ class VoicePickerFragment : Fragment(), VoiceSelectedCallback {
             }
         }
         updateVoices((activity as MainActivity).ttsManager)
-    }
-
-    private fun setLoading(loading: Boolean) {
-        binding.apply {
-            if (loading) {
-                loadingSpinner.visibility = View.VISIBLE
-                recyclerView.isEnabled = false
-            } else {
-                loadingSpinner.visibility = View.INVISIBLE
-                recyclerView.isEnabled = false
-            }
-        }
     }
 
     private fun updateVoices(tts: TtsManager) {
