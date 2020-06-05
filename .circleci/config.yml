@@ -8,9 +8,9 @@ commands:
     steps:
       - restore_cache:
           key: deps-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
-      - execute_gradle:
-          task_name: Update Dependencies
-          commands: androidDependencies
+      - run:
+          name: Update Dependencies
+          command: ./gradlew androidDependencies
       - save_cache:
           paths:
             - ~/.gradle
