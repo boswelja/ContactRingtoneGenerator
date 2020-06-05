@@ -3,27 +3,8 @@ version: 2.1
 orbs:
   android: circleci/android@0.2.1
 
-executors:
-  main:
-    working_directory: ~/ContactRingtoneGenerator
-    docker:
-      - image: circleci/android:api-29
-    environment:
-      _JAVA_OPTIONS: -Xmx2g
-      GRADLE_OPTS: -Dkotlin.compiler.execution.strategy=in-process
-
 commands:
-  execute_gradle:
-    parameters:
-      task_name:
-        type: string
-      commands:
-        type: string
-    steps:
-      - run:
-          name: <<parameters.task_name>>
-          command: ./gradlew <<parameters.commands>> --max-workers=2
-  update_deps:
+  update-deps:
     steps:
       - restore_cache:
           key: deps-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
@@ -40,20 +21,20 @@ jobs:
     executor: android/android
     steps:
       - checkout
-      - update_deps
+      - update-deps
       - android/restore-build-cache
-      - execute_gradle:
-          task_name: Build
-          commands: :app:assemble
+      - run:
+          name: Build
+          command: ./gradlew :app:assemble
       - android/save-build-cache
   code_quality_test:
     executor: android/android
     steps:
       - checkout
-      - update_deps
-      - execute_gradle:
-          task_name: Code Quality Check
-          commands: :app:lint
+      - update-deps
+      - run:
+          name: Code Quality Check
+          command: ./gradlew :app:lint
       - store_artifacts:
           path: ./app/build/reports/
 
