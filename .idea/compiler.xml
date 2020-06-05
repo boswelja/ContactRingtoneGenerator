@@ -3,7 +3,6 @@
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="1.8">
       <module name="app" target="1.8" />
-      <module name="Contact_Ringtone_Generator.app" target="1.8" />
     </bytecodeTargetLevel>
   </component>
 </project>

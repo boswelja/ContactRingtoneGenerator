@@ -1,5 +1,8 @@
 version: 2.1
 
+orbs:
+  android: circleci/android@0.2.1
+
 executors:
   main:
     working_directory: ~/ContactRingtoneGenerator
@@ -23,26 +26,28 @@ commands:
   update_deps:
     steps:
       - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
+          key: deps-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
       - execute_gradle:
           task_name: Update Dependencies
           commands: androidDependencies
       - save_cache:
           paths:
             - ~/.gradle
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
+          key: deps-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
 
 jobs:
   build:
-    executor: main
+    executor: android
     steps:
       - checkout
       - update_deps
+      - restore-build-cache
       - execute_gradle:
           task_name: Build
           commands: :app:assemble
+      - save-build-cache
   code_quality_test:
-    executor: main
+    executor: android
     steps:
       - checkout
       - update_deps
