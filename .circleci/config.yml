@@ -37,17 +37,17 @@ commands:
 
 jobs:
   build:
-    executor: android
+    executor: android/android
     steps:
       - checkout
       - update_deps
-      - restore-build-cache
+      - android/restore-build-cache
       - execute_gradle:
           task_name: Build
           commands: :app:assemble
-      - save-build-cache
+      - android/save-build-cache
   code_quality_test:
-    executor: android
+    executor: android/android
     steps:
       - checkout
       - update_deps
