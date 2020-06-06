@@ -2,6 +2,7 @@ package com.boswelja.contactringtonegenerator.ui
 
 import android.animation.LayoutTransition
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -9,44 +10,33 @@ import androidx.navigation.ui.setupWithNavController
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ActivityMainBinding
-import com.boswelja.contactringtonegenerator.tts.TtsManager
-import com.boswelja.contactringtonegenerator.tts.TtsUtterance
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.BaseItem
 
-class MainActivity : AppCompatActivity(), TtsManager.TtsManagerInterface {
+class MainActivity : AppCompatActivity() {
+
+    private val ttsInitListener = TextToSpeech.OnInitListener {
+        when (it) {
+            TextToSpeech.SUCCESS -> {
+
+            }
+            TextToSpeech.ERROR -> {
+
+            }
+        }
+    }
 
     val selectedContacts = ArrayList<Contact>()
     val ringtoneItems = ArrayList<BaseItem>()
 
-    var ttsEngine: String = "com.google.android.tts"
+    var ttsEngine: String? = null
 
     private lateinit var binding: ActivityMainBinding
-    lateinit var ttsManager: TtsManager
-
-    override fun onTtsReady() {
-    }
-
-    override fun onSynthesisComplete() {
-    }
-
-    override fun onStartSynthesizing(jobCount: Int) {
-    }
-
-    override fun onJobStart(ttsUtterance: TtsUtterance) {
-    }
-
-    override fun onJobFinished(ttsUtterance: TtsUtterance) {
-    }
-
-    override fun onJobError(ttsUtterance: TtsUtterance) {
-    }
+    lateinit var tts: TextToSpeech
+        private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ttsManager = TtsManager(this).also {
-            it.addTtsManagerInterface(this)
-            it.initTts()
-        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
@@ -64,6 +54,11 @@ class MainActivity : AppCompatActivity(), TtsManager.TtsManagerInterface {
 
             binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         }
+        initTts()
+    }
+
+    fun initTts() {
+        tts = TextToSpeech(this, ttsInitListener, ttsEngine)
     }
 
     fun removeTitle() {
