@@ -4,18 +4,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.databinding.FragmentRingtoneCreatorBinding
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorAvailableItemBinding
+import com.boswelja.contactringtonegenerator.ui.MainActivity
+import com.boswelja.contactringtonegenerator.ui.common.BaseDataFragment
+import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.BaseItem
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.ContactName
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.ID
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.TextItem
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.Utils.ALL_ITEMS
 import com.google.android.material.chip.Chip
 
-class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventListener {
+class RingtoneCreatorFragment : BaseDataFragment<ArrayList<BaseItem>>(), RingtoneCreatorAdapter.DataEventListener {
 
     private val adapter = RingtoneCreatorAdapter(this)
 
@@ -33,6 +35,15 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
     private var isDataValid: Boolean = true
 
     private lateinit var binding: FragmentRingtoneCreatorBinding
+
+    override fun onSaveData(activity: MainActivity, data: ArrayList<BaseItem>) {
+        activity.ringtoneItems.apply {
+            clear()
+            addAll(data)
+        }
+    }
+
+    override fun requestData(): ArrayList<BaseItem>? = adapter.getItems()
 
     override fun onItemAdded() {
         isDataEmpty = false

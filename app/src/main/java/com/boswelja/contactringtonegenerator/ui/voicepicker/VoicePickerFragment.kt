@@ -16,11 +16,17 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.Locale
 
-class VoicePickerFragment : FragmentEasyModeList(), VoiceSelectedCallback {
+class VoicePickerFragment : FragmentEasyModeList<Voice>(), VoiceSelectedCallback {
 
     private val coroutineScope = MainScope()
 
     private var selectedVoice: Voice? = null
+
+    override fun onSaveData(activity: MainActivity, data: Voice) {
+        activity.ttsManager.setVoice(data)
+    }
+
+    override fun requestData(): Voice? = selectedVoice
 
     override fun onPreview(item: Voice) {
         (activity as MainActivity).ttsManager.previewVoice(item, "This is what this voice sounds like")

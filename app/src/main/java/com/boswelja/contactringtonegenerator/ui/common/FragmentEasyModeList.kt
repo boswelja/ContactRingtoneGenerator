@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.boswelja.contactringtonegenerator.databinding.FragmentEasyModeListBinding
 
-abstract class FragmentEasyModeList : Fragment() {
+abstract class FragmentEasyModeList<T> : BaseDataFragment<T>() {
 
     protected lateinit var binding: FragmentEasyModeListBinding
 

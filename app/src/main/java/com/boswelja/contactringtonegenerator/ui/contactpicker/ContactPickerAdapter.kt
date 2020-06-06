@@ -72,6 +72,8 @@ class ContactPickerAdapter(private val listener: ContactSelectionListener? = nul
 
     override fun getFilter(): Filter = filter
 
+    fun getSelectedContacts(): ArrayList<Contact> = selectedContacts
+
     fun setUseNicknames(useNicknames: Boolean) {
         if (this.useNicknames != useNicknames) {
             this.useNicknames = useNicknames

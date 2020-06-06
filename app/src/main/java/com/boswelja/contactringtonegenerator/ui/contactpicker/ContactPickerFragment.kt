@@ -20,13 +20,22 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ContactPickerFragment : FragmentEasyModeList(), ContactSelectionListener {
+class ContactPickerFragment : FragmentEasyModeList<ArrayList<Contact>>(), ContactSelectionListener {
 
     private val selectedContacts = ArrayList<Contact>()
     private val coroutineScope = MainScope()
     private val adapter = ContactPickerAdapter(this)
 
     private lateinit var searchBox: AppCompatEditText
+
+    override fun requestData(): ArrayList<Contact>? = adapter.getSelectedContacts()
+
+    override fun onSaveData(activity: MainActivity, data: ArrayList<Contact>) {
+        activity.selectedContacts.apply {
+            clear()
+            addAll(data)
+        }
+    }
 
     override fun onContactDeselected(contact: Contact) {
         selectedContacts.remove(contact)
