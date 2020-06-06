@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
         initTts()
     }
 
-    fun initTts() {
+    private fun initTts() {
         tts = TextToSpeech(this, ttsInitListener, ttsEngine)
     }
 
