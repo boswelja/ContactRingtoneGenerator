@@ -28,4 +28,9 @@ abstract class BaseDataFragment<T> : Fragment() {
      * @return The stored data [T], or null if it doesn't exist.
      */
     open fun requestData(): T? = null
+
+    override fun onPause() {
+        super.onPause()
+        saveData()
+    }
 }
