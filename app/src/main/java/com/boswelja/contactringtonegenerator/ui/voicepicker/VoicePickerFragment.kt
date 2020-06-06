@@ -1,12 +1,12 @@
 package com.boswelja.contactringtonegenerator.ui.voicepicker
 
 import android.os.Bundle
+import android.speech.tts.TextToSpeech
 import android.speech.tts.Voice
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.tts.TtsManager
 import com.boswelja.contactringtonegenerator.ui.MainActivity
 import com.boswelja.contactringtonegenerator.ui.common.FragmentEasyModeList
 import com.boswelja.contactringtonegenerator.ui.common.SectionedAdapter
@@ -14,7 +14,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import java.util.Locale
 
 class VoicePickerFragment : FragmentEasyModeList<Voice>(), VoiceSelectedCallback {
 
@@ -23,13 +22,13 @@ class VoicePickerFragment : FragmentEasyModeList<Voice>(), VoiceSelectedCallback
     private var selectedVoice: Voice? = null
 
     override fun onSaveData(activity: MainActivity, data: Voice) {
-        activity.ttsManager.setVoice(data)
+        activity.tts.voice = data
     }
 
     override fun requestData(): Voice? = selectedVoice
 
     override fun onPreview(item: Voice) {
-        (activity as MainActivity).ttsManager.previewVoice(item, "This is what this voice sounds like")
+        //(activity as MainActivity).ttsManager.previewVoice(item, "This is what this voice sounds like")
     }
 
     override fun onSelected(item: Voice) {
@@ -45,19 +44,19 @@ class VoicePickerFragment : FragmentEasyModeList<Voice>(), VoiceSelectedCallback
                 findNavController().navigate(VoicePickerFragmentDirections.toRingtoneCreatorFragment())
             }
         }
-        updateVoices((activity as MainActivity).ttsManager)
+        updateVoices((activity as MainActivity).tts)
     }
 
-    private fun updateVoices(tts: TtsManager) {
+    private fun updateVoices(tts: TextToSpeech) {
         coroutineScope.launch(Dispatchers.IO) {
             val result = ArrayList<Pair<String, ArrayList<Voice>>>()
             val defaultSection = Pair<String, ArrayList<Voice>>(SectionedAdapter.SECTION_HEADER_HIDDEN, ArrayList())
-            val defaultVoice = tts.getDefaultVoice()
+            val defaultVoice = tts.defaultVoice
                     ?: throw IllegalStateException("TTS engine not initialized")
             defaultSection.second.add(defaultVoice)
             result.add(defaultSection)
 
-            val voices = tts.getAvailableVoices(Locale.getDefault())
+            val voices = tts.voices
             if (!voices.isNullOrEmpty()) {
                 val maleSection = Pair<String, ArrayList<Voice>>(getString(R.string.voice_name_male), ArrayList())
                 val femaleSection = Pair<String, ArrayList<Voice>>(getString(R.string.voice_name_female), ArrayList())
