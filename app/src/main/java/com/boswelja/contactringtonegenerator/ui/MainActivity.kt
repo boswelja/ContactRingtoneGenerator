@@ -29,6 +29,12 @@ class MainActivity : AppCompatActivity() {
     val ringtoneItems = ArrayList<BaseItem>()
 
     var ttsEngine: String? = null
+        set(value) {
+            if (field != value) {
+                field = value
+                initTts()
+            }
+        }
 
     private lateinit var binding: ActivityMainBinding
     lateinit var tts: TextToSpeech
