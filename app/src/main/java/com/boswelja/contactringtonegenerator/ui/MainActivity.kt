@@ -7,11 +7,18 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.boswelja.contactringtonegenerator.R
+import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ActivityMainBinding
 import com.boswelja.contactringtonegenerator.tts.TtsManager
 import com.boswelja.contactringtonegenerator.tts.TtsUtterance
+import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.BaseItem
 
 class MainActivity : AppCompatActivity(), TtsManager.TtsManagerInterface {
+
+    val selectedContacts = ArrayList<Contact>()
+    val ringtoneItems = ArrayList<BaseItem>()
+
+    var ttsEngine: String = "com.google.android.tts"
 
     private lateinit var binding: ActivityMainBinding
     lateinit var ttsManager: TtsManager
