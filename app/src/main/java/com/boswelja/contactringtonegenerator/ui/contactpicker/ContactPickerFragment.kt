@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.Extensions.dp
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
-import com.boswelja.contactringtonegenerator.contacts.ContactManager
+import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.ui.MainActivity
 import com.boswelja.contactringtonegenerator.ui.common.FragmentEasyModeList
 import kotlinx.coroutines.Dispatchers
@@ -97,7 +97,7 @@ class ContactPickerFragment : FragmentEasyModeList<ArrayList<Contact>>(), Contac
 
     private fun updateContacts() {
         coroutineScope.launch(Dispatchers.IO) {
-            val contacts = ContactManager.getContacts(requireContext())
+            val contacts = ContactsHelper.getContacts(requireContext())
             withContext(Dispatchers.Main) {
                 adapter.setContacts(contacts)
                 setLoading(false)
