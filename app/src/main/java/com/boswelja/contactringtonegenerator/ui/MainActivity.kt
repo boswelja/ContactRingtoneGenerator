@@ -2,7 +2,6 @@ package com.boswelja.contactringtonegenerator.ui
 
 import android.animation.LayoutTransition
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -10,20 +9,12 @@ import androidx.navigation.ui.setupWithNavController
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ActivityMainBinding
+import com.boswelja.contactringtonegenerator.tts.TtsManager
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.BaseItem
 
 class MainActivity : AppCompatActivity() {
 
-    private val ttsInitListener = TextToSpeech.OnInitListener {
-        when (it) {
-            TextToSpeech.SUCCESS -> {
-
-            }
-            TextToSpeech.ERROR -> {
-
-            }
-        }
-    }
+    private val ttsManager by lazy { TtsManager(this) }
 
     val selectedContacts = ArrayList<Contact>()
     val ringtoneItems = ArrayList<BaseItem>()
@@ -32,13 +23,11 @@ class MainActivity : AppCompatActivity() {
         set(value) {
             if (field != value) {
                 field = value
-                initTts()
+                ttsManager.setEngine(field)
             }
         }
 
     private lateinit var binding: ActivityMainBinding
-    lateinit var tts: TextToSpeech
-        private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,11 +49,6 @@ class MainActivity : AppCompatActivity() {
 
             binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         }
-        initTts()
-    }
-
-    private fun initTts() {
-        tts = TextToSpeech(this, ttsInitListener, ttsEngine)
     }
 
     fun removeTitle() {

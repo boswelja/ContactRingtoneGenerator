@@ -5,7 +5,6 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.provider.MediaStore
-import android.util.Log
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -42,7 +41,6 @@ object MediaStoreHelper {
                             outStream.write(byte)
                             byte = inStream.read()
                         }
-                        Log.d("MediaStoreManager", "Saved $it")
                         outStream.close()
                     }
                     inStream.close()

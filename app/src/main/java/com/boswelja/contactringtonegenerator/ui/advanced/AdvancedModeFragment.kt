@@ -37,12 +37,12 @@ class AdvancedModeFragment : Fragment(), ContactPickerDialog.DialogEventListener
         contactPickerDialog = ContactPickerDialog()
         contactPickerDialog.dialogEventListeners.add(this)
         ringtoneGenerator = RingtoneGenerator(requireContext())
-        ringtoneGenerator.addEventListener(object : RingtoneGenerator.EventListener {
-            override fun onReady() {
-                setupVoicePickerSpinner()
-                binding.previewButton.isEnabled = true
-            }
-        })
+//        ringtoneGenerator.addEventListener(object : RingtoneGenerator.EventListener {
+//            override fun onReady() {
+//                setupVoicePickerSpinner()
+//                binding.previewButton.isEnabled = true
+//            }
+//        })
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -51,7 +51,6 @@ class AdvancedModeFragment : Fragment(), ContactPickerDialog.DialogEventListener
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        ringtoneGenerator.init()
         binding.apply {
             generateButton.apply {
                 setOnClickListener {
