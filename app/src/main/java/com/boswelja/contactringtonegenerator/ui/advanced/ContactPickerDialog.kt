@@ -9,10 +9,16 @@ import androidx.fragment.app.FragmentManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
-import com.boswelja.contactringtonegenerator.contacts.ContactManager
+import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.databinding.ContactPickerDialogBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ContactPickerDialog : DialogFragment() {
+
+    private val coroutineScope = MainScope()
 
     private var dialog: AlertDialog? = null
     private var useNicknames: Boolean = true
@@ -35,7 +41,6 @@ class ContactPickerDialog : DialogFragment() {
 
         setLoading(true)
         updateContacts()
-        setLoading(false)
     }
 
     private fun createDialog() {
@@ -81,8 +86,13 @@ class ContactPickerDialog : DialogFragment() {
     private fun updateContacts() {
         if (wantsContactUpdate) {
             wantsContactUpdate = false
-            (binding.contactsRecyclerview.adapter as ContactPickerAdapter)
-                .setContacts(ContactManager.getContacts(requireContext()))
+            coroutineScope.launch {
+                (binding.contactsRecyclerview.adapter as ContactPickerAdapter)
+                        .setContacts(ContactsHelper.getContacts(requireContext()))
+                withContext(Dispatchers.Main) {
+                    setLoading(false)
+                }
+            }
         }
     }
 
