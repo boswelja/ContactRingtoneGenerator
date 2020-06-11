@@ -42,13 +42,13 @@ class AudioJoiner {
 
     private suspend fun notifyJobCompleted(id: String) {
         withContext(Dispatchers.Main) {
-            progressListener?.onJoinCompleted(id)
+            progressListener?.onJoinCompleted(true, id)
         }
     }
 
     private suspend fun notifyJobFailed(id: String) {
         withContext(Dispatchers.Main) {
-            progressListener?.onJoinFailed(id)
+            progressListener?.onJoinCompleted(false, id)
         }
     }
 
@@ -59,7 +59,6 @@ class AudioJoiner {
 
     interface JoinProgressListener {
         fun onJoinStarted(jobId: String)
-        fun onJoinCompleted(jobId: String)
-        fun onJoinFailed(jobId: String)
+        fun onJoinCompleted(isSuccessful: Boolean, jobId: String)
     }
 }

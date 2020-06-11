@@ -1,5 +1,6 @@
 package com.boswelja.contactringtonegenerator.tts
 
+import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.ID
 import java.util.concurrent.atomic.AtomicInteger
 
 class SynthesisJob private constructor(val synthesisId: String, val message: String) {
@@ -18,9 +19,11 @@ class SynthesisJob private constructor(val synthesisId: String, val message: Str
     }
 
     companion object {
-        private val utteranceIdCounter = AtomicInteger()
+        private val utteranceIdCounter = AtomicInteger(ID.values().last().id.toInt() + 1)
 
         fun create(message: String): SynthesisJob =
-                SynthesisJob(utteranceIdCounter.incrementAndGet().toString(), message)
+                create(message, utteranceIdCounter.incrementAndGet().toString())
+
+        fun create(message: String, id: String) = SynthesisJob(id, message)
     }
 }
