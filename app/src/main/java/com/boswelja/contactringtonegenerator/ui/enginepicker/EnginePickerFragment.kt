@@ -1,7 +1,6 @@
 package com.boswelja.contactringtonegenerator.ui.enginepicker
 
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
 import android.view.View
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.ui.MainActivity
@@ -37,9 +36,9 @@ class EnginePickerFragment : FragmentEasyModeList<String>() {
         coroutineScope.launch(Dispatchers.Default) {
             val mainActivity = activity
             val engines = if (mainActivity is MainActivity) {
-                mainActivity.tts.engines
+                mainActivity.ttsManager.engines
             } else {
-                emptyList<TextToSpeech.EngineInfo>()
+                emptyList()
             }
             withContext(Dispatchers.Main) {
                 adapter.setEngines(engines)

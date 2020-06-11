@@ -14,8 +14,7 @@ import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.BaseItem
 
 class MainActivity : AppCompatActivity() {
 
-    private val ttsManager by lazy { TtsManager(this) }
-
+    val ttsManager by lazy { TtsManager(this) }
     val selectedContacts = ArrayList<Contact>()
     val ringtoneItems = ArrayList<BaseItem>()
 
