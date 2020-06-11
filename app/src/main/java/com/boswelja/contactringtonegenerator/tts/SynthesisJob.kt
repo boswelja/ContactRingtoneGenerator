@@ -1,6 +1,6 @@
 package com.boswelja.contactringtonegenerator.tts
 
-import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.ID
+import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
 import java.util.concurrent.atomic.AtomicInteger
 
 class SynthesisJob private constructor(val synthesisId: String, val message: String) {

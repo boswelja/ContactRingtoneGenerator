@@ -10,7 +10,7 @@ import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ActivityMainBinding
 import com.boswelja.contactringtonegenerator.tts.TtsManager
-import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.BaseItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 
 class MainActivity : AppCompatActivity() {
 

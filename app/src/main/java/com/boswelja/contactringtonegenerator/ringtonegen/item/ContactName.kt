@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ui.ringtonecreator.item
+package com.boswelja.contactringtonegenerator.ringtonegen.item
 
 class ContactName : BaseItem(ID.CONTACT_NAME) {
 
