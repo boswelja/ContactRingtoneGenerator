@@ -7,7 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import com.boswelja.contactringtonegenerator.databinding.FragmentLoadingBinding
 
-class LoadingFragment : Fragment() {
+class ProgressFragment : Fragment() {
 
     private lateinit var binding: FragmentLoadingBinding
 
