@@ -2,11 +2,9 @@ package com.boswelja.contactringtonegenerator.ringtonegen.item
 
 class ContactName : BaseItem(ID.CONTACT_NAME) {
 
-    override val isDynamic: Boolean = true
-
     override fun getLabel(): String {
         return "Contact Name"
     }
 
-    override fun getEngineText(): String = "contact_name"
+    override fun getEngineText(): String = Constants.CONTACT_NAME_PLACEHOLDER
 }

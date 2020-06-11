@@ -4,8 +4,6 @@ import java.util.Locale
 
 abstract class BaseItem(val id: ID) {
 
-    abstract val isDynamic: Boolean
-
     abstract fun getLabel(): String
     abstract fun getEngineText(): String
 
