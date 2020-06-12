@@ -18,6 +18,8 @@ class MainActivity : AppCompatActivity() {
     val ttsManager by lazy { TtsManager(this) }
     val selectedContacts = ArrayList<Contact>()
     val ringtoneItems = ArrayList<BaseItem>()
+    val canStartGenerating: Boolean
+        get() = ttsManager.isEngineReady && selectedContacts.isNotEmpty() && ringtoneItems.isNotEmpty()
 
     var ringtoneGenerator: RingtoneGenerator? = null
         private set
@@ -69,5 +71,12 @@ class MainActivity : AppCompatActivity() {
     fun createRingtoneManager() {
         ringtoneGenerator?.destroy()
         ringtoneGenerator = RingtoneGenerator(cacheDir, ttsManager, ringtoneItems, selectedContacts)
+    }
+
+    fun generate() {
+        if (canStartGenerating) {
+            createRingtoneManager()
+            ringtoneGenerator!!.start()
+        }
     }
 }

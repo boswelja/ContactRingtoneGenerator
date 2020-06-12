@@ -31,7 +31,6 @@ class GetStartedFragment : Fragment() {
                 }
                 findNavController().navigate(action)
             }
-            advancedModeButton.setOnClickListener(Navigation.createNavigateOnClickListener(GetStartedFragmentDirections.toAdvancedModeFragment()))
         }
         val activity = requireActivity()
         if (activity is MainActivity) {
