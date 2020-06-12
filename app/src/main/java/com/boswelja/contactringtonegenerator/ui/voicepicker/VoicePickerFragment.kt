@@ -1,12 +1,12 @@
 package com.boswelja.contactringtonegenerator.ui.voicepicker
 
 import android.os.Bundle
-import android.speech.tts.TextToSpeech
 import android.speech.tts.Voice
 import android.view.View
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.R
+import com.boswelja.contactringtonegenerator.tts.TtsManager
 import com.boswelja.contactringtonegenerator.ui.MainActivity
 import com.boswelja.contactringtonegenerator.ui.common.FragmentEasyModeList
 import com.boswelja.contactringtonegenerator.ui.common.SectionedAdapter
@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class VoicePickerFragment : FragmentEasyModeList<Voice>(), VoiceSelectedCallback {
 
@@ -22,7 +23,7 @@ class VoicePickerFragment : FragmentEasyModeList<Voice>(), VoiceSelectedCallback
     private var selectedVoice: Voice? = null
 
     override fun onSaveData(activity: MainActivity, data: Voice) {
-        activity.tts.voice = data
+        activity.ttsManager.setVoice(data)
     }
 
     override fun requestData(): Voice? = selectedVoice
@@ -44,19 +45,21 @@ class VoicePickerFragment : FragmentEasyModeList<Voice>(), VoiceSelectedCallback
                 findNavController().navigate(VoicePickerFragmentDirections.toRingtoneCreatorFragment())
             }
         }
-        updateVoices((activity as MainActivity).tts)
+        if (activity is MainActivity) {
+            updateVoices((activity as MainActivity).ttsManager)
+        }
     }
 
-    private fun updateVoices(tts: TextToSpeech) {
+    private fun updateVoices(tts: TtsManager) {
         coroutineScope.launch(Dispatchers.IO) {
             val result = ArrayList<Pair<String, ArrayList<Voice>>>()
             val defaultSection = Pair<String, ArrayList<Voice>>(SectionedAdapter.SECTION_HEADER_HIDDEN, ArrayList())
-            val defaultVoice = tts.defaultVoice
+            val defaultVoice = tts.getDefaultVoice()
                     ?: throw IllegalStateException("TTS engine not initialized")
             defaultSection.second.add(defaultVoice)
             result.add(defaultSection)
 
-            val voices = tts.voices
+            val voices = tts.getAvailableVoices(Locale.getDefault())
             if (!voices.isNullOrEmpty()) {
                 val maleSection = Pair<String, ArrayList<Voice>>(getString(R.string.voice_name_male), ArrayList())
                 val femaleSection = Pair<String, ArrayList<Voice>>(getString(R.string.voice_name_female), ArrayList())
