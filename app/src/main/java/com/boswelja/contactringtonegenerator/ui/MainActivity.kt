@@ -9,6 +9,7 @@ import androidx.navigation.ui.setupWithNavController
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ActivityMainBinding
+import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
 import com.boswelja.contactringtonegenerator.tts.TtsManager
 import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 
@@ -18,6 +19,8 @@ class MainActivity : AppCompatActivity() {
     val selectedContacts = ArrayList<Contact>()
     val ringtoneItems = ArrayList<BaseItem>()
 
+    var ringtoneGenerator: RingtoneGenerator? = null
+        private set
     var ttsEngine: String? = null
         set(value) {
             if (field != value) {
@@ -47,6 +50,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        ringtoneGenerator?.destroy()
+    }
+
     fun removeTitle() {
         binding.toolbar.title = null
     }
@@ -56,5 +64,10 @@ class MainActivity : AppCompatActivity() {
             this.subtitle = subtitle
             layoutTransition = LayoutTransition()
         }
+    }
+
+    fun createRingtoneManager() {
+        ringtoneGenerator?.destroy()
+        ringtoneGenerator = RingtoneGenerator(cacheDir, ttsManager, ringtoneItems, selectedContacts)
     }
 }
