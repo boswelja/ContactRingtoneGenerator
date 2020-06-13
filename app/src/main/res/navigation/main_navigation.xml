@@ -17,13 +17,6 @@
             app:popEnterAnim="@anim/slide_in_left"
             app:exitAnim="@anim/slide_out_left"
             app:popExitAnim="@anim/slide_out_right" />
-        <action
-            android:id="@+id/to_permissionFragment"
-            app:destination="@id/permissionFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_left"
-            app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
         android:id="@+id/contactPickerFragment"
@@ -43,57 +36,11 @@
         android:label="Build a Ringtone"
         android:name="com.boswelja.contactringtonegenerator.ui.ringtonecreator.RingtoneCreatorFragment" >
         <action
-            android:id="@+id/to_loadingFragment"
-            app:destination="@id/loadingFragment"
+            android:id="@+id/to_generatingFlow"
+            app:destination="@id/generatingFlow"
             app:enterAnim="@anim/slide_in_right"
-            app:popEnterAnim="@anim/slide_in_left"
             app:exitAnim="@anim/slide_out_left"
-            app:popExitAnim="@anim/slide_out_right" />
-        <action
-            android:id="@+id/to_permissionFragment"
-            app:destination="@id/permissionFragment"
-            app:enterAnim="@anim/slide_in_right"
             app:popEnterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_left"
-            app:popExitAnim="@anim/slide_out_right" />
-    </fragment>
-    <fragment
-        android:id="@+id/errorFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.ErrorFragment" />
-    <fragment
-        android:id="@+id/successFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.SuccessFragment" />
-    <fragment
-        android:id="@+id/loadingFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.ProgressFragment" >
-        <action
-            android:id="@+id/to_successFragment"
-            app:destination="@id/successFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_left"
-            app:popExitAnim="@anim/slide_out_right" />
-        <action
-            android:id="@+id/to_errorFragment"
-            app:destination="@id/errorFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_left"
-            app:popExitAnim="@anim/slide_out_right" />
-    </fragment>
-    <fragment
-        android:id="@+id/permissionFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.PermissionFragment"
-        tools:layout="@layout/fragment_permission" >
-        <argument
-            android:name="permission"
-            app:argType="string" />
-        <action
-            android:id="@+id/to_contactPickerFragment"
-            app:destination="@id/contactPickerFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_left"
             app:popExitAnim="@anim/slide_out_right" />
     </fragment>
     <fragment
@@ -122,4 +69,32 @@
             app:exitAnim="@anim/slide_out_left"
             app:popExitAnim="@anim/slide_out_right" />
     </fragment>
+    <navigation
+        android:id="@+id/generatingFlow"
+        app:startDestination="@id/loadingFragment">
+        <fragment
+            android:id="@+id/loadingFragment"
+            android:name="com.boswelja.contactringtonegenerator.ui.ProgressFragment">
+            <action
+                android:id="@+id/to_successFragment"
+                app:destination="@id/successFragment"
+                app:exitAnim="@anim/slide_out_left"
+                app:enterAnim="@anim/slide_in_right"
+                app:popEnterAnim="@anim/slide_in_left"
+                app:popExitAnim="@anim/slide_out_right" />
+            <action
+                android:id="@+id/to_errorFragment"
+                app:destination="@id/errorFragment"
+                app:enterAnim="@anim/slide_in_right"
+                app:exitAnim="@anim/slide_out_left"
+                app:popEnterAnim="@anim/slide_in_left"
+                app:popExitAnim="@anim/slide_out_right" />
+        </fragment>
+        <fragment
+            android:id="@+id/errorFragment"
+            android:name="com.boswelja.contactringtonegenerator.ui.ErrorFragment" />
+        <fragment
+            android:id="@+id/successFragment"
+            android:name="com.boswelja.contactringtonegenerator.ui.SuccessFragment" />
+    </navigation>
 </navigation>
