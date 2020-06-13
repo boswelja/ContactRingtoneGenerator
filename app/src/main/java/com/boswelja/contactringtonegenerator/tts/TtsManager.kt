@@ -44,6 +44,7 @@ class TtsManager(context: Context) :
 
     override fun onInit(status: Int) {
         isEngineReady = status == SUCCESS
+        engineEventListener?.onInitialised(isEngineReady)
         if (isEngineReady) {
             tts.setOnUtteranceProgressListener(this)
         }
