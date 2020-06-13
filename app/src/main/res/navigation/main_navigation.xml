@@ -24,8 +24,8 @@
         android:label="@string/contact_picker_title"
         tools:layout="@layout/fragment_easy_mode_list" >
         <action
-            android:id="@+id/to_enginePickerFragment"
-            app:destination="@id/enginePickerFragment"
+            android:id="@+id/to_voicePickerFragment"
+            app:destination="@id/voicePickerFragment"
             app:enterAnim="@anim/slide_in_right"
             app:popEnterAnim="@anim/slide_in_left"
             app:exitAnim="@anim/slide_out_left"
