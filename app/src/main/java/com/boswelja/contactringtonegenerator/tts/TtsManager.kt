@@ -7,7 +7,7 @@ import android.speech.tts.TextToSpeech.SUCCESS
 import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
 import java.io.File
-import java.util.*
+import java.util.Locale
 import kotlin.collections.ArrayList
 
 class TtsManager(context: Context) :
@@ -38,13 +38,12 @@ class TtsManager(context: Context) :
         private set(value) {
             if (field != value) {
                 field = value
-                engineEventListener?.onInitialised(value)
             }
+            engineEventListener?.onInitialised(value)
         }
 
     override fun onInit(status: Int) {
         isEngineReady = status == SUCCESS
-        engineEventListener?.onInitialised(isEngineReady)
         if (isEngineReady) {
             tts.setOnUtteranceProgressListener(this)
         }
@@ -97,6 +96,7 @@ class TtsManager(context: Context) :
      * @param enginePackageName The package name of the TTS engine to use, or null if default.
      */
     private fun initTts(enginePackageName: String? = null) {
+        isEngineReady = false
         tts = TextToSpeech(context, this, enginePackageName)
     }
 
