@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.lang.IllegalStateException
 import java.util.Locale
 
 class VoicePickerFragment : FragmentEasyModeList<Voice>(), VoiceSelectedCallback {
@@ -42,21 +43,27 @@ class VoicePickerFragment : FragmentEasyModeList<Voice>(), VoiceSelectedCallback
             recyclerView.layoutManager =
                     LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
             nextButton.setOnClickListener {
-                findNavController().navigate(VoicePickerFragmentDirections.toRingtoneCreatorFragment())
+                navigateNext()
             }
         }
         if (activity is MainActivity) {
-            updateVoices((activity as MainActivity).ttsManager)
+            val ttsManager = (activity as MainActivity).ttsManager
+            if (ttsManager.isEngineReady) {
+                updateVoices(ttsManager)
+            } else {
+                throw IllegalStateException("TTS not initialised")
+            }
         }
     }
+
+    private fun navigateNext() = findNavController().navigate(VoicePickerFragmentDirections.toRingtoneCreatorFragment())
 
     private fun updateVoices(tts: TtsManager) {
         coroutineScope.launch(Dispatchers.IO) {
             val result = ArrayList<Pair<String, ArrayList<Voice>>>()
             val defaultSection = Pair<String, ArrayList<Voice>>(SectionedAdapter.SECTION_HEADER_HIDDEN, ArrayList())
             val defaultVoice = tts.getDefaultVoice()
-                    ?: throw IllegalStateException("TTS engine not initialized")
-            defaultSection.second.add(defaultVoice)
+            defaultSection.second.add(defaultVoice!!)
             result.add(defaultSection)
 
             val voices = tts.getAvailableVoices(Locale.getDefault())
