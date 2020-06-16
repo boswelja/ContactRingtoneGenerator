@@ -15,7 +15,6 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 
 class MainActivity : AppCompatActivity() {
 
-    val ttsManager by lazy { TtsManager(this) }
     val selectedContacts = ArrayList<Contact>()
     val ringtoneItems = ArrayList<BaseItem>()
     val canStartGenerating: Boolean
@@ -23,15 +22,9 @@ class MainActivity : AppCompatActivity() {
 
     var ringtoneGenerator: RingtoneGenerator? = null
         private set
-    var ttsEngine: String? = null
-        set(value) {
-            if (field != value) {
-                field = value
-                ttsManager.setEngine(field)
-            }
-        }
-
     private lateinit var binding: ActivityMainBinding
+    lateinit var ttsManager: TtsManager
+        private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +43,11 @@ class MainActivity : AppCompatActivity() {
 
             binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        ttsManager = TtsManager(this)
     }
 
     override fun onDestroy() {
