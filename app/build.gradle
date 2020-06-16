@@ -4,7 +4,7 @@ plugins {
     id 'kotlin-android-extensions'
     id 'kotlin-kapt'
     id 'androidx.navigation.safeargs.kotlin'
-    id "com.diffplug.gradle.spotless" version "4.0.1"
+    id "com.diffplug.gradle.spotless" version "4.3.0"
 }
 
 android {
