@@ -1,5 +1,6 @@
 package com.boswelja.contactringtonegenerator.ui.contactpicker
 
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -8,6 +9,7 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.setPadding
 import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
+import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.Extensions.dp
 import com.boswelja.contactringtonegenerator.R
@@ -24,7 +26,12 @@ class ContactPickerFragment : FragmentEasyModeList<ArrayList<Contact>>(), Contac
 
     private val selectedContacts = ArrayList<Contact>()
     private val coroutineScope = MainScope()
-    private val adapter = ContactPickerAdapter(this)
+    private val sharedPreferences: SharedPreferences by lazy {
+        PreferenceManager.getDefaultSharedPreferences(requireContext())
+    }
+    private val adapter: ContactPickerAdapter by lazy {
+        ContactPickerAdapter(sharedPreferences.getBoolean("use_nicknames", true),this)
+    }
 
     private lateinit var searchBox: AppCompatEditText
 
@@ -82,9 +89,7 @@ class ContactPickerFragment : FragmentEasyModeList<ArrayList<Contact>>(), Contac
             }
             recyclerView.apply {
                 layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-                adapter = this@ContactPickerFragment.adapter.apply {
-                    setUseNicknames(true)
-                }
+                adapter = this@ContactPickerFragment.adapter
             }
         }
         updateContacts()

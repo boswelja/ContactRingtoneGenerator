@@ -10,11 +10,10 @@ import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ContactPickerRecyclerviewItemBinding
 import java.util.Locale
 
-class ContactPickerAdapter(private val listener: ContactSelectionListener? = null) :
+class ContactPickerAdapter(private val useNicknames: Boolean, private val listener: ContactSelectionListener) :
         RecyclerView.Adapter<ContactPickerAdapter.ContactViewHolder>(), Filterable {
 
     private var layoutInflater: LayoutInflater? = null
-    private var useNicknames: Boolean = true
 
     private val allContacts = ArrayList<Contact>()
     private val filteredContacts = ArrayList<Contact>(allContacts)
@@ -44,11 +43,11 @@ class ContactPickerAdapter(private val listener: ContactSelectionListener? = nul
                 if (holder.isChecked) {
                     selectedContacts.remove(contact)
                     holder.isChecked = false
-                    listener?.onContactDeselected(contact)
+                    listener.onContactDeselected(contact)
                 } else {
                     selectedContacts.add(contact)
                     holder.isChecked = true
-                    listener?.onContactSelected(contact)
+                    listener.onContactSelected(contact)
                 }
             }
             checkbox.isChecked = selected
@@ -73,14 +72,6 @@ class ContactPickerAdapter(private val listener: ContactSelectionListener? = nul
     override fun getFilter(): Filter = filter
 
     fun getSelectedContacts(): ArrayList<Contact> = selectedContacts
-
-    fun setUseNicknames(useNicknames: Boolean) {
-        if (this.useNicknames != useNicknames) {
-            this.useNicknames = useNicknames
-            sortContacts()
-            notifyDataSetChanged()
-        }
-    }
 
     fun setContacts(newContacts: List<Contact>) {
         ArrayList(newContacts).apply {
