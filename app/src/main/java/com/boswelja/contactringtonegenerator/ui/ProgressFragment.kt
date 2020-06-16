@@ -49,6 +49,8 @@ class ProgressFragment : Fragment(), RingtoneGenerator.ProgressListener {
         val activity = requireActivity()
         if (activity is MainActivity) {
             activity.removeTitle()
+            activity.createRingtoneGenerator().progressListener = this
+            activity.generate()
         }
     }
 }

@@ -68,15 +68,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun createRingtoneManager() {
+    fun createRingtoneGenerator(): RingtoneGenerator {
         ringtoneGenerator?.destroy()
         ringtoneGenerator = RingtoneGenerator(cacheDir, ttsManager, ringtoneItems, selectedContacts)
+        return ringtoneGenerator!!
     }
 
     fun generate() {
         if (canStartGenerating) {
-            createRingtoneManager()
-            ringtoneGenerator!!.start()
+            ringtoneGenerator?.start()
         }
     }
 }
