@@ -99,4 +99,13 @@ object ContactsHelper {
             context.contentResolver.update(contactUri, values, null, null)
         }
     }
+
+    suspend fun removeContactRingtone(context: Context, contact: Contact) {
+        withContext(Dispatchers.IO) {
+            val contactUri = ContactsContract.Contacts.getLookupUri(contact.id, contact.lookupKey)
+            val values = ContentValues()
+            values.putNull(ContactsContract.Contacts.CUSTOM_RINGTONE)
+            context.contentResolver.update(contactUri, values, null, null)
+        }
+    }
 }
