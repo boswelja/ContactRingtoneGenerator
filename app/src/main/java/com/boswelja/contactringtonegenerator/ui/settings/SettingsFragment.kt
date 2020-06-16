@@ -26,10 +26,6 @@ class SettingsFragment :
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        addResetPreferences()
-    }
-
-    private fun addResetPreferences() {
         addPreferencesFromResource(R.xml.settings)
         findPreference<Preference>(RESET_RINGTONES_KEY)!!.onPreferenceClickListener = this
     }

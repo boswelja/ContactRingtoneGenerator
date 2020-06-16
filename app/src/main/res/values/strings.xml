@@ -10,6 +10,7 @@
     <string name="change_selection">Change Selection</string>
 
     <string name="settings_title">Settings</string>
+    <string name="contact_picker_settings_title">Contact Picker</string>
     <string name="reset_settings_title">Reset</string>
     <string name="reset_ringtones_title">Reset Contact Ringtones</string>
     <string name="reset_ringtones_summary">This will clear all custom ringtones for all your contacts</string>
