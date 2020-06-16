@@ -7,39 +7,35 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.boswelja.contactringtonegenerator.R
+import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ActivityMainBinding
+import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
 import com.boswelja.contactringtonegenerator.tts.TtsManager
-import com.boswelja.contactringtonegenerator.tts.TtsUtterance
+import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 
-class MainActivity : AppCompatActivity(), TtsManager.TtsManagerInterface {
+class MainActivity : AppCompatActivity() {
+
+    val ttsManager by lazy { TtsManager(this) }
+    val selectedContacts = ArrayList<Contact>()
+    val ringtoneItems = ArrayList<BaseItem>()
+    val canStartGenerating: Boolean
+        get() = ttsManager.isEngineReady && selectedContacts.isNotEmpty() && ringtoneItems.isNotEmpty()
+
+    var ringtoneGenerator: RingtoneGenerator? = null
+        private set
+    var ttsEngine: String? = null
+        set(value) {
+            if (field != value) {
+                field = value
+                ttsManager.setEngine(field)
+            }
+        }
 
     private lateinit var binding: ActivityMainBinding
-    lateinit var ttsManager: TtsManager
-
-    override fun onTtsReady() {
-    }
-
-    override fun onSynthesisComplete() {
-    }
-
-    override fun onStartSynthesizing(jobCount: Int) {
-    }
-
-    override fun onJobStart(ttsUtterance: TtsUtterance) {
-    }
-
-    override fun onJobFinished(ttsUtterance: TtsUtterance) {
-    }
-
-    override fun onJobError(ttsUtterance: TtsUtterance) {
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ttsManager = TtsManager(this).also {
-            it.addTtsManagerInterface(this)
-            it.initTts()
-        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
 
         setContentView(binding.root)
@@ -51,8 +47,14 @@ class MainActivity : AppCompatActivity(), TtsManager.TtsManagerInterface {
         val navController = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container)?.findNavController()
         if (navController != null) {
             val appBarConfiguration = AppBarConfiguration(navController.graph)
+
             binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        ringtoneGenerator?.destroy()
     }
 
     fun removeTitle() {
@@ -63,6 +65,18 @@ class MainActivity : AppCompatActivity(), TtsManager.TtsManagerInterface {
         binding.toolbar.apply {
             this.subtitle = subtitle
             layoutTransition = LayoutTransition()
+        }
+    }
+
+    fun createRingtoneGenerator(): RingtoneGenerator {
+        ringtoneGenerator?.destroy()
+        ringtoneGenerator = RingtoneGenerator(cacheDir, ttsManager, ringtoneItems, selectedContacts)
+        return ringtoneGenerator!!
+    }
+
+    fun generate() {
+        if (canStartGenerating) {
+            ringtoneGenerator?.start()
         }
     }
 }

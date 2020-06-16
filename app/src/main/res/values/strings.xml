@@ -9,6 +9,12 @@
     <string name="next">Next</string>
     <string name="change_selection">Change Selection</string>
 
+    <string name="settings_title">Settings</string>
+    <string name="contact_picker_settings_title">Contact Picker</string>
+    <string name="reset_settings_title">Reset</string>
+    <string name="reset_ringtones_title">Reset Contact Ringtones</string>
+    <string name="reset_ringtones_summary">This will clear all custom ringtones for all your contacts</string>
+
     <string name="voice_picker_title">Select a Voice</string>
     <string name="contact_picker_title">Select Contacts</string>
     <string name="contact_picker_missing_permission">We need your permission to see your contacts, so we can retrieve information about them and create a personalised ringtone for them.</string>
@@ -39,4 +45,11 @@
     <string name="average">Average</string>
     <string name="low">Low</string>
     <string name="very_low">Very Low</string>
+    <string name="ringtone_creator_no_content">Choose an item below to start building your ringtone</string>
+
+    <string name="search_hint">Search</string>
+
+    <string name="permission_missing_title">We need your permission to:</string>
+    <string name="permission_missing_read_contacts">\u2802 Get the names and nicknames of your contacts</string>
+    <string name="permission_missing_write_contacts">\u2802 Set a ringtone for each of your contacts</string>
 </resources>

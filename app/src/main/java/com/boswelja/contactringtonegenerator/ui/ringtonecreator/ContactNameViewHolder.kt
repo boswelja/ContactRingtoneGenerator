@@ -5,9 +5,13 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorItemBinding
-import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.BaseItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 
 class ContactNameViewHolder(binding: RingtoneCreatorItemBinding) : BaseViewHolder(binding) {
+
+    init {
+        initWidgetView()
+    }
 
     override fun createWidgetView(): View {
         return AppCompatTextView(itemView.context).apply {
@@ -19,7 +23,6 @@ class ContactNameViewHolder(binding: RingtoneCreatorItemBinding) : BaseViewHolde
 
 
     override fun bind(item: BaseItem) {
-        super.bind(item)
         (widgetView as AppCompatTextView).text = item.getLabel()
     }
 }

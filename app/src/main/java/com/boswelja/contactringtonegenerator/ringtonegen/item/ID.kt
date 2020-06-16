@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ui.ringtonecreator.item
+package com.boswelja.contactringtonegenerator.ringtonegen.item
 
 enum class ID(val id: Long) {
     CONTACT_NAME(0),

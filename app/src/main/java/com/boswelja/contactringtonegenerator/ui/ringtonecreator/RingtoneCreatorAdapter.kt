@@ -4,13 +4,14 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorItemBinding
-import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.BaseItem
-import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.ID
+import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
 
-class RingtoneCreatorAdapter(private val listener: ItemEventListener) :
+class RingtoneCreatorAdapter(private val listener: DataEventListener) :
         RecyclerView.Adapter<BaseViewHolder>() {
 
     private val items: ArrayList<BaseItem> = ArrayList()
+    private val isDataValid: ArrayList<Boolean> = ArrayList()
 
     private var layoutInflater: LayoutInflater? = null
 
@@ -28,7 +29,7 @@ class RingtoneCreatorAdapter(private val listener: ItemEventListener) :
                 ContactNameViewHolder(itemBinding)
             }
             ID.TEXT_ITEM.id.toInt() -> {
-                CustomTextViewHolder(itemBinding)
+                CustomTextViewHolder(this, itemBinding)
             }
             else -> throw Exception("Invalid item in adapter")
         }
@@ -36,9 +37,28 @@ class RingtoneCreatorAdapter(private val listener: ItemEventListener) :
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         holder.bind(getItem(position))
+        when (holder) {
+            is ContactNameViewHolder -> {
+                setIsDataValid(position, true)
+            }
+        }
     }
 
-    private fun getItem(position: Int): BaseItem = items[position]
+    fun getItems(): ArrayList<BaseItem> = items
+
+    fun setIsDataValid(position: Int, isValid: Boolean) {
+        if (position in isDataValid.indices) {
+            if (isDataValid[position] != isValid) {
+                isDataValid[position] = isValid
+                listener.onDataValidityChanged(isDataValid.none { !it })
+            }
+        } else {
+            isDataValid.add(position, isValid)
+            listener.onDataValidityChanged(isDataValid.none { !it })
+        }
+    }
+
+    fun getItem(position: Int): BaseItem = items[position]
 
     fun addItem(item: BaseItem) {
         if (items.add(item)) {
@@ -55,12 +75,15 @@ class RingtoneCreatorAdapter(private val listener: ItemEventListener) :
 
     fun removeItem(position: Int) {
         items.removeAt(position)
+        isDataValid.removeAt(position)
         notifyItemRemoved(position)
         listener.onItemRemoved(items.isEmpty())
+        listener.onDataValidityChanged(isDataValid.none { !it })
     }
 
-    interface ItemEventListener {
+    interface DataEventListener {
         fun onItemAdded()
         fun onItemRemoved(isEmpty: Boolean)
+        fun onDataValidityChanged(isDataValid: Boolean)
     }
 }

@@ -7,7 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
-import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import com.boswelja.contactringtonegenerator.databinding.FragmentGetStartedBinding
 
@@ -23,15 +22,16 @@ class GetStartedFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.apply {
             getStartedButton.setOnClickListener {
-                val action = if (context?.checkSelfPermission(Manifest.permission.READ_CONTACTS)
-                        == PackageManager.PERMISSION_GRANTED){
-                    GetStartedFragmentDirections.toContactPickerFragment()
+                if (context?.checkSelfPermission(Manifest.permission.READ_CONTACTS)
+                        == PackageManager.PERMISSION_GRANTED) {
+                    findNavController().navigate(GetStartedFragmentDirections.toContactPickerFragment())
                 } else {
-                    GetStartedFragmentDirections.toPermissionFragment(Manifest.permission.READ_CONTACTS)
+                    PermissionSheet().show(childFragmentManager, "PermissionSheet")
                 }
-                findNavController().navigate(action)
             }
-            advancedModeButton.setOnClickListener(Navigation.createNavigateOnClickListener(GetStartedFragmentDirections.toAdvancedModeFragment()))
+            settingsButton.setOnClickListener {
+                findNavController().navigate(GetStartedFragmentDirections.toSettingsFragment())
+            }
         }
         val activity = requireActivity()
         if (activity is MainActivity) {

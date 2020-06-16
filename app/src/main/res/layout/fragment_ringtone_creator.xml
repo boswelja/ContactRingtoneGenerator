@@ -45,7 +45,8 @@
             android:layout_marginStart="@dimen/content_side_margins"
             android:layout_marginEnd="@dimen/content_side_margins"
             android:textAlignment="center"
-            android:text="Choose from the items below to start building your ringtone" />
+            android:text="@string/ringtone_creator_no_content"
+            style="@style/TextAppearance.MaterialComponents.Body1" />
 
     </FrameLayout>
 

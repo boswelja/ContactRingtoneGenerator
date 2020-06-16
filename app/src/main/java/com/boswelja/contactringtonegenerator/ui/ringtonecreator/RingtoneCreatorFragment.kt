@@ -4,34 +4,61 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.databinding.FragmentRingtoneCreatorBinding
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorAvailableItemBinding
-import com.boswelja.contactringtonegenerator.ui.ringtonecreator.item.Utils.ALL_ITEMS
+import com.boswelja.contactringtonegenerator.ui.MainActivity
+import com.boswelja.contactringtonegenerator.ui.common.BaseDataFragment
+import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.ContactName
+import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
+import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.Utils.ALL_ITEMS
 import com.google.android.material.chip.Chip
 
-class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.ItemEventListener {
+class RingtoneCreatorFragment : BaseDataFragment<ArrayList<BaseItem>>(), RingtoneCreatorAdapter.DataEventListener {
 
     private val adapter = RingtoneCreatorAdapter(this)
 
     private val onAvailableItemClickListener = View.OnClickListener {
         if (it is Chip) {
-            val item = ALL_ITEMS.first { item -> item.getLabel() == it.text }
+            val item = when (ALL_ITEMS.first { item -> item.getLabel() == it.text }.id) {
+                ID.CONTACT_NAME -> ContactName()
+                ID.TEXT_ITEM -> TextItem()
+            }
             adapter.addItem(item)
-            setMessageHasContent(true)
         }
     }
 
+    private var isDataEmpty: Boolean = true
+    private var isDataValid: Boolean = true
+
     private lateinit var binding: FragmentRingtoneCreatorBinding
 
+    override fun onSaveData(activity: MainActivity, data: ArrayList<BaseItem>) {
+        activity.ringtoneItems.apply {
+            clear()
+            addAll(data)
+        }
+    }
+
+    override fun requestData(): ArrayList<BaseItem>? = adapter.getItems()
+
     override fun onItemAdded() {
-        setMessageHasContent(true)
+        isDataEmpty = false
+        updateNoDataViewVisibility()
+        binding.messageBuilderView.smoothScrollToPosition(adapter.itemCount - 1)
     }
 
     override fun onItemRemoved(isEmpty: Boolean) {
-        setMessageHasContent(!isEmpty)
+        isDataEmpty = isEmpty
+        updateNoDataViewVisibility()
+    }
+
+    override fun onDataValidityChanged(isDataValid: Boolean) {
+        this.isDataValid = isDataValid
+        updateNextButtonEnabled()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -42,8 +69,10 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.ItemEventList
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setupAvailableMessageItems()
         setupMessageCreatorView()
+        updateNextButtonEnabled()
+        updateNoDataViewVisibility()
         binding.nextButton.setOnClickListener {
-            findNavController().navigate(RingtoneCreatorFragmentDirections.toLoadingFragment())
+            findNavController().navigate(RingtoneCreatorFragmentDirections.toGeneratingFlow())
         }
     }
 
@@ -66,15 +95,19 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.ItemEventList
         }
     }
 
-    private fun setMessageHasContent(hasContent: Boolean) {
+    private fun updateNoDataViewVisibility() {
+        val shouldShow = isDataEmpty
         binding.apply {
-            if (hasContent) {
-                messageNoContentView.visibility = View.GONE
-                nextButton.isEnabled = true
-            } else {
+            if (shouldShow) {
                 messageNoContentView.visibility = View.VISIBLE
-                nextButton.isEnabled = false
+            } else {
+                messageNoContentView.visibility = View.GONE
             }
         }
+    }
+
+    private fun updateNextButtonEnabled() {
+        val shouldEnable = !isDataEmpty && isDataValid
+        binding.nextButton.isEnabled = shouldEnable
     }
 }
