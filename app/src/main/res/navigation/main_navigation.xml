@@ -63,19 +63,6 @@
             app:exitAnim="@anim/slide_out_left"
             app:popExitAnim="@anim/slide_out_right" />
     </fragment>
-    <fragment
-        android:id="@+id/enginePickerFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.enginepicker.EnginePickerFragment"
-        android:label="Choose a Text To Speech Engine"
-        tools:layout="@layout/fragment_easy_mode_list" >
-        <action
-            android:id="@+id/to_voicePickerFragment"
-            app:destination="@id/voicePickerFragment"
-            app:enterAnim="@anim/slide_in_right"
-            app:popEnterAnim="@anim/slide_in_left"
-            app:exitAnim="@anim/slide_out_left"
-            app:popExitAnim="@anim/slide_out_right" />
-    </fragment>
     <navigation
         android:id="@+id/generatingFlow"
         app:startDestination="@id/loadingFragment">
