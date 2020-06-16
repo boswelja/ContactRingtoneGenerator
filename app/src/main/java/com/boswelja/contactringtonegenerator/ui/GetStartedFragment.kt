@@ -29,6 +29,9 @@ class GetStartedFragment : Fragment() {
                     PermissionSheet().show(childFragmentManager, "PermissionSheet")
                 }
             }
+            settingsButton.setOnClickListener {
+                findNavController().navigate(GetStartedFragmentDirections.toSettingsFragment())
+            }
         }
         val activity = requireActivity()
         if (activity is MainActivity) {
