@@ -45,7 +45,8 @@ class ProgressFragment : Fragment(), RingtoneGenerator.ProgressListener {
         return binding.root
     }
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onResume() {
+        super.onResume()
         val activity = requireActivity()
         if (activity is MainActivity) {
             activity.removeTitle()
