@@ -1,5 +1,6 @@
 package com.boswelja.contactringtonegenerator.ui.common
 
+import android.util.Log
 import androidx.fragment.app.Fragment
 import com.boswelja.contactringtonegenerator.ui.MainActivity
 
@@ -8,11 +9,13 @@ abstract class BaseDataFragment<T> : Fragment() {
     /**
      * Checks whether the data from [requestData] can be saved, and calls [onSaveData] if possible.
      */
-    fun saveData() {
+    private fun saveData() {
         val data = requestData()
         val mainActivity = activity
         if (data != null && mainActivity is MainActivity) {
             onSaveData(mainActivity, data)
+        } else {
+            Log.w("BaseDataFragment", "Tried to save data, but data was null or not the right activity")
         }
     }
 
