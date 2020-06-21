@@ -64,7 +64,7 @@ class VoicePickerFragment : FragmentEasyModeList<Voice>(), VoiceSelectedCallback
             val result = ArrayList<Pair<String, ArrayList<Voice>>>()
             val defaultSection = Pair<String, ArrayList<Voice>>(SectionedAdapter.SECTION_HEADER_HIDDEN, ArrayList())
             val defaultVoice = tts.getDefaultVoice()
-            selectedVoice = defaultVoice
+            if (selectedVoice == null) selectedVoice = defaultVoice
             defaultSection.second.add(defaultVoice!!)
             result.add(defaultSection)
 
