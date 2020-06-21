@@ -2,7 +2,6 @@ package com.boswelja.contactringtonegenerator.ui
 
 import android.animation.LayoutTransition
 import android.os.Bundle
-import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -13,6 +12,7 @@ import com.boswelja.contactringtonegenerator.databinding.ActivityMainBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
 import com.boswelja.contactringtonegenerator.tts.TtsManager
 import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
+import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
@@ -77,7 +77,7 @@ class MainActivity : AppCompatActivity() {
         if (canStartGenerating) {
             ringtoneGenerator?.start()
         } else {
-            Log.w("MainActivity", "Tried to start generating ringtones when not ready")
+            Timber.w("Tried to start generating ringtones when not ready")
         }
     }
 }

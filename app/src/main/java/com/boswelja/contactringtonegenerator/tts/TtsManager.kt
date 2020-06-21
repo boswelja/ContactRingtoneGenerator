@@ -6,7 +6,7 @@ import android.speech.tts.TextToSpeech.QUEUE_FLUSH
 import android.speech.tts.TextToSpeech.SUCCESS
 import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
-import android.util.Log
+import timber.log.Timber
 import java.io.File
 import java.util.Locale
 import kotlin.collections.ArrayList
@@ -43,7 +43,7 @@ class TtsManager(context: Context) :
         }
 
     override fun onInit(status: Int) {
-        Log.d("TtsManager", "Init $status")
+        Timber.d("Init $status")
         isEngineReady = status == SUCCESS
         if (isEngineReady) {
             tts.setOnUtteranceProgressListener(this)

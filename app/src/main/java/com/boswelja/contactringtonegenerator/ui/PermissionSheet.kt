@@ -6,7 +6,6 @@ import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,6 +14,7 @@ import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.StringJoinerCompat
 import com.boswelja.contactringtonegenerator.databinding.SheetPermissionBinding
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import timber.log.Timber
 
 class PermissionSheet : BottomSheetDialogFragment() {
 
@@ -44,7 +44,7 @@ class PermissionSheet : BottomSheetDialogFragment() {
             if (grantResults.all { it == PackageManager.PERMISSION_GRANTED }) {
                 dismiss()
             } else {
-                Log.d("PermissionSheet", "Permissions denied")
+                Timber.d("Permissions denied")
             }
         } else {
             super.onRequestPermissionsResult(requestCode, permissions, grantResults)
