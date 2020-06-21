@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
 
     fun createRingtoneGenerator(): RingtoneGenerator {
         ringtoneGenerator?.destroy()
-        ringtoneGenerator = RingtoneGenerator(cacheDir, ttsManager, ringtoneItems, selectedContacts)
+        ringtoneGenerator = RingtoneGenerator(this, ttsManager, ringtoneItems, selectedContacts)
         return ringtoneGenerator!!
     }
 

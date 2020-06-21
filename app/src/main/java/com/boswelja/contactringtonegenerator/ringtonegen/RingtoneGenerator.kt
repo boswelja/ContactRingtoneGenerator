@@ -1,7 +1,10 @@
 package com.boswelja.contactringtonegenerator.ringtonegen
 
+import android.content.Context
 import com.boswelja.contactringtonegenerator.StringJoinerCompat
 import com.boswelja.contactringtonegenerator.contacts.Contact
+import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
+import com.boswelja.contactringtonegenerator.mediastore.MediaStoreHelper
 import com.boswelja.contactringtonegenerator.tts.TtsManager
 import com.boswelja.contactringtonegenerator.tts.SynthesisJob
 import com.boswelja.contactringtonegenerator.tts.SynthesisResult
@@ -14,7 +17,7 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 class RingtoneGenerator(
-        private val cacheDir: File,
+        private val context: Context,
         private val ttsManager: TtsManager,
         private val ringtoneStructure: List<BaseItem>,
         private val contacts: List<Contact>
@@ -23,8 +26,9 @@ class RingtoneGenerator(
     TtsManager.TtsEngineEventListener {
 
     private val coroutineScope = MainScope()
+    private val cacheDir: File = context.cacheDir
 
-    private var remainingJobs: Int = 0
+    private var remainingJobs: HashMap<String, Contact> = HashMap()
 
     var progressListener: ProgressListener? = null
 
@@ -44,13 +48,13 @@ class RingtoneGenerator(
     }
 
     override fun onJobCompleted(success: Boolean, synthesisResult: SynthesisResult) {
-        progressListener?.onJobCompleted(success, synthesisResult)
-        remainingJobs -= 1
-        if (remainingJobs < 1) progressListener?.onGenerateFinished()
-    }
-
-    private fun calculateJobCount(): Int {
-        return contacts.count()
+        val contact = remainingJobs[synthesisResult.synthesisId]
+        if (success) handleGenerateCompleted(contact!!, synthesisResult)
+        else {
+            remainingJobs.remove(synthesisResult.synthesisId)
+            progressListener?.onJobCompleted(success, synthesisResult)
+            if (remainingJobs.count() < 1) progressListener?.onGenerateFinished()
+        }
     }
 
     private suspend fun queueJobFor(contact: Contact) {
@@ -64,13 +68,28 @@ class RingtoneGenerator(
                     .replace(Constants.CONTACT_NAME_PLACEHOLDER, contactName)
             SynthesisJob.create(message, contact.id.toString()).also {
                 ttsManager.enqueueJob(it)
+                remainingJobs[it.synthesisId] = contact
+            }
+        }
+    }
+
+    private fun handleGenerateCompleted(contact: Contact, synthesisResult: SynthesisResult) {
+        coroutineScope.launch(Dispatchers.IO) {
+            val uri = MediaStoreHelper.scanNewFile(context, synthesisResult.file)
+            val success = if (uri != null) {
+                ContactsHelper.setContactRingtone(context, contact, uri)
+                true
+            } else false
+            remainingJobs.remove(synthesisResult.synthesisId)
+            withContext(Dispatchers.Main) {
+                progressListener?.onJobCompleted(success, synthesisResult)
+                if (remainingJobs.count() < 1) progressListener?.onGenerateFinished()
             }
         }
     }
 
     fun start() {
-        remainingJobs = calculateJobCount()
-        progressListener?.onGenerateStarted(remainingJobs)
+        progressListener?.onGenerateStarted(remainingJobs.count())
         coroutineScope.launch(Dispatchers.Default) {
             contacts.forEach {
                 queueJobFor(it)
