@@ -2,6 +2,7 @@ package com.boswelja.contactringtonegenerator.ui
 
 import android.animation.LayoutTransition
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -17,7 +18,7 @@ class MainActivity : AppCompatActivity() {
 
     val selectedContacts = ArrayList<Contact>()
     val ringtoneItems = ArrayList<BaseItem>()
-    val canStartGenerating: Boolean
+    private val canStartGenerating: Boolean
         get() = ttsManager.isEngineReady && selectedContacts.isNotEmpty() && ringtoneItems.isNotEmpty()
 
     var ringtoneGenerator: RingtoneGenerator? = null
@@ -75,6 +76,8 @@ class MainActivity : AppCompatActivity() {
     fun generate() {
         if (canStartGenerating) {
             ringtoneGenerator?.start()
+        } else {
+            Log.w("MainActivity", "Tried to start generating ringtones when not ready")
         }
     }
 }
