@@ -9,7 +9,7 @@ abstract class BaseDataFragment<T> : Fragment() {
     /**
      * Checks whether the data from [requestData] can be saved, and calls [onSaveData] if possible.
      */
-    private fun saveData() {
+    fun saveData() {
         val data = requestData()
         val mainActivity = activity
         if (data != null && mainActivity is MainActivity) {
@@ -31,9 +31,4 @@ abstract class BaseDataFragment<T> : Fragment() {
      * @return The stored data [T], or null if it doesn't exist.
      */
     open fun requestData(): T? = null
-
-    override fun onPause() {
-        super.onPause()
-        saveData()
-    }
 }

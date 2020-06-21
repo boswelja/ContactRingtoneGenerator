@@ -49,11 +49,13 @@ class RingtoneCreatorFragment : BaseDataFragment<ArrayList<BaseItem>>(), Rington
         isDataEmpty = false
         updateNoDataViewVisibility()
         binding.messageBuilderView.smoothScrollToPosition(adapter.itemCount - 1)
+        if (isDataValid) saveData()
     }
 
     override fun onItemRemoved(isEmpty: Boolean) {
         isDataEmpty = isEmpty
         updateNoDataViewVisibility()
+        if (isDataValid) saveData()
     }
 
     override fun onDataValidityChanged(isDataValid: Boolean) {

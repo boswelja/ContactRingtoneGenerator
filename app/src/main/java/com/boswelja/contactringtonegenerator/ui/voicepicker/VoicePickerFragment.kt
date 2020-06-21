@@ -35,6 +35,7 @@ class VoicePickerFragment : FragmentEasyModeList<Voice>(), VoiceSelectedCallback
 
     override fun onSelected(item: Voice) {
         selectedVoice = item
+        saveData()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

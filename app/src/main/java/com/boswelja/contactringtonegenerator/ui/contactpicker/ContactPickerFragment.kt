@@ -48,12 +48,14 @@ class ContactPickerFragment : FragmentEasyModeList<ArrayList<Contact>>(), Contac
         selectedContacts.remove(contact)
         updateSelectedContactsView()
         updateNextEnabled()
+        saveData()
     }
 
     override fun onContactSelected(contact: Contact) {
         selectedContacts.add(contact)
         updateSelectedContactsView()
         updateNextEnabled()
+        saveData()
     }
 
     override fun onCreateWidgetView(): View? {
