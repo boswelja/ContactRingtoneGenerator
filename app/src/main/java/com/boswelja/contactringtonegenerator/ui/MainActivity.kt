@@ -42,9 +42,7 @@ class MainActivity : AppCompatActivity() {
         if (navController != null) {
             val appBarConfiguration = AppBarConfiguration(setOf(
                     R.id.getStartedFragment,
-                    R.id.loadingFragment,
-                    R.id.successFragment,
-                    R.id.errorFragment))
+                    R.id.generatingFlow))
 
             binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         }
