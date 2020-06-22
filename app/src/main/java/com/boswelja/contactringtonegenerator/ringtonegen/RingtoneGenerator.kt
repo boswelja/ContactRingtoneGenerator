@@ -66,7 +66,8 @@ class RingtoneGenerator(
             val contactName = contact.contactNickname ?: contact.contactName
             val message = messageBuilder.toString()
                     .replace(Constants.CONTACT_NAME_PLACEHOLDER, contactName)
-            SynthesisJob.create(message, contact.id.toString()).also {
+            val synthesisId = contactName.replace(" ", "_") + "-ringtone"
+            SynthesisJob.create(message, synthesisId).also {
                 ttsManager.enqueueJob(it)
                 remainingJobs[it.synthesisId] = contact
             }
