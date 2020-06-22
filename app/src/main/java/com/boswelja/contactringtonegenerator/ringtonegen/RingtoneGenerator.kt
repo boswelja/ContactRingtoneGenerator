@@ -94,6 +94,7 @@ class RingtoneGenerator(
             contacts.forEach {
                 queueJobFor(it)
             }
+            ttsManager.startSynthesis()
         }
     }
 
