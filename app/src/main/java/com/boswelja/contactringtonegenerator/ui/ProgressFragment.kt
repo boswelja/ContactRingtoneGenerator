@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.FragmentLoadingBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
@@ -30,6 +31,18 @@ class ProgressFragment :
                     progress = 0
                     secondaryProgress = 0
                 }
+                binding.loadingTitle.text = getString(R.string.progress_generating)
+            }
+            RingtoneGenerator.State.FINISHED -> {
+                binding.apply {
+                    val successes = progressBar.progress
+                    val failures = progressBar.secondaryProgress - progressBar.progress
+                    loadingTitle.text = getString(R.string.progress_complete)
+                    loadingStatus.text = getString(
+                            R.string.status_complete,
+                            successes.toString(),
+                            failures.toString())
+                }
             }
         }
     }
@@ -47,6 +60,7 @@ class ProgressFragment :
 
     override fun onJobStarted(contact: Contact) {
         Timber.d("onJobStarted()")
+        binding.loadingStatus.text = getString(R.string.status_generating, contact.contactNickname ?: contact.contactName)
     }
 
     override fun onJobCompleted(success: Boolean, synthesisResult: SynthesisResult) {
