@@ -31,11 +31,23 @@ class RingtoneGenerator(
     private var remainingJobs: HashMap<String, Contact> = HashMap()
 
     var progressListener: ProgressListener? = null
+    var stateListener: StateListener? = null
+    var state: State = State.NOT_READY
+        private set(value) {
+            field = value
+            stateListener?.onStateChanged(value)
+        }
 
     init {
         ttsManager.apply {
             jobProgressListener = this@RingtoneGenerator
             engineEventListener = this@RingtoneGenerator
+        }
+        coroutineScope.launch(Dispatchers.Default) {
+            contacts.forEach {
+                queueJobFor(it)
+            }
+            state = State.READY
         }
     }
 
@@ -84,18 +96,23 @@ class RingtoneGenerator(
             remainingJobs.remove(synthesisResult.synthesisId)
             withContext(Dispatchers.Main) {
                 progressListener?.onJobCompleted(success, synthesisResult)
-                if (remainingJobs.count() < 1) progressListener?.onGenerateFinished()
+                if (remainingJobs.count() < 1) {
+                    state = State.FINISHED
+                    progressListener?.onGenerateFinished()
+                }
             }
         }
     }
 
+    private fun calculateTotalJobCount(): Int = remainingJobs.count()
+
     fun start() {
-        progressListener?.onGenerateStarted(remainingJobs.count())
-        coroutineScope.launch(Dispatchers.Default) {
-            contacts.forEach {
-                queueJobFor(it)
-            }
+        if (state == State.READY) {
+            state = State.GENERATING
+            progressListener?.onGenerateStarted(calculateTotalJobCount())
             ttsManager.startSynthesis()
+        } else {
+            throw IllegalStateException("Generator not ready")
         }
     }
 
@@ -104,10 +121,21 @@ class RingtoneGenerator(
         cacheDir.deleteRecursively()
     }
 
+    interface StateListener {
+        fun onStateChanged(state: State)
+    }
+
     interface ProgressListener {
         fun onGenerateStarted(totalJobCount: Int)
         fun onJobStarted()
         fun onJobCompleted(success: Boolean, synthesisResult: SynthesisResult)
         fun onGenerateFinished()
+    }
+
+    enum class State {
+        NOT_READY,
+        READY,
+        GENERATING,
+        FINISHED
     }
 }
