@@ -31,6 +31,8 @@ class RingtoneGenerator(
     private var remainingJobs: HashMap<String, Contact> = HashMap()
     private var jobsQueued: Boolean = false
 
+    val totalJobCount: Int get() = remainingJobs.count()
+
     var progressListener: ProgressListener? = null
     var stateListener: StateListener? = null
     var state: State = State.NOT_READY
@@ -69,7 +71,7 @@ class RingtoneGenerator(
         else {
             remainingJobs.remove(synthesisResult.synthesisId)
             progressListener?.onJobCompleted(success, synthesisResult)
-            if (remainingJobs.count() < 1) progressListener?.onGenerateFinished()
+            if (remainingJobs.count() < 1) state = State.FINISHED
         }
     }
 
@@ -102,18 +104,15 @@ class RingtoneGenerator(
                 progressListener?.onJobCompleted(success, synthesisResult)
                 if (remainingJobs.count() < 1) {
                     state = State.FINISHED
-                    progressListener?.onGenerateFinished()
                 }
             }
         }
     }
 
-    private fun calculateTotalJobCount(): Int = remainingJobs.count()
 
     fun start() {
         if (state == State.READY) {
             state = State.GENERATING
-            progressListener?.onGenerateStarted(calculateTotalJobCount())
             ttsManager.startSynthesis()
         } else {
             throw IllegalStateException("Generator not ready")
@@ -130,10 +129,8 @@ class RingtoneGenerator(
     }
 
     interface ProgressListener {
-        fun onGenerateStarted(totalJobCount: Int)
         fun onJobStarted(contact: Contact)
         fun onJobCompleted(success: Boolean, synthesisResult: SynthesisResult)
-        fun onGenerateFinished()
     }
 
     enum class State {

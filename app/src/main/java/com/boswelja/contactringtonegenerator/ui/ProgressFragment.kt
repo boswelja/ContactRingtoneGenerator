@@ -31,6 +31,7 @@ class ProgressFragment :
                     isIndeterminate = false
                     progress = 0
                     secondaryProgress = 0
+                    max = ringtoneGenerator.totalJobCount
                 }
                 binding.loadingTitle.text = getString(R.string.progress_generating)
             }
@@ -47,17 +48,6 @@ class ProgressFragment :
                 ringtoneGenerator.destroy()
             }
         }
-    }
-
-    override fun onGenerateStarted(totalJobCount: Int) {
-        Timber.d("onGenerateStarted($totalJobCount)")
-        binding.progressBar.apply {
-            max = totalJobCount
-        }
-    }
-
-    override fun onGenerateFinished() {
-
     }
 
     override fun onJobStarted(contact: Contact) {
