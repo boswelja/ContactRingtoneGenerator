@@ -12,14 +12,11 @@ import com.boswelja.contactringtonegenerator.databinding.ActivityMainBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
 import com.boswelja.contactringtonegenerator.tts.TtsManager
 import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
-import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
     val selectedContacts = ArrayList<Contact>()
     val ringtoneItems = ArrayList<BaseItem>()
-    private val canStartGenerating: Boolean
-        get() = ttsManager.isEngineReady && selectedContacts.isNotEmpty() && ringtoneItems.isNotEmpty()
 
     var ringtoneGenerator: RingtoneGenerator? = null
         private set
@@ -73,13 +70,5 @@ class MainActivity : AppCompatActivity() {
         ringtoneGenerator?.destroy()
         ringtoneGenerator = RingtoneGenerator(this, ttsManager, ringtoneItems, selectedContacts)
         return ringtoneGenerator!!
-    }
-
-    fun generate() {
-        if (canStartGenerating) {
-            ringtoneGenerator?.start()
-        } else {
-            Timber.w("Tried to start generating ringtones when not ready")
-        }
     }
 }
