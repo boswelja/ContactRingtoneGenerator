@@ -47,11 +47,14 @@ class ProgressFragment :
                 }
                 ringtoneGenerator.destroy()
             }
+            else -> {
+                // Do nothing
+            }
         }
     }
 
     override fun onJobStarted(contact: Contact) {
-        Timber.d("onJobStarted()")
+        Timber.d("onJobStarted($contact)")
         binding.loadingStatus.text = getString(R.string.status_generating, contact.contactNickname ?: contact.contactName)
     }
 
