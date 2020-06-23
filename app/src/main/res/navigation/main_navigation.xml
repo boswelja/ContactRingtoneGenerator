@@ -43,12 +43,14 @@
         android:label="Build a Ringtone"
         android:name="com.boswelja.contactringtonegenerator.ui.ringtonecreator.RingtoneCreatorFragment" >
         <action
-            android:id="@+id/to_generatingFlow"
+            android:id="@+id/to_loadingFragment"
             app:destination="@id/loadingFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
-            app:popExitAnim="@anim/slide_out_right" />
+            app:popExitAnim="@anim/slide_out_right"
+            app:popUpTo="@id/getStartedFragment"
+            app:popUpToInclusive="true" />
     </fragment>
     <fragment
         android:id="@+id/loadingFragment"
