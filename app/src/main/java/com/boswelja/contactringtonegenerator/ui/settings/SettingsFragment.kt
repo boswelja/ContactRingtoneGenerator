@@ -1,6 +1,8 @@
 package com.boswelja.contactringtonegenerator.ui.settings
 
+import android.content.Intent
 import android.os.Bundle
+import android.widget.Toast
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.boswelja.contactringtonegenerator.R
@@ -21,6 +23,10 @@ class SettingsFragment :
                 resetContactRingtones()
                 true
             }
+            LAUNCH_TTS_SETTINGS_KEY -> {
+                launchTtsSettings()
+                true
+            }
             else -> false
         }
     }
@@ -28,6 +34,16 @@ class SettingsFragment :
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.settings)
         findPreference<Preference>(RESET_RINGTONES_KEY)!!.onPreferenceClickListener = this
+        findPreference<Preference>(LAUNCH_TTS_SETTINGS_KEY)!!.onPreferenceClickListener = this
+    }
+
+    private fun launchTtsSettings() {
+        Intent().apply {
+            action = "com.android.settings.TTS_SETTINGS"
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }.also {
+            startActivity(it)
+        }
     }
 
     private fun resetContactRingtones() {
@@ -35,10 +51,12 @@ class SettingsFragment :
             ContactsHelper.getContacts(requireContext()).forEach {
                 ContactsHelper.removeContactRingtone(requireContext(), it)
             }
+            Toast.makeText(requireContext(), "Successfully reset contact ringtones", Toast.LENGTH_LONG).show()
         }
     }
 
     companion object {
         private const val RESET_RINGTONES_KEY = "reset_ringtones"
+        private const val LAUNCH_TTS_SETTINGS_KEY = "launch_tts_settings"
     }
 }

@@ -14,6 +14,8 @@
     <string name="reset_settings_title">Reset</string>
     <string name="reset_ringtones_title">Reset Contact Ringtones</string>
     <string name="reset_ringtones_summary">This will clear all custom ringtones for all your contacts</string>
+    <string name="tts_settings_title">Text to Speech</string>
+    <string name="launch_tts_settings_title">Open Text to Speech Settings</string>
 
     <string name="voice_picker_title">Select a Voice</string>
     <string name="contact_picker_title">Select Contacts</string>
