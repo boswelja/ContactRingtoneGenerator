@@ -24,6 +24,13 @@ class ProgressFragment :
             RingtoneGenerator.State.READY -> {
                 ringtoneGenerator.start()
             }
+            RingtoneGenerator.State.GENERATING -> {
+                binding.progressBar.apply {
+                    isIndeterminate = false
+                    progress = 0
+                    secondaryProgress = 0
+                }
+            }
         }
     }
 
@@ -31,8 +38,6 @@ class ProgressFragment :
         Timber.d("onGenerateStarted($totalJobCount)")
         binding.progressBar.apply {
             max = totalJobCount
-            progress = 0
-            secondaryProgress = 0
         }
     }
 
