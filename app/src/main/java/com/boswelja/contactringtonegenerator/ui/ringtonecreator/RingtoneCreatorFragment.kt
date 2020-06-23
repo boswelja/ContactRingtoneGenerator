@@ -89,12 +89,13 @@ class RingtoneCreatorFragment : BaseDataFragment<ArrayList<BaseItem>>(), Rington
         ID.values().forEach {
             val chipBinding = RingtoneCreatorAvailableItemBinding.inflate(layoutInflater)
             chipBinding.root.apply {
-                when (it) {
+                // TODO There must be a better way of getting the label for an item
+                text = when (it) {
                     ID.CONTACT_NAME -> {
-                        text = ContactName().getLabel()
+                        ContactName().getLabel()
                     }
                     ID.TEXT_ITEM -> {
-                        text = TextItem().getLabel()
+                        TextItem().getLabel()
                     }
                 }
                 id = it.id
