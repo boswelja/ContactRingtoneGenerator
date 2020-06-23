@@ -21,6 +21,7 @@ class ProgressFragment :
     private lateinit var ringtoneGenerator: RingtoneGenerator
 
     override fun onStateChanged(state: RingtoneGenerator.State) {
+        Timber.d("onStateChanged($state)")
         when (state) {
             RingtoneGenerator.State.READY -> {
                 ringtoneGenerator.start()
