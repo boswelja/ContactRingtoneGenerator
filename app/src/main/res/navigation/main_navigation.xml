@@ -44,40 +44,15 @@
         android:name="com.boswelja.contactringtonegenerator.ui.ringtonecreator.RingtoneCreatorFragment" >
         <action
             android:id="@+id/to_generatingFlow"
-            app:destination="@id/generatingFlow"
+            app:destination="@id/loadingFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
             app:popExitAnim="@anim/slide_out_right" />
     </fragment>
-    <navigation
-        android:id="@+id/generatingFlow"
-        app:startDestination="@id/loadingFragment">
-        <fragment
-            android:id="@+id/loadingFragment"
-            android:name="com.boswelja.contactringtonegenerator.ui.ProgressFragment">
-            <action
-                android:id="@+id/to_successFragment"
-                app:destination="@id/successFragment"
-                app:exitAnim="@anim/slide_out_left"
-                app:enterAnim="@anim/slide_in_right"
-                app:popEnterAnim="@anim/slide_in_left"
-                app:popExitAnim="@anim/slide_out_right" />
-            <action
-                android:id="@+id/to_errorFragment"
-                app:destination="@id/errorFragment"
-                app:enterAnim="@anim/slide_in_right"
-                app:exitAnim="@anim/slide_out_left"
-                app:popEnterAnim="@anim/slide_in_left"
-                app:popExitAnim="@anim/slide_out_right" />
-        </fragment>
-        <fragment
-            android:id="@+id/errorFragment"
-            android:name="com.boswelja.contactringtonegenerator.ui.ErrorFragment" />
-        <fragment
-            android:id="@+id/successFragment"
-            android:name="com.boswelja.contactringtonegenerator.ui.SuccessFragment" />
-    </navigation>
+    <fragment
+        android:id="@+id/loadingFragment"
+        android:name="com.boswelja.contactringtonegenerator.ui.ProgressFragment" />
     <fragment
         android:id="@+id/settingsFragment"
         android:name="com.boswelja.contactringtonegenerator.ui.settings.SettingsFragment"
