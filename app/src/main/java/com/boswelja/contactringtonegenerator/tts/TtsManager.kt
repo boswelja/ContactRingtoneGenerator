@@ -59,7 +59,7 @@ class TtsManager(context: Context) :
 
     override fun onDone(utteranceId: String?) {
         val synthesisJob = getSynthesisJob(utteranceId)
-        val synthesisResult = synthesisResults.firstOrNull { it.synthesisId == utteranceId }
+        val synthesisResult = synthesisResults.firstOrNull { it.id == utteranceId }
         if (synthesisJob != null) synthesisJobs.remove(synthesisJob)
         if (synthesisResult != null) {
             synthesisResults.remove(synthesisResult)
@@ -74,7 +74,7 @@ class TtsManager(context: Context) :
 
     override fun onError(utteranceId: String?) {
         val synthesisJob = getSynthesisJob(utteranceId)
-        val synthesisResult = synthesisResults.firstOrNull { it.synthesisId == utteranceId }
+        val synthesisResult = synthesisResults.firstOrNull { it.id == utteranceId }
         if (synthesisJob != null) synthesisJobs.remove(synthesisJob)
         if (synthesisResult != null) {
             synthesisResults.remove(synthesisResult)
