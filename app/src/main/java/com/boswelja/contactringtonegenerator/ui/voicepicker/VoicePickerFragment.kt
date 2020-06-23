@@ -57,7 +57,7 @@ class VoicePickerFragment : FragmentEasyModeList<Voice>(), VoiceSelectedCallback
         }
     }
 
-    private fun navigateNext() = findNavController().navigate(VoicePickerFragmentDirections.toRingtoneCreatorFragment())
+    private fun navigateNext() = null //findNavController().navigate(VoicePickerFragmentDirections.toRingtoneCreatorFragment())
 
     private fun updateVoices(tts: TtsManager) {
         coroutineScope.launch(Dispatchers.IO) {

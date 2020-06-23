@@ -87,7 +87,7 @@ class ContactPickerFragment : FragmentEasyModeList<ArrayList<Contact>>(), Contac
         updateNextEnabled()
         binding.apply {
             nextButton.setOnClickListener {
-                findNavController().navigate(ContactPickerFragmentDirections.toVoicePickerFragment())
+                findNavController().navigate(ContactPickerFragmentDirections.toRingtoneCreatorFragment())
             }
             recyclerView.apply {
                 layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
