@@ -89,16 +89,16 @@ class TtsManager(context: Context) :
      * @return The existing [SynthesisJob], or null if none were found.
      */
     private fun getSynthesisJob(utteranceId: String?): SynthesisJob? {
-        return synthesisJobs.firstOrNull { it.synthesisId == utteranceId }
+        return synthesisJobs.firstOrNull { it.id == utteranceId }
     }
 
     fun startSynthesis() {
         if (isEngineReady) {
             for (synthesisJob in synthesisJobs) {
-                val synthesisId = synthesisJob.synthesisId
+                val synthesisId = synthesisJob.id
                 val file = File(cacheDirectory, "$synthesisId.ogg")
                 if (!file.exists()) file.createNewFile()
-                tts.synthesizeToFile(synthesisJob.message, null, file, synthesisId)
+                tts.synthesizeToFile(synthesisJob.text, null, file, synthesisId)
                 synthesisResults.add(SynthesisResult(synthesisId, file))
             }
         }

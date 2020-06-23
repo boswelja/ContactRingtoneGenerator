@@ -61,7 +61,7 @@ class RingtoneGenerator(
     }
 
     override fun onJobStarted(synthesisJob: SynthesisJob) {
-        val contact = remainingJobs[synthesisJob.synthesisId]!!
+        val contact = remainingJobs[synthesisJob.id]!!
         progressListener?.onJobStarted(contact)
     }
 
@@ -85,9 +85,9 @@ class RingtoneGenerator(
             val message = messageBuilder.toString()
                     .replace(Constants.CONTACT_NAME_PLACEHOLDER, contactName)
             val synthesisId = contactName.replace(" ", "_") + "-ringtone"
-            SynthesisJob.create(message, synthesisId).also {
+            SynthesisJob(synthesisId, message).also {
                 ttsManager.enqueueJob(it)
-                remainingJobs[it.synthesisId] = contact
+                remainingJobs[it.id] = contact
             }
         }
     }

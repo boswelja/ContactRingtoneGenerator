@@ -6,7 +6,7 @@ data class SynthesisResult(val synthesisId: String, val file: File) {
 
     override fun equals(other: Any?): Boolean {
         if (other is SynthesisJob) {
-            return other.synthesisId == synthesisId
+            return other.id == synthesisId
         }
         return super.equals(other)
     }
