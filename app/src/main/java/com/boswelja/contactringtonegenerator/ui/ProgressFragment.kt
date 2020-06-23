@@ -43,6 +43,7 @@ class ProgressFragment :
                             successes.toString(),
                             failures.toString())
                 }
+                ringtoneGenerator.destroy()
             }
         }
     }
@@ -55,7 +56,7 @@ class ProgressFragment :
     }
 
     override fun onGenerateFinished() {
-        Timber.d("onGenerateFinished()")
+
     }
 
     override fun onJobStarted(contact: Contact) {
@@ -80,8 +81,8 @@ class ProgressFragment :
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         val activity = requireActivity()
         if (activity is MainActivity) {
             activity.removeTitle()

@@ -17,8 +17,6 @@ class MainActivity : AppCompatActivity() {
     val selectedContacts = ArrayList<Contact>()
     val ringtoneItems = ArrayList<BaseItem>()
 
-    var ringtoneGenerator: RingtoneGenerator? = null
-        private set
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,11 +40,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        ringtoneGenerator?.destroy()
-    }
-
     fun removeTitle() {
         binding.toolbar.title = null
     }
@@ -58,9 +51,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    fun createRingtoneGenerator(): RingtoneGenerator {
-        ringtoneGenerator?.destroy()
-        ringtoneGenerator = RingtoneGenerator(this, ringtoneItems, selectedContacts)
-        return ringtoneGenerator!!
-    }
+    fun createRingtoneGenerator(): RingtoneGenerator =
+            RingtoneGenerator(this, ringtoneItems, selectedContacts)
 }
