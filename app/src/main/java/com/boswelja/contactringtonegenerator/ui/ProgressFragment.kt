@@ -13,9 +13,9 @@ import com.boswelja.contactringtonegenerator.tts.SynthesisResult
 import timber.log.Timber
 
 class ProgressFragment :
-        Fragment(),
-        RingtoneGenerator.ProgressListener,
-        RingtoneGenerator.StateListener {
+    Fragment(),
+    RingtoneGenerator.ProgressListener,
+    RingtoneGenerator.StateListener {
 
     private lateinit var binding: FragmentLoadingBinding
     private lateinit var ringtoneGenerator: RingtoneGenerator
@@ -41,9 +41,10 @@ class ProgressFragment :
                     val failures = progressBar.secondaryProgress - progressBar.progress
                     loadingTitle.text = getString(R.string.progress_complete)
                     loadingStatus.text = getString(
-                            R.string.status_complete,
-                            successes.toString(),
-                            failures.toString())
+                        R.string.status_complete,
+                        successes.toString(),
+                        failures.toString()
+                    )
                 }
                 ringtoneGenerator.destroy()
             }

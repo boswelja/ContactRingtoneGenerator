@@ -8,7 +8,7 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
 
 class RingtoneCreatorAdapter(private val listener: DataEventListener) :
-        RecyclerView.Adapter<BaseViewHolder>() {
+    RecyclerView.Adapter<BaseViewHolder>() {
 
     private val items: ArrayList<BaseItem> = ArrayList()
     private val isDataValid: ArrayList<Boolean> = ArrayList()

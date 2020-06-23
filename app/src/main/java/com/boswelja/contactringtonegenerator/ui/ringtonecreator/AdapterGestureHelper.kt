@@ -14,7 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.boswelja.contactringtonegenerator.Extensions.dp
 
 class AdapterGestureHelper(val adapter: RingtoneCreatorAdapter) :
-        ItemTouchHelper.SimpleCallback(UP or DOWN, START or END) {
+    ItemTouchHelper.SimpleCallback(UP or DOWN, START or END) {
 
     private var isElevated: Boolean = false
 
@@ -42,14 +42,15 @@ class AdapterGestureHelper(val adapter: RingtoneCreatorAdapter) :
     }
 
     override fun onChildDraw(
-            c: Canvas,
-            recyclerView: RecyclerView,
-            viewHolder: RecyclerView.ViewHolder,
-            dX: Float,
-            dY: Float,
-            actionState: Int,
-            isCurrentlyActive: Boolean) {
-        //To avoid elevation conflicts with the system implementation, we will always inform the super that we aren't active
+        c: Canvas,
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        dX: Float,
+        dY: Float,
+        actionState: Int,
+        isCurrentlyActive: Boolean
+    ) {
+        // To avoid elevation conflicts with the system implementation, we will always inform the super that we aren't active
         when (actionState) {
             ACTION_STATE_DRAG -> {
                 super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, false)

@@ -1,6 +1,6 @@
 package com.boswelja.contactringtonegenerator
 
-import org.junit.Assert.*
+import org.junit.Assert.* // ktlint-disable
 import org.junit.Test
 
 class StringJoinerCompatTest {

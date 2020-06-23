@@ -11,7 +11,7 @@ import com.boswelja.contactringtonegenerator.databinding.ContactPickerRecyclervi
 import java.util.Locale
 
 class ContactPickerAdapter(private val useNicknames: Boolean, private val listener: ContactSelectionListener) :
-        RecyclerView.Adapter<ContactPickerAdapter.ContactViewHolder>(), Filterable {
+    RecyclerView.Adapter<ContactPickerAdapter.ContactViewHolder>(), Filterable {
 
     private var layoutInflater: LayoutInflater? = null
 
@@ -89,14 +89,14 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
     }
 
     class ContactViewHolder(private val binding: ContactPickerRecyclerviewItemBinding) :
-            RecyclerView.ViewHolder(binding.root) {
+        RecyclerView.ViewHolder(binding.root) {
 
         val contactName = binding.contactName
         val contactIcon = binding.contactIcon
         val checkbox = binding.checkbox
 
         var isChecked: Boolean get() = binding.checkbox.isChecked
-        set(value) { binding.checkbox.isChecked = value }
+            set(value) { binding.checkbox.isChecked = value }
     }
 
     inner class ItemFilter : Filter() {
@@ -107,7 +107,7 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
                 val search = constraint.toString().toLowerCase(Locale.ROOT)
                 val filteredData = defaultData.filter {
                     it.name.toLowerCase(Locale.ROOT).contains(search) ||
-                            it.nickname?.toLowerCase(Locale.ROOT)?.contains(search) ?: false
+                        it.nickname?.toLowerCase(Locale.ROOT)?.contains(search) ?: false
                 }
                 results.values = filteredData
             } else {

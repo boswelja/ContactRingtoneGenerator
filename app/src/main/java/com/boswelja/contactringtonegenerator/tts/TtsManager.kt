@@ -183,8 +183,9 @@ class TtsManager(context: Context) :
                 restoreVoice = tts.voice
                 tts.voice = voice
             }
-            tts.speak(message, QUEUE_FLUSH, null,
-                    PREVIEW_UTTERANCE_ID
+            tts.speak(
+                message, QUEUE_FLUSH, null,
+                PREVIEW_UTTERANCE_ID
             )
         }
     }

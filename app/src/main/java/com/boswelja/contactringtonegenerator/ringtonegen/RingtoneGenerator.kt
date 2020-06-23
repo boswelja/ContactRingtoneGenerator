@@ -5,11 +5,11 @@ import com.boswelja.contactringtonegenerator.StringJoinerCompat
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.mediastore.MediaStoreHelper
-import com.boswelja.contactringtonegenerator.tts.TtsManager
-import com.boswelja.contactringtonegenerator.tts.SynthesisJob
-import com.boswelja.contactringtonegenerator.tts.SynthesisResult
 import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.Constants
+import com.boswelja.contactringtonegenerator.tts.SynthesisJob
+import com.boswelja.contactringtonegenerator.tts.SynthesisResult
+import com.boswelja.contactringtonegenerator.tts.TtsManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -17,9 +17,9 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 class RingtoneGenerator(
-        private val context: Context,
-        private val ringtoneStructure: List<BaseItem>,
-        private val contacts: List<Contact>
+    private val context: Context,
+    private val ringtoneStructure: List<BaseItem>,
+    private val contacts: List<Contact>
 ) :
     TtsManager.TtsJobProgressListener,
     TtsManager.TtsEngineEventListener {
@@ -83,7 +83,7 @@ class RingtoneGenerator(
             }
             val contactName = contact.nickname ?: contact.name
             val message = messageBuilder.toString()
-                    .replace(Constants.CONTACT_NAME_PLACEHOLDER, contactName)
+                .replace(Constants.CONTACT_NAME_PLACEHOLDER, contactName)
             val synthesisId = contactName.replace(" ", "_") + "-ringtone"
             SynthesisJob(synthesisId, message).also {
                 ttsManager.enqueueJob(it)
@@ -108,7 +108,6 @@ class RingtoneGenerator(
             }
         }
     }
-
 
     fun start() {
         if (state == State.READY) {

@@ -12,8 +12,8 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 
 class SettingsFragment :
-        PreferenceFragmentCompat(),
-        Preference.OnPreferenceClickListener {
+    PreferenceFragmentCompat(),
+    Preference.OnPreferenceClickListener {
 
     private val coroutineScope = MainScope()
 

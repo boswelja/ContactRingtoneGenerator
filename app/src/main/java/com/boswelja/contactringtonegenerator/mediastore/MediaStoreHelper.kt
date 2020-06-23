@@ -21,7 +21,7 @@ object MediaStoreHelper {
     suspend fun scanNewFile(context: Context, file: File): Uri? {
         return withContext(Dispatchers.IO) {
             val contentResolver = context.contentResolver
-            val ringtoneCollection =if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val ringtoneCollection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
             } else {
                 MediaStore.Audio.Media.EXTERNAL_CONTENT_URI

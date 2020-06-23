@@ -26,8 +26,10 @@ object ContactsHelper {
     suspend fun getContacts(context: Context): List<Contact> {
         val contacts = ArrayList<Contact>()
         withContext(Dispatchers.IO) {
-            val cursor = context.contentResolver.query(ContactsContract.Contacts.CONTENT_URI,
-                    CONTACTS_PROJECTION, null, null, null)
+            val cursor = context.contentResolver.query(
+                ContactsContract.Contacts.CONTENT_URI,
+                CONTACTS_PROJECTION, null, null, null
+            )
             if (cursor != null) {
                 val idColumn = cursor.getColumnIndex(ContactsContract.Contacts._ID)
                 val lookupKeyColumn = cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)
@@ -36,13 +38,13 @@ object ContactsHelper {
                     val id = cursor.getLong(idColumn)
                     val lookupKey = cursor.getString(lookupKeyColumn)
                     val contact =
-                            Contact(
-                                    id,
-                                    lookupKey,
-                                    cursor.getString(displayNameColumn),
-                                    getContactNickname(context, lookupKey),
-                                    getContactPhotoUri(context, id)
-                            )
+                        Contact(
+                            id,
+                            lookupKey,
+                            cursor.getString(displayNameColumn),
+                            getContactNickname(context, lookupKey),
+                            getContactPhotoUri(context, id)
+                        )
                     if (!contacts.any { it.id == contact.id }) {
                         contacts.add(contact)
                     }
@@ -58,10 +60,11 @@ object ContactsHelper {
     private suspend fun getContactNickname(context: Context, lookupKey: String): String? {
         return withContext(Dispatchers.IO) {
             val cursor = context.contentResolver.query(
-                    ContactsContract.Data.CONTENT_URI,
-                    CONTACT_NICKNAME_PROJECTION,
-                    "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.Nickname.MIMETYPE} = ?",
-                    arrayOf(lookupKey, ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE), null)
+                ContactsContract.Data.CONTENT_URI,
+                CONTACT_NICKNAME_PROJECTION,
+                "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.Nickname.MIMETYPE} = ?",
+                arrayOf(lookupKey, ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE), null
+            )
 
             var nickname: String? = null
             if (cursor != null) {
@@ -76,7 +79,7 @@ object ContactsHelper {
         }
     }
 
-    private suspend fun getContactPhotoUri(context: Context, contactId: Long) : Uri? {
+    private suspend fun getContactPhotoUri(context: Context, contactId: Long): Uri? {
         return withContext(Dispatchers.IO) {
             val contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId)
             val photoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)

@@ -30,7 +30,7 @@ class ContactPickerFragment : FragmentEasyModeList<ArrayList<Contact>>(), Contac
         PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
     private val adapter: ContactPickerAdapter by lazy {
-        ContactPickerAdapter(sharedPreferences.getBoolean("use_nicknames", true),this)
+        ContactPickerAdapter(sharedPreferences.getBoolean("use_nicknames", true), this)
     }
 
     private lateinit var searchBox: AppCompatEditText
@@ -62,8 +62,9 @@ class ContactPickerFragment : FragmentEasyModeList<ArrayList<Contact>>(), Contac
         val widgetPadding = 8.dp.toInt()
         searchBox = AppCompatEditText(context).apply {
             layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT)
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_search, 0, 0, 0)
             compoundDrawablePadding = widgetPadding
             setPadding(widgetPadding)

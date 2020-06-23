@@ -23,10 +23,10 @@ import kotlin.collections.ArrayList
  * @param showSectionDividers Whether section headers should show a divider as well.
  */
 abstract class SectionedAdapter<T>(
-        private val items: ArrayList<Pair<String, ArrayList<T>>> = ArrayList(),
-        private val showSectionDividers: Boolean = true,
-        private val sectionSortMode: SortMode = SortMode.DEFAULT,
-        private val itemSortMode: SortMode = SortMode.DEFAULT
+    private val items: ArrayList<Pair<String, ArrayList<T>>> = ArrayList(),
+    private val showSectionDividers: Boolean = true,
+    private val sectionSortMode: SortMode = SortMode.DEFAULT,
+    private val itemSortMode: SortMode = SortMode.DEFAULT
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     private var layoutInflater: LayoutInflater? = null
@@ -46,7 +46,7 @@ abstract class SectionedAdapter<T>(
     abstract fun onBindItemViewHolder(holder: RecyclerView.ViewHolder, item: T, position: Int)
 
     override fun getItemCount(): Int =
-            sectionCount + itemCount
+        sectionCount + itemCount
 
     override fun getItemViewType(position: Int): Int {
         return when (getItem(position)) {

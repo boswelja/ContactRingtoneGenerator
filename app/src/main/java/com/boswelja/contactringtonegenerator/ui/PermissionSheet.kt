@@ -31,7 +31,7 @@ class PermissionSheet : BottomSheetDialogFragment() {
         updateMissingPermissionDescription()
 
         binding.grantButton.setOnClickListener {
-            if (permissions.any { shouldShowRequestPermissionRationale(it)}) {
+            if (permissions.any { shouldShowRequestPermissionRationale(it) }) {
                 launchApplicationSettings()
             } else {
                 requestPermissions(permissions, PERMISSION_REQUEST_CODE)
@@ -84,7 +84,7 @@ class PermissionSheet : BottomSheetDialogFragment() {
     }
 
     private fun hasPermission(permission: String) =
-            requireContext().checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
+        requireContext().checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
 
     companion object {
         private const val PERMISSION_REQUEST_CODE = 123

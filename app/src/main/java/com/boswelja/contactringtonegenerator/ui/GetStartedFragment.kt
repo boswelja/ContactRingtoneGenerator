@@ -23,7 +23,8 @@ class GetStartedFragment : Fragment() {
         binding.apply {
             getStartedButton.setOnClickListener {
                 if (context?.checkSelfPermission(Manifest.permission.READ_CONTACTS)
-                        == PackageManager.PERMISSION_GRANTED) {
+                    == PackageManager.PERMISSION_GRANTED
+                ) {
                     findNavController().navigate(GetStartedFragmentDirections.toContactPickerFragment())
                 } else {
                     PermissionSheet().show(childFragmentManager, "PermissionSheet")

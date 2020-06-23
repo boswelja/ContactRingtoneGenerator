@@ -6,5 +6,4 @@ interface ContactSelectionListener {
 
     fun onContactSelected(contact: Contact)
     fun onContactDeselected(contact: Contact)
-
 }

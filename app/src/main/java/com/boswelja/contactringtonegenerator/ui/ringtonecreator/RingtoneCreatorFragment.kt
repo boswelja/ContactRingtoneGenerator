@@ -8,12 +8,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.databinding.FragmentRingtoneCreatorBinding
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorAvailableItemBinding
-import com.boswelja.contactringtonegenerator.ui.MainActivity
-import com.boswelja.contactringtonegenerator.ui.common.BaseDataFragment
 import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ContactName
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
 import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
+import com.boswelja.contactringtonegenerator.ui.MainActivity
+import com.boswelja.contactringtonegenerator.ui.common.BaseDataFragment
 import com.google.android.material.chip.Chip
 
 class RingtoneCreatorFragment : BaseDataFragment<ArrayList<BaseItem>>(), RingtoneCreatorAdapter.DataEventListener {

@@ -16,11 +16,11 @@ class ContactNameViewHolder(binding: RingtoneCreatorItemBinding) : BaseViewHolde
     override fun createWidgetView(): View {
         return AppCompatTextView(itemView.context).apply {
             layoutParams = ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT)
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT
+            )
             setTextAppearance(R.style.TextAppearance_MaterialComponents_Body1)
         }
     }
-
 
     override fun bind(item: BaseItem) {
         (widgetView as AppCompatTextView).text = item.getLabel()
