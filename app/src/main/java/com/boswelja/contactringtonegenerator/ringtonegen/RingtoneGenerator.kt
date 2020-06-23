@@ -18,7 +18,6 @@ import java.io.File
 
 class RingtoneGenerator(
         private val context: Context,
-        private val ttsManager: TtsManager,
         private val ringtoneStructure: List<BaseItem>,
         private val contacts: List<Contact>
 ) :
@@ -27,6 +26,7 @@ class RingtoneGenerator(
 
     private val coroutineScope = MainScope()
     private val cacheDir: File = context.cacheDir
+    private val ttsManager = TtsManager(context)
 
     private var remainingJobs: HashMap<String, Contact> = HashMap()
 

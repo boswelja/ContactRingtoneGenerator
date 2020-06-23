@@ -10,7 +10,6 @@ import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ActivityMainBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
-import com.boswelja.contactringtonegenerator.tts.TtsManager
 import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 
 class MainActivity : AppCompatActivity() {
@@ -21,8 +20,6 @@ class MainActivity : AppCompatActivity() {
     var ringtoneGenerator: RingtoneGenerator? = null
         private set
     private lateinit var binding: ActivityMainBinding
-    lateinit var ttsManager: TtsManager
-        private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -45,11 +42,6 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onStart() {
-        super.onStart()
-        ttsManager = TtsManager(this)
-    }
-
     override fun onDestroy() {
         super.onDestroy()
         ringtoneGenerator?.destroy()
@@ -68,7 +60,7 @@ class MainActivity : AppCompatActivity() {
 
     fun createRingtoneGenerator(): RingtoneGenerator {
         ringtoneGenerator?.destroy()
-        ringtoneGenerator = RingtoneGenerator(this, ttsManager, ringtoneItems, selectedContacts)
+        ringtoneGenerator = RingtoneGenerator(this, ringtoneItems, selectedContacts)
         return ringtoneGenerator!!
     }
 }
