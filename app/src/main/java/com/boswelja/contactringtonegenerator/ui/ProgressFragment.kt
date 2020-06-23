@@ -8,12 +8,14 @@ import androidx.fragment.app.Fragment
 import com.boswelja.contactringtonegenerator.databinding.FragmentLoadingBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
 import com.boswelja.contactringtonegenerator.tts.SynthesisResult
+import timber.log.Timber
 
 class ProgressFragment : Fragment(), RingtoneGenerator.ProgressListener {
 
     private lateinit var binding: FragmentLoadingBinding
 
     override fun onGenerateStarted(totalJobCount: Int) {
+        Timber.d("onGenerateStarted($totalJobCount)")
         binding.progressBar.apply {
             max = totalJobCount
             progress = 0
@@ -22,14 +24,15 @@ class ProgressFragment : Fragment(), RingtoneGenerator.ProgressListener {
     }
 
     override fun onGenerateFinished() {
-
+        Timber.d("onGenerateFinished()")
     }
 
     override fun onJobStarted() {
-
+        Timber.d("onJobStarted()")
     }
 
     override fun onJobCompleted(success: Boolean, synthesisResult: SynthesisResult) {
+        Timber.d("onJobCompleted($success, $synthesisResult)")
         binding.progressBar.apply {
             if (success) {
                 progress += 1
