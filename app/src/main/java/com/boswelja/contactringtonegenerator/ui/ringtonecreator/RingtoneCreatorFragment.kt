@@ -14,7 +14,6 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ContactName
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
 import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.Utils.ALL_ITEMS
 import com.google.android.material.chip.Chip
 
 class RingtoneCreatorFragment : BaseDataFragment<ArrayList<BaseItem>>(), RingtoneCreatorAdapter.DataEventListener {
@@ -23,7 +22,7 @@ class RingtoneCreatorFragment : BaseDataFragment<ArrayList<BaseItem>>(), Rington
 
     private val onAvailableItemClickListener = View.OnClickListener {
         if (it is Chip) {
-            val item = when (ALL_ITEMS.first { item -> item.getLabel() == it.text }.id) {
+            val item = when (ID.values().first { item -> item.id == it.id }) {
                 ID.CONTACT_NAME -> ContactName()
                 ID.TEXT_ITEM -> TextItem()
             }
@@ -87,10 +86,19 @@ class RingtoneCreatorFragment : BaseDataFragment<ArrayList<BaseItem>>(), Rington
     }
 
     private fun setupAvailableMessageItems() {
-        ALL_ITEMS.forEach {
+        ID.values().forEach {
             val chipBinding = RingtoneCreatorAvailableItemBinding.inflate(layoutInflater)
             chipBinding.root.apply {
-                text = it.getLabel()
+                // TODO There must be a better way of getting the label for an item
+                text = when (it) {
+                    ID.CONTACT_NAME -> {
+                        ContactName().getLabel()
+                    }
+                    ID.TEXT_ITEM -> {
+                        TextItem().getLabel()
+                    }
+                }
+                id = it.id
                 setOnClickListener(onAvailableItemClickListener)
             }
             binding.availableItems.addView(chipBinding.root)

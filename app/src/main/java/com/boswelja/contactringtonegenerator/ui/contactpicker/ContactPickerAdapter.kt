@@ -35,9 +35,9 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
         val selected = selectedContacts.contains(contact)
         holder.apply {
             contactName.text = if (useNicknames) {
-                contact.contactNickname ?: contact.contactName
+                contact.nickname ?: contact.name
             } else {
-                contact.contactName
+                contact.name
             }
             itemView.setOnClickListener {
                 if (holder.isChecked) {
@@ -62,9 +62,9 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
     private fun sortContacts() {
         filteredContacts.sortBy {
             if (useNicknames) {
-                it.contactNickname ?: it.contactName
+                it.nickname ?: it.name
             } else {
-                it.contactName
+                it.name
             }
         }
     }
@@ -106,8 +106,8 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
             if (constraint != null) {
                 val search = constraint.toString().toLowerCase(Locale.ROOT)
                 val filteredData = defaultData.filter {
-                    it.contactName.toLowerCase(Locale.ROOT).contains(search) ||
-                            it.contactNickname?.toLowerCase(Locale.ROOT)?.contains(search) ?: false
+                    it.name.toLowerCase(Locale.ROOT).contains(search) ||
+                            it.nickname?.toLowerCase(Locale.ROOT)?.contains(search) ?: false
                 }
                 results.values = filteredData
             } else {
