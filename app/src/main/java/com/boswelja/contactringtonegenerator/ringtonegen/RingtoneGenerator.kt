@@ -18,7 +18,6 @@ import java.io.File
 
 class RingtoneGenerator(
         private val context: Context,
-        private val ttsManager: TtsManager,
         private val ringtoneStructure: List<BaseItem>,
         private val contacts: List<Contact>
 ) :
@@ -27,8 +26,12 @@ class RingtoneGenerator(
 
     private val coroutineScope = MainScope()
     private val cacheDir: File = context.cacheDir
+    private val ttsManager = TtsManager(context)
 
     private var remainingJobs: HashMap<String, Contact> = HashMap()
+    private var jobsQueued: Boolean = false
+
+    val totalJobCount: Int get() = remainingJobs.count()
 
     var progressListener: ProgressListener? = null
     var stateListener: StateListener? = null
@@ -47,26 +50,28 @@ class RingtoneGenerator(
             contacts.forEach {
                 queueJobFor(it)
             }
-            state = State.READY
+            jobsQueued = true
+            if (ttsManager.isEngineReady) state = State.READY
         }
     }
 
     override fun onInitialised(success: Boolean) {
-
+        if (!success) throw IllegalStateException("TTS failed to initialise")
+        if (jobsQueued) state = State.READY
     }
 
     override fun onJobStarted(synthesisJob: SynthesisJob) {
-        val contact = remainingJobs[synthesisJob.synthesisId]!!
+        val contact = remainingJobs[synthesisJob.id]!!
         progressListener?.onJobStarted(contact)
     }
 
     override fun onJobCompleted(success: Boolean, synthesisResult: SynthesisResult) {
-        val contact = remainingJobs[synthesisResult.synthesisId]
+        val contact = remainingJobs[synthesisResult.id]
         if (success) handleGenerateCompleted(contact!!, synthesisResult)
         else {
-            remainingJobs.remove(synthesisResult.synthesisId)
+            remainingJobs.remove(synthesisResult.id)
             progressListener?.onJobCompleted(success, synthesisResult)
-            if (remainingJobs.count() < 1) progressListener?.onGenerateFinished()
+            if (remainingJobs.count() < 1) state = State.FINISHED
         }
     }
 
@@ -80,37 +85,34 @@ class RingtoneGenerator(
             val message = messageBuilder.toString()
                     .replace(Constants.CONTACT_NAME_PLACEHOLDER, contactName)
             val synthesisId = contactName.replace(" ", "_") + "-ringtone"
-            SynthesisJob.create(message, synthesisId).also {
+            SynthesisJob(synthesisId, message).also {
                 ttsManager.enqueueJob(it)
-                remainingJobs[it.synthesisId] = contact
+                remainingJobs[it.id] = contact
             }
         }
     }
 
     private fun handleGenerateCompleted(contact: Contact, synthesisResult: SynthesisResult) {
         coroutineScope.launch(Dispatchers.IO) {
-            val uri = MediaStoreHelper.scanNewFile(context, synthesisResult.file)
+            val uri = MediaStoreHelper.scanNewFile(context, synthesisResult.result)
             val success = if (uri != null) {
                 ContactsHelper.setContactRingtone(context, contact, uri)
                 true
             } else false
-            remainingJobs.remove(synthesisResult.synthesisId)
+            remainingJobs.remove(synthesisResult.id)
             withContext(Dispatchers.Main) {
                 progressListener?.onJobCompleted(success, synthesisResult)
                 if (remainingJobs.count() < 1) {
                     state = State.FINISHED
-                    progressListener?.onGenerateFinished()
                 }
             }
         }
     }
 
-    private fun calculateTotalJobCount(): Int = remainingJobs.count()
 
     fun start() {
         if (state == State.READY) {
             state = State.GENERATING
-            progressListener?.onGenerateStarted(calculateTotalJobCount())
             ttsManager.startSynthesis()
         } else {
             throw IllegalStateException("Generator not ready")
@@ -127,10 +129,8 @@ class RingtoneGenerator(
     }
 
     interface ProgressListener {
-        fun onGenerateStarted(totalJobCount: Int)
         fun onJobStarted(contact: Contact)
         fun onJobCompleted(success: Boolean, synthesisResult: SynthesisResult)
-        fun onGenerateFinished()
     }
 
     enum class State {

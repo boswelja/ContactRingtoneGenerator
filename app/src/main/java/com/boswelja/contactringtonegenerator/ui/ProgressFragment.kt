@@ -21,6 +21,7 @@ class ProgressFragment :
     private lateinit var ringtoneGenerator: RingtoneGenerator
 
     override fun onStateChanged(state: RingtoneGenerator.State) {
+        Timber.d("onStateChanged($state)")
         when (state) {
             RingtoneGenerator.State.READY -> {
                 ringtoneGenerator.start()
@@ -30,6 +31,7 @@ class ProgressFragment :
                     isIndeterminate = false
                     progress = 0
                     secondaryProgress = 0
+                    max = ringtoneGenerator.totalJobCount
                 }
                 binding.loadingTitle.text = getString(R.string.progress_generating)
             }
@@ -43,23 +45,16 @@ class ProgressFragment :
                             successes.toString(),
                             failures.toString())
                 }
+                ringtoneGenerator.destroy()
+            }
+            else -> {
+                // Do nothing
             }
         }
     }
 
-    override fun onGenerateStarted(totalJobCount: Int) {
-        Timber.d("onGenerateStarted($totalJobCount)")
-        binding.progressBar.apply {
-            max = totalJobCount
-        }
-    }
-
-    override fun onGenerateFinished() {
-        Timber.d("onGenerateFinished()")
-    }
-
     override fun onJobStarted(contact: Contact) {
-        Timber.d("onJobStarted()")
+        Timber.d("onJobStarted($contact)")
         binding.loadingStatus.text = getString(R.string.status_generating, contact.contactNickname ?: contact.contactName)
     }
 
@@ -80,8 +75,8 @@ class ProgressFragment :
         return binding.root
     }
 
-    override fun onResume() {
-        super.onResume()
+    override fun onStart() {
+        super.onStart()
         val activity = requireActivity()
         if (activity is MainActivity) {
             activity.removeTitle()

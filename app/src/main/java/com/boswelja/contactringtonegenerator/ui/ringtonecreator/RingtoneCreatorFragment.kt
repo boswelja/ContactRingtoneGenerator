@@ -74,7 +74,7 @@ class RingtoneCreatorFragment : BaseDataFragment<ArrayList<BaseItem>>(), Rington
         updateNextButtonEnabled()
         updateNoDataViewVisibility()
         binding.nextButton.setOnClickListener {
-            findNavController().navigate(RingtoneCreatorFragmentDirections.toGeneratingFlow())
+            findNavController().navigate(RingtoneCreatorFragmentDirections.toLoadingFragment())
         }
     }
 
