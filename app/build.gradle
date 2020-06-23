@@ -66,8 +66,6 @@ spotless {
 
         ktlint("0.37.2")
         endWithNewline()
-
-        licenseHeaderFile '../LICENSE'
     }
     format 'misc', {
         target '**/*.gradle', '**/.gitignore'
