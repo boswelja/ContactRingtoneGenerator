@@ -56,7 +56,8 @@ class RingtoneGenerator(
     }
 
     override fun onJobStarted(synthesisJob: SynthesisJob) {
-        progressListener?.onJobStarted()
+        val contact = remainingJobs[synthesisJob.synthesisId]!!
+        progressListener?.onJobStarted(contact)
     }
 
     override fun onJobCompleted(success: Boolean, synthesisResult: SynthesisResult) {
@@ -127,7 +128,7 @@ class RingtoneGenerator(
 
     interface ProgressListener {
         fun onGenerateStarted(totalJobCount: Int)
-        fun onJobStarted()
+        fun onJobStarted(contact: Contact)
         fun onJobCompleted(success: Boolean, synthesisResult: SynthesisResult)
         fun onGenerateFinished()
     }

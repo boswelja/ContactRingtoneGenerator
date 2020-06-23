@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.FragmentLoadingBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
 import com.boswelja.contactringtonegenerator.tts.SynthesisResult
@@ -39,7 +40,7 @@ class ProgressFragment :
         Timber.d("onGenerateFinished()")
     }
 
-    override fun onJobStarted() {
+    override fun onJobStarted(contact: Contact) {
         Timber.d("onJobStarted()")
     }
 
