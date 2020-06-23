@@ -6,6 +6,7 @@ import android.speech.tts.TextToSpeech.QUEUE_FLUSH
 import android.speech.tts.TextToSpeech.SUCCESS
 import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
+import timber.log.Timber
 import java.io.File
 import java.util.Locale
 import kotlin.collections.ArrayList
@@ -15,11 +16,10 @@ class TtsManager(context: Context) :
     UtteranceProgressListener() {
 
     private val cacheDirectory = context.cacheDir
-    private val context = context.applicationContext
     private val synthesisJobs = ArrayList<SynthesisJob>()
     private val synthesisResults = ArrayList<SynthesisResult>()
 
-    private var tts: TextToSpeech = TextToSpeech(context.applicationContext, this)
+    private val tts: TextToSpeech = TextToSpeech(context, this)
     private var restoreVoice: Voice? = null
 
     /**
@@ -43,6 +43,7 @@ class TtsManager(context: Context) :
         }
 
     override fun onInit(status: Int) {
+        Timber.d("Init $status")
         isEngineReady = status == SUCCESS
         if (isEngineReady) {
             tts.setOnUtteranceProgressListener(this)
@@ -89,15 +90,6 @@ class TtsManager(context: Context) :
      */
     private fun getSynthesisJob(utteranceId: String?): SynthesisJob? {
         return synthesisJobs.firstOrNull { it.synthesisId == utteranceId }
-    }
-
-    /**
-     * Initialise [TextToSpeech].
-     * @param enginePackageName The package name of the TTS engine to use, or null if default.
-     */
-    private fun initTts(enginePackageName: String? = null) {
-        isEngineReady = false
-        tts = TextToSpeech(context, this, enginePackageName)
     }
 
     fun startSynthesis() {
@@ -157,14 +149,6 @@ class TtsManager(context: Context) :
             return tts.setVoice(voice) == SUCCESS
         }
         return false
-    }
-
-    /**
-     * Set the TTS engine to use.
-     * @param enginePackageName The package name of the TTS engine, or null if default.
-     */
-    fun setEngine(enginePackageName: String?) {
-        initTts(enginePackageName)
     }
 
     /**

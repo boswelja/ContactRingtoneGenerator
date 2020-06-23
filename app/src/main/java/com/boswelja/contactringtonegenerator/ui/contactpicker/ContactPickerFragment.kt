@@ -48,12 +48,14 @@ class ContactPickerFragment : FragmentEasyModeList<ArrayList<Contact>>(), Contac
         selectedContacts.remove(contact)
         updateSelectedContactsView()
         updateNextEnabled()
+        saveData()
     }
 
     override fun onContactSelected(contact: Contact) {
         selectedContacts.add(contact)
         updateSelectedContactsView()
         updateNextEnabled()
+        saveData()
     }
 
     override fun onCreateWidgetView(): View? {
@@ -85,7 +87,7 @@ class ContactPickerFragment : FragmentEasyModeList<ArrayList<Contact>>(), Contac
         updateNextEnabled()
         binding.apply {
             nextButton.setOnClickListener {
-                findNavController().navigate(ContactPickerFragmentDirections.toVoicePickerFragment())
+                findNavController().navigate(ContactPickerFragmentDirections.toRingtoneCreatorFragment())
             }
             recyclerView.apply {
                 layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)

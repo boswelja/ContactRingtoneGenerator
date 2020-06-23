@@ -15,23 +15,14 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 
 class MainActivity : AppCompatActivity() {
 
-    val ttsManager by lazy { TtsManager(this) }
     val selectedContacts = ArrayList<Contact>()
     val ringtoneItems = ArrayList<BaseItem>()
-    val canStartGenerating: Boolean
-        get() = ttsManager.isEngineReady && selectedContacts.isNotEmpty() && ringtoneItems.isNotEmpty()
 
     var ringtoneGenerator: RingtoneGenerator? = null
         private set
-    var ttsEngine: String? = null
-        set(value) {
-            if (field != value) {
-                field = value
-                ttsManager.setEngine(field)
-            }
-        }
-
     private lateinit var binding: ActivityMainBinding
+    lateinit var ttsManager: TtsManager
+        private set
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,10 +37,17 @@ class MainActivity : AppCompatActivity() {
 
         val navController = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container)?.findNavController()
         if (navController != null) {
-            val appBarConfiguration = AppBarConfiguration(navController.graph)
+            val appBarConfiguration = AppBarConfiguration(setOf(
+                    R.id.getStartedFragment,
+                    R.id.loadingFragment))
 
             binding.toolbar.setupWithNavController(navController, appBarConfiguration)
         }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        ttsManager = TtsManager(this)
     }
 
     override fun onDestroy() {
@@ -70,13 +68,7 @@ class MainActivity : AppCompatActivity() {
 
     fun createRingtoneGenerator(): RingtoneGenerator {
         ringtoneGenerator?.destroy()
-        ringtoneGenerator = RingtoneGenerator(cacheDir, ttsManager, ringtoneItems, selectedContacts)
+        ringtoneGenerator = RingtoneGenerator(this, ttsManager, ringtoneItems, selectedContacts)
         return ringtoneGenerator!!
-    }
-
-    fun generate() {
-        if (canStartGenerating) {
-            ringtoneGenerator?.start()
-        }
     }
 }

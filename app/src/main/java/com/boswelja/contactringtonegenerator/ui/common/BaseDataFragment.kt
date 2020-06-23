@@ -2,6 +2,7 @@ package com.boswelja.contactringtonegenerator.ui.common
 
 import androidx.fragment.app.Fragment
 import com.boswelja.contactringtonegenerator.ui.MainActivity
+import timber.log.Timber
 
 abstract class BaseDataFragment<T> : Fragment() {
 
@@ -13,6 +14,8 @@ abstract class BaseDataFragment<T> : Fragment() {
         val mainActivity = activity
         if (data != null && mainActivity is MainActivity) {
             onSaveData(mainActivity, data)
+        } else {
+            Timber.w("Tried to save data, but data was null or not the right activity")
         }
     }
 
@@ -28,9 +31,4 @@ abstract class BaseDataFragment<T> : Fragment() {
      * @return The stored data [T], or null if it doesn't exist.
      */
     open fun requestData(): T? = null
-
-    override fun onPause() {
-        super.onPause()
-        saveData()
-    }
 }
