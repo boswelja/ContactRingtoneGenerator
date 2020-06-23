@@ -29,6 +29,7 @@ class RingtoneGenerator(
     private val ttsManager = TtsManager(context)
 
     private var remainingJobs: HashMap<String, Contact> = HashMap()
+    private var jobsQueued: Boolean = false
 
     var progressListener: ProgressListener? = null
     var stateListener: StateListener? = null
@@ -47,12 +48,14 @@ class RingtoneGenerator(
             contacts.forEach {
                 queueJobFor(it)
             }
-            state = State.READY
+            jobsQueued = true
+            if (ttsManager.isEngineReady) state = State.READY
         }
     }
 
     override fun onInitialised(success: Boolean) {
-
+        if (!success) throw IllegalStateException("TTS failed to initialise")
+        if (jobsQueued) state = State.READY
     }
 
     override fun onJobStarted(synthesisJob: SynthesisJob) {
