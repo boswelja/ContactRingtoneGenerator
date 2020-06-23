@@ -81,7 +81,7 @@ class RingtoneGenerator(
             ringtoneStructure.forEach {
                 messageBuilder.add(it.getEngineText())
             }
-            val contactName = contact.contactNickname ?: contact.contactName
+            val contactName = contact.nickname ?: contact.name
             val message = messageBuilder.toString()
                     .replace(Constants.CONTACT_NAME_PLACEHOLDER, contactName)
             val synthesisId = contactName.replace(" ", "_") + "-ringtone"

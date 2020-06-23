@@ -39,11 +39,9 @@ object ContactsHelper {
                             Contact(
                                     id,
                                     lookupKey,
-                                    getContactPhotoUri(context, id),
                                     cursor.getString(displayNameColumn),
-                                    getContactNickname(
-                                            context,
-                                            lookupKey)
+                                    getContactNickname(context, lookupKey),
+                                    getContactPhotoUri(context, id)
                             )
                     if (!contacts.any { it.id == contact.id }) {
                         contacts.add(contact)
@@ -53,7 +51,7 @@ object ContactsHelper {
             }
         }
         return withContext(Dispatchers.Default) {
-            return@withContext contacts.sortedBy { it.contactNickname ?: it.contactName }
+            return@withContext contacts.sortedBy { it.nickname ?: it.name }
         }
     }
 
