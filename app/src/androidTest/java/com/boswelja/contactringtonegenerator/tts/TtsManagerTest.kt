@@ -4,10 +4,9 @@ import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import com.boswelja.contactringtonegenerator.MockitoHelper
 import org.awaitility.kotlin.await
-import org.junit.Test
-
 import org.junit.Assert.* // ktlint-disable
 import org.junit.Before
+import org.junit.Test
 import org.mockito.ArgumentMatchers
 import org.mockito.Mock
 import org.mockito.Mockito.times
@@ -60,9 +59,9 @@ class TtsManagerTest {
         await.atMost(5, TimeUnit.SECONDS).until(ttsManager::isEngineReady)
 
         val jobs = arrayOf(
-                SynthesisJob("id1", "text"),
-                SynthesisJob("id2", "text"),
-                SynthesisJob("id3", "text")
+            SynthesisJob("id1", "text"),
+            SynthesisJob("id2", "text"),
+            SynthesisJob("id3", "text")
         )
         jobs.forEach {
             ttsManager.enqueueJob(it)

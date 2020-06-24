@@ -1,6 +1,6 @@
 package com.boswelja.contactringtonegenerator
 
-import org.junit.Assert.* // ktfmt-disable
+import org.junit.Assert.* // ktlint-disable
 import org.junit.Test
 import timber.log.Timber
 

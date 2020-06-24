@@ -75,8 +75,9 @@ class AdapterGestureHelper(val adapter: RingtoneCreatorAdapter) :
         if (elevate) {
             isElevated = true
             ViewCompat.setElevation(
-                    viewHolder.itemView,
-                    viewHolder.itemView.resources.getDimension(R.dimen.adapter_gesture_elevation))
+                viewHolder.itemView,
+                viewHolder.itemView.resources.getDimension(R.dimen.adapter_gesture_elevation)
+            )
         } else {
             isElevated = false
             ViewCompat.setElevation(viewHolder.itemView, 0f)
