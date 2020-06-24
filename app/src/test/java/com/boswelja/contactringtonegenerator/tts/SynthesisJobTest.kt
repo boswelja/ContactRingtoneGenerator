@@ -1,8 +1,7 @@
 package com.boswelja.contactringtonegenerator.tts
 
+import org.junit.Assert.* // ktlint-disable
 import org.junit.Test
-
-import org.junit.Assert.*
 
 class SynthesisJobTest {
 
