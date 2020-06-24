@@ -66,11 +66,12 @@ class RingtoneGenerator(
     }
 
     override fun onJobCompleted(success: Boolean, synthesisResult: SynthesisResult) {
-        val contact = remainingJobs[synthesisResult.id]
-        if (success) handleGenerateCompleted(contact!!, synthesisResult)
-        else {
+        coroutineScope.launch(Dispatchers.Main) {
+            val contact = remainingJobs[synthesisResult.id]
+            val saveSuccess = if (success) handleGenerateCompleted(contact!!, synthesisResult)
+            else false
             remainingJobs.remove(synthesisResult.id)
-            progressListener?.onJobCompleted(success, synthesisResult)
+            progressListener?.onJobCompleted(saveSuccess, synthesisResult)
             if (remainingJobs.count() < 1) state = State.FINISHED
         }
     }
@@ -92,20 +93,13 @@ class RingtoneGenerator(
         }
     }
 
-    private fun handleGenerateCompleted(contact: Contact, synthesisResult: SynthesisResult) {
-        coroutineScope.launch(Dispatchers.IO) {
+    private suspend fun handleGenerateCompleted(contact: Contact, synthesisResult: SynthesisResult): Boolean {
+        return withContext(Dispatchers.IO) {
             val uri = MediaStoreHelper.scanNewFile(context, synthesisResult.result)
-            val success = if (uri != null) {
+            return@withContext if (uri != null) {
                 ContactsHelper.setContactRingtone(context, contact, uri)
                 true
             } else false
-            remainingJobs.remove(synthesisResult.id)
-            withContext(Dispatchers.Main) {
-                progressListener?.onJobCompleted(success, synthesisResult)
-                if (remainingJobs.count() < 1) {
-                    state = State.FINISHED
-                }
-            }
         }
     }
 
