@@ -5,7 +5,7 @@ import java.io.File
 data class SynthesisResult(val id: String, val result: File) {
 
     override fun equals(other: Any?): Boolean {
-        if (other is SynthesisJob) {
+        if (other is SynthesisResult) {
             return other.id == id
         }
         return super.equals(other)
