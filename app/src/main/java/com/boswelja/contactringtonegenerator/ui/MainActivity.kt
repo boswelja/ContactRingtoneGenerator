@@ -39,10 +39,11 @@ class MainActivity : AppCompatActivity() {
             val appBarConfiguration = AppBarConfiguration(
                 setOf(R.id.getStartedFragment, R.id.loadingFragment)
             )
-
-            binding.toolbar.setupWithNavController(navController, appBarConfiguration)
-            navController.addOnDestinationChangedListener { _, destination, _ ->
-                binding.toolbar.title = destination.label
+            binding.toolbar.apply {
+                setupWithNavController(navController, appBarConfiguration)
+                navController.addOnDestinationChangedListener { _, destination, _ ->
+                    title = destination.label
+                }
             }
         }
     }
