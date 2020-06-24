@@ -3,4 +3,7 @@
     <color name="colorPrimary">#673ab7</color>
     <color name="windowBackground">#FFFFFF</color>
     <color name="searchBackground">#FFFFFF</color>
+
+    <color name="progressSuccessColor">@color/colorPrimary</color>
+    <color name="progressFailedColor">#B00020</color>
 </resources>
