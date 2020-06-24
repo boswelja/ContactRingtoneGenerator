@@ -17,6 +17,12 @@ import java.util.concurrent.TimeUnit
 
 class TtsManagerTest {
 
+    private val testJobs = arrayOf(
+            SynthesisJob("id1", "text"),
+            SynthesisJob("id2", "text"),
+            SynthesisJob("id3", "text")
+    )
+
     @Mock
     lateinit var engineEventListener: TtsManager.EngineEventListener
     @Mock
@@ -34,9 +40,9 @@ class TtsManagerTest {
     fun jobQueue() {
         val ttsManager = TtsManager(context)
         assertEquals(ttsManager.synthesisJobCount, 0)
-        ttsManager.enqueueJob(SynthesisJob("id1", "text"))
-        ttsManager.enqueueJob(SynthesisJob("id2", "text"))
-        ttsManager.enqueueJob(SynthesisJob("id3", "text"))
+        testJobs.forEach {
+            ttsManager.enqueueJob(it)
+        }
         assertEquals(ttsManager.synthesisJobCount, 3)
         ttsManager.destroy()
     }
@@ -58,12 +64,7 @@ class TtsManagerTest {
         }
         await.atMost(5, TimeUnit.SECONDS).until(ttsManager::isEngineReady)
 
-        val jobs = arrayOf(
-            SynthesisJob("id1", "text"),
-            SynthesisJob("id2", "text"),
-            SynthesisJob("id3", "text")
-        )
-        jobs.forEach {
+        testJobs.forEach {
             ttsManager.enqueueJob(it)
         }
 
@@ -74,7 +75,7 @@ class TtsManagerTest {
         val callable = Callable { jobCountRef.get() == 0 }
         await.atMost(30, TimeUnit.SECONDS).until(callable)
 
-        jobs.forEach {
+        testJobs.forEach {
             verify(progressListener, times(1)).onJobStarted(it)
         }
         verify(progressListener, times(3)).onJobCompleted(ArgumentMatchers.anyBoolean(), MockitoHelper.anyObject())
