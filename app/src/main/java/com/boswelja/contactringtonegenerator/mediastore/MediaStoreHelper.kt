@@ -14,8 +14,8 @@ import java.io.FileInputStream
 object MediaStoreHelper {
 
     private val DELETE_RINGTONE_PROJECTION = arrayOf(
-            MediaStore.Audio.Media.DISPLAY_NAME,
-            MediaStore.Audio.Media.IS_RINGTONE
+        MediaStore.Audio.Media.DISPLAY_NAME,
+        MediaStore.Audio.Media.IS_RINGTONE
     )
 
     /**
