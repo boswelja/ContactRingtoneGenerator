@@ -18,9 +18,9 @@ import java.util.concurrent.TimeUnit
 class TtsManagerTest {
 
     private val testJobs = arrayOf(
-            SynthesisJob("id1", "text"),
-            SynthesisJob("id2", "text"),
-            SynthesisJob("id3", "text")
+        SynthesisJob("id1", "text"),
+        SynthesisJob("id2", "text"),
+        SynthesisJob("id3", "text")
     )
 
     @Mock

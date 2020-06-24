@@ -80,7 +80,6 @@ class ProgressFragment :
         super.onStart()
         val activity = requireActivity()
         if (activity is MainActivity) {
-            activity.removeTitle()
             ringtoneGenerator = activity.createRingtoneGenerator().apply {
                 progressListener = this@ProgressFragment
                 stateListener = this@ProgressFragment

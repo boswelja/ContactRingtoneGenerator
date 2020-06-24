@@ -30,21 +30,21 @@ class MainActivity : AppCompatActivity() {
             setDisplayShowTitleEnabled(false)
         }
 
+        setupNavController()
+    }
+
+    private fun setupNavController() {
         val navController = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container)?.findNavController()
         if (navController != null) {
             val appBarConfiguration = AppBarConfiguration(
-                setOf(
-                    R.id.getStartedFragment,
-                    R.id.loadingFragment
-                )
+                setOf(R.id.getStartedFragment, R.id.loadingFragment)
             )
 
             binding.toolbar.setupWithNavController(navController, appBarConfiguration)
+            navController.addOnDestinationChangedListener { _, destination, _ ->
+                binding.toolbar.title = destination.label
+            }
         }
-    }
-
-    fun removeTitle() {
-        binding.toolbar.title = null
     }
 
     fun setSubtitle(subtitle: String?) {

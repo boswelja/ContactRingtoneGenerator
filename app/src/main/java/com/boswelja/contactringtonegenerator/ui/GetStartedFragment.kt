@@ -22,21 +22,37 @@ class GetStartedFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         binding.apply {
             getStartedButton.setOnClickListener {
-                if (context?.checkSelfPermission(Manifest.permission.READ_CONTACTS)
-                    == PackageManager.PERMISSION_GRANTED
-                ) {
-                    findNavController().navigate(GetStartedFragmentDirections.toContactPickerFragment())
-                } else {
-                    PermissionSheet().show(childFragmentManager, "PermissionSheet")
-                }
+                getStarted()
             }
             settingsButton.setOnClickListener {
-                findNavController().navigate(GetStartedFragmentDirections.toSettingsFragment())
+                navigateToSettings()
             }
         }
-        val activity = requireActivity()
-        if (activity is MainActivity) {
-            activity.removeTitle()
+    }
+
+    /**
+     * Navigate to Settings.
+     */
+    private fun navigateToSettings() {
+        findNavController().navigate(GetStartedFragmentDirections.toSettingsFragment())
+    }
+
+    /**
+     * Starts the generator flow, or asks for permission if missing first.
+     */
+    private fun getStarted() {
+        if (hasContactPermissions()) {
+            findNavController().navigate(GetStartedFragmentDirections.toContactPickerFragment())
+        } else {
+            PermissionSheet().show(childFragmentManager, "PermissionSheet")
         }
     }
+
+    /**
+     * Checks whether this app has READ_CONTACTS or WRITE_CONTACTS.
+     * @return true if we have both permissions, false otherwise.
+     */
+    private fun hasContactPermissions(): Boolean =
+        context?.checkSelfPermission(Manifest.permission.READ_CONTACTS) == PackageManager.PERMISSION_GRANTED &&
+            context?.checkSelfPermission(Manifest.permission.WRITE_CONTACTS) == PackageManager.PERMISSION_GRANTED
 }
