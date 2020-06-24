@@ -4,7 +4,6 @@ import android.content.Context
 import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.SUCCESS
 import android.speech.tts.UtteranceProgressListener
-import android.speech.tts.Voice
 import timber.log.Timber
 import java.io.File
 import kotlin.collections.ArrayList
@@ -20,9 +19,7 @@ class TtsManager(context: Context) :
     private val cacheDirectory = context.cacheDir
     private val synthesisJobs = ArrayList<SynthesisJob>()
     private val synthesisResults = ArrayList<SynthesisResult>()
-
     private val tts: TextToSpeech = TextToSpeech(context, this)
-    private var restoreVoice: Voice? = null
 
     /**
      * The number of [SynthesisJob] that are still enqueued.
@@ -53,6 +50,7 @@ class TtsManager(context: Context) :
     }
 
     override fun onStart(utteranceId: String?) {
+        Timber.d("onStart($utteranceId) called")
         val utteranceJob = getSynthesisJob(utteranceId)
         if (utteranceJob != null) {
             jobProgressListener?.onJobStarted(utteranceJob)
@@ -65,12 +63,7 @@ class TtsManager(context: Context) :
         if (synthesisJob != null) synthesisJobs.remove(synthesisJob)
         if (synthesisResult != null) {
             synthesisResults.remove(synthesisResult)
-            if (utteranceId == PREVIEW_UTTERANCE_ID && restoreVoice != null) {
-                tts.voice = restoreVoice
-                restoreVoice = null
-            } else {
-                jobProgressListener?.onJobCompleted(true, synthesisResult)
-            }
+            jobProgressListener?.onJobCompleted(true, synthesisResult)
         }
     }
 
@@ -80,8 +73,7 @@ class TtsManager(context: Context) :
         if (synthesisJob != null) synthesisJobs.remove(synthesisJob)
         if (synthesisResult != null) {
             synthesisResults.remove(synthesisResult)
-            if (utteranceId != PREVIEW_UTTERANCE_ID)
-                jobProgressListener?.onJobCompleted(false, synthesisResult)
+            jobProgressListener?.onJobCompleted(false, synthesisResult)
         }
     }
 
@@ -153,9 +145,5 @@ class TtsManager(context: Context) :
          * @param success true if [TtsManager] was successfully initialised, false otherwise.
          */
         fun onInitialised(success: Boolean)
-    }
-
-    companion object {
-        private const val PREVIEW_UTTERANCE_ID = "speaking_utterance_id"
     }
 }
