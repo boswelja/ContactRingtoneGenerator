@@ -2,13 +2,11 @@ package com.boswelja.contactringtonegenerator.tts
 
 import android.content.Context
 import android.speech.tts.TextToSpeech
-import android.speech.tts.TextToSpeech.QUEUE_FLUSH
 import android.speech.tts.TextToSpeech.SUCCESS
 import android.speech.tts.UtteranceProgressListener
 import android.speech.tts.Voice
 import timber.log.Timber
 import java.io.File
-import java.util.Locale
 import kotlin.collections.ArrayList
 
 /**
@@ -109,80 +107,6 @@ class TtsManager(context: Context) :
                 tts.synthesizeToFile(synthesisJob.text, null, file, synthesisId)
                 synthesisResults.add(SynthesisResult(synthesisId, file))
             }
-        }
-    }
-
-    /**
-     * Get a [List] of available [Voice] classes.
-     * @param locale The optional [Locale] to get available voices for.
-     * @return A [List] of [Voice] classes, or null if the engine isn't ready.
-     */
-    fun getAvailableVoices(locale: Locale = Locale.getDefault()): List<Voice>? {
-        if (isEngineReady) {
-            return tts.voices?.filter { it.locale == locale }?.sortedBy { it.name }
-        }
-        return null
-    }
-
-    /**
-     * Get the TTS engine's default [Voice].
-     * @return The engine's default [Voice], or null if the engine isn't ready.
-     */
-    fun getDefaultVoice(): Voice? {
-        if (isEngineReady) {
-            return tts.defaultVoice
-        }
-        return null
-    }
-
-    /**
-     * Sets the [Voice] to use for speech synthesis.
-     * @param voice The new [Voice] to use.
-     * @return true if setting the voice was successful, false otherwise.
-     */
-    fun setVoice(voice: Voice): Boolean {
-        if (isEngineReady) {
-            return tts.setVoice(voice) == SUCCESS
-        }
-        return false
-    }
-
-    /**
-     * Set the speech rate.
-     * @param speechRate The speech rate to use, 1.0 being the default,
-     * lower numbers are slower and higher numbers are faster.
-     * @return true if setting the speech rate was successful, false otherwise.
-     */
-    fun setSpeechRate(speechRate: Float): Boolean {
-        if (isEngineReady) {
-            return tts.setSpeechRate(speechRate) == SUCCESS
-        }
-        return false
-    }
-
-    /**
-     * Speak a message with the current voice.
-     * @param message The message to speak.
-     */
-    fun preview(message: String) {
-        previewVoice(tts.voice, message)
-    }
-
-    /**
-     * Speak a message in a specified voice.
-     * @param voice The [Voice] to speak in.
-     * @param message The message to speak.
-     */
-    fun previewVoice(voice: Voice, message: String) {
-        if (isEngineReady) {
-            if (voice != tts.voice) {
-                restoreVoice = tts.voice
-                tts.voice = voice
-            }
-            tts.speak(
-                message, QUEUE_FLUSH, null,
-                PREVIEW_UTTERANCE_ID
-            )
         }
     }
 
