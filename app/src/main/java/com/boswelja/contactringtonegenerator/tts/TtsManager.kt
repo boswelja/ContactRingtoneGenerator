@@ -128,18 +128,6 @@ class TtsManager(context: Context) :
     }
 
     /**
-     * The [List] of [TextToSpeech.EngineInfo] that describes available TTS engines.
-     */
-    val engines: List<TextToSpeech.EngineInfo>
-        get() = tts.engines
-
-    /**
-     * The package name of the default TTS engine.
-     */
-    val defaultEngine: String
-        get() = tts.defaultEngine
-
-    /**
      * Sets the [Voice] to use for speech synthesis.
      * @param voice The new [Voice] to use.
      * @return true if setting the voice was successful, false otherwise.
