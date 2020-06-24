@@ -21,8 +21,8 @@ class RingtoneGenerator(
     private val ringtoneStructure: List<BaseItem>,
     private val contacts: List<Contact>
 ) :
-    TtsManager.TtsJobProgressListener,
-    TtsManager.TtsEngineEventListener {
+    TtsManager.JobProgressListener,
+    TtsManager.EngineEventListener {
 
     private val coroutineScope = MainScope()
     private val cacheDir: File = context.cacheDir

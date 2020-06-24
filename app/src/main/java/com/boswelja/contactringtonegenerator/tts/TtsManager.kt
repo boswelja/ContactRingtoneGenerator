@@ -11,6 +11,10 @@ import java.io.File
 import java.util.Locale
 import kotlin.collections.ArrayList
 
+/**
+ * A class to handle queueing and synthesizing jobs through a [TextToSpeech] instance.
+ * @param context The [Context] to run everything with.
+ */
 class TtsManager(context: Context) :
     TextToSpeech.OnInitListener,
     UtteranceProgressListener() {
@@ -28,8 +32,8 @@ class TtsManager(context: Context) :
     val synthesisJobCount: Int
         get() = synthesisJobs.count()
 
-    var jobProgressListener: TtsJobProgressListener? = null
-    var engineEventListener: TtsEngineEventListener? = null
+    var jobProgressListener: JobProgressListener? = null
+    var engineEventListener: EngineEventListener? = null
 
     /**
      * Whether the TTS engine is ready.
@@ -92,6 +96,10 @@ class TtsManager(context: Context) :
         return synthesisJobs.firstOrNull { it.id == utteranceId }
     }
 
+    /**
+     * Schedules all [SynthesisJob]s in the queue for synthesis.
+     * Does nothing if [isEngineReady] is false.
+     */
     fun startSynthesis() {
         if (isEngineReady) {
             for (synthesisJob in synthesisJobs) {
@@ -198,12 +206,28 @@ class TtsManager(context: Context) :
         tts.shutdown()
     }
 
-    interface TtsJobProgressListener {
+    interface JobProgressListener {
+
+        /**
+         * Called when a [SynthesisJob] is started.\
+         * @param synthesisJob The job that has been started.
+         */
         fun onJobStarted(synthesisJob: SynthesisJob)
+
+        /**
+         * Called when a [SynthesisJob] has been completed.
+         * @param success true if the synthesis was successful, false otherwise.
+         * @param synthesisResult The [SynthesisResult] for the job.
+         */
         fun onJobCompleted(success: Boolean, synthesisResult: SynthesisResult)
     }
 
-    interface TtsEngineEventListener {
+    interface EngineEventListener {
+
+        /**
+         * Called when [TtsManager] has been initialised.
+         * @param success true if [TtsManager] was successfully initialised, false otherwise.
+         */
         fun onInitialised(success: Boolean)
     }
 

@@ -19,9 +19,9 @@ import java.util.concurrent.TimeUnit
 class TtsManagerTest {
 
     @Mock
-    lateinit var engineEventListener: TtsManager.TtsEngineEventListener
+    lateinit var engineEventListener: TtsManager.EngineEventListener
     @Mock
-    lateinit var progressListener: TtsManager.TtsJobProgressListener
+    lateinit var progressListener: TtsManager.JobProgressListener
 
     lateinit var context: Context
 
