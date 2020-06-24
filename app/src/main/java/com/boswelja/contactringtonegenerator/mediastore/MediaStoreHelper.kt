@@ -99,11 +99,13 @@ object MediaStoreHelper {
      * @param fileNames The file names of all the ringtones to delete.
      */
     suspend fun deleteRingtones(context: Context, fileNames: Array<String>) {
-        Timber.d("Deleting ${fileNames.count()} ringtones")
-        try {
-            context.contentResolver.delete(RINGTONE_COLLECTION, "${MediaStore.Audio.Media.DISPLAY_NAME} = ?", fileNames)
-        } catch (e: Exception) {
-            Timber.w(e)
+        withContext(Dispatchers.IO) {
+            Timber.d("Deleting ${fileNames.count()} ringtones")
+            try {
+                context.contentResolver.delete(RINGTONE_COLLECTION, "${MediaStore.Audio.Media.DISPLAY_NAME} = ?", fileNames)
+            } catch (e: Exception) {
+                Timber.w(e)
+            }
         }
     }
 }
