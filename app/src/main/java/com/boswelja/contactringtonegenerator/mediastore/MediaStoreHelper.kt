@@ -7,10 +7,16 @@ import android.os.Build
 import android.provider.MediaStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.File
 import java.io.FileInputStream
 
 object MediaStoreHelper {
+
+    private val DELETE_RINGTONE_PROJECTION = arrayOf(
+            MediaStore.Audio.Media.DISPLAY_NAME,
+            MediaStore.Audio.Media.IS_RINGTONE
+    )
 
     /**
      * Scan a ringtone file into the [MediaStore].
@@ -52,6 +58,40 @@ object MediaStoreHelper {
                 }
             }
             return@withContext uri
+        }
+    }
+
+    /**
+     * Deletes all ringtones created by this app.
+     * @param context [Context].
+     */
+    suspend fun deleteAllRingtones(context: Context) {
+        Timber.d("deleteAllRingtones() called")
+        withContext(Dispatchers.IO) {
+            val contentResolver = context.contentResolver
+            val ringtoneCollection = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
+            } else {
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI
+            }
+            val displayNameArray = ArrayList<String>()
+            val query = contentResolver.query(ringtoneCollection, DELETE_RINGTONE_PROJECTION, null, null, null)
+            if (query != null && query.moveToFirst()) {
+                val displayNameCol = query.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)
+                do {
+                    val displayName = query.getString(displayNameCol)
+                    Timber.d("Inspecting $displayName")
+                    if (displayName.endsWith("-generated-ringtone.ogg")) {
+                        displayNameArray.add(displayName)
+                    }
+                }
+                while (query.moveToNext())
+                query.close()
+            } else {
+                Timber.w("Query null or empty")
+            }
+            Timber.d("Deleting ${displayNameArray.count()} ringtones")
+            contentResolver.delete(ringtoneCollection, "${MediaStore.Audio.Media.DISPLAY_NAME} = ?", displayNameArray.toTypedArray())
         }
     }
 }

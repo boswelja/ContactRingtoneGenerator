@@ -2,11 +2,11 @@ package com.boswelja.contactringtonegenerator.ui.settings
 
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
 import androidx.preference.Preference
 import androidx.preference.PreferenceFragmentCompat
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
+import com.boswelja.contactringtonegenerator.mediastore.MediaStoreHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -51,7 +51,7 @@ class SettingsFragment :
             ContactsHelper.getContacts(requireContext()).forEach {
                 ContactsHelper.removeContactRingtone(requireContext(), it)
             }
-            Toast.makeText(requireContext(), "Successfully reset contact ringtones", Toast.LENGTH_LONG).show()
+            MediaStoreHelper.deleteAllRingtones(requireContext())
         }
     }
 
