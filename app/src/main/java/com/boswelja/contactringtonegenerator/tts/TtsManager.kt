@@ -1,6 +1,7 @@
 package com.boswelja.contactringtonegenerator.tts
 
 import android.content.Context
+import android.os.Build
 import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.SUCCESS
 import android.speech.tts.UtteranceProgressListener
@@ -19,6 +20,7 @@ class TtsManager(context: Context) :
     private val cacheDirectory = context.cacheDir
     private val synthesisJobs = ArrayList<SynthesisJob>()
     private val synthesisResults = ArrayList<SynthesisResult>()
+    private val startedJobIds = ArrayList<String>()
     private val tts: TextToSpeech = TextToSpeech(context, this)
 
     /**
@@ -53,7 +55,15 @@ class TtsManager(context: Context) :
         Timber.d("onStart($utteranceId) called")
         val utteranceJob = getSynthesisJob(utteranceId)
         if (utteranceJob != null) {
-            jobProgressListener?.onJobStarted(utteranceJob)
+            // onStart seems to get called twice per job on API versions 25 and lower, work around this by keeping track of which job IDs have been called
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+                jobProgressListener?.onJobStarted(utteranceJob)
+            } else {
+                if (!startedJobIds.contains(utteranceId)) {
+                    startedJobIds.add(utteranceId!!)
+                    jobProgressListener?.onJobStarted(utteranceJob)
+                }
+            }
         }
     }
 
