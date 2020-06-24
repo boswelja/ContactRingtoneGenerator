@@ -41,7 +41,17 @@ jobs:
       - execute_gradle:
           task_name: Build
           commands: :app:assemble
-  code_quality_test:
+  test:
+    executor: main
+    steps:
+      - checkout
+      - update_deps
+      - execute_gradle:
+          task_name: Run Tests
+          commands: test
+      - store_test_results:
+          path: ./app/build/reports/tests/
+  code_quality:
     executor: main
     steps:
       - checkout
@@ -53,9 +63,12 @@ jobs:
           path: ./app/build/reports/
 
 workflows:
-  build-and-test:
+  main:
     jobs:
       - build
-      - code_quality_test:
+      - test:
+          requires:
+            - build
+      - code_quality:
           requires:
             - build
