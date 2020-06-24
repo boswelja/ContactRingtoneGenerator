@@ -18,17 +18,17 @@ class RingtoneCreatorAdapter(private val listener: DataEventListener) :
     override fun getItemCount(): Int = items.count()
 
     override fun getItemViewType(position: Int): Int {
-        return getItem(position).id.id.toInt()
+        return getItem(position).id.id
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         if (layoutInflater == null) layoutInflater = LayoutInflater.from(parent.context)
         val itemBinding = RingtoneCreatorItemBinding.inflate(layoutInflater!!, parent, false)
         return when (viewType) {
-            ID.CONTACT_NAME.id.toInt() -> {
+            ID.CONTACT_NAME.id -> {
                 ContactNameViewHolder(itemBinding)
             }
-            ID.TEXT_ITEM.id.toInt() -> {
+            ID.TEXT_ITEM.id -> {
                 CustomTextViewHolder(this, itemBinding)
             }
             else -> throw Exception("Invalid item in adapter")

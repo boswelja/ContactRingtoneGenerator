@@ -28,7 +28,7 @@ class TtsManagerTest {
     @Mock
     lateinit var progressListener: TtsManager.JobProgressListener
 
-    lateinit var context: Context
+    private lateinit var context: Context
 
     @Before
     fun setUp() {

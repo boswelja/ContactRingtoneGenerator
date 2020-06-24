@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.ItemTouchHelper.UP
 import androidx.recyclerview.widget.RecyclerView
 import com.boswelja.contactringtonegenerator.R
 
-class AdapterGestureHelper(val adapter: RingtoneCreatorAdapter) :
+class AdapterGestureHelper(private val adapter: RingtoneCreatorAdapter) :
     ItemTouchHelper.SimpleCallback(UP or DOWN, START or END) {
 
     private var isElevated: Boolean = false

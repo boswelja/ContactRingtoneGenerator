@@ -7,7 +7,6 @@
 
     <string name="grant">Grant</string>
     <string name="next">Next</string>
-    <string name="change_selection">Change Selection</string>
 
     <string name="settings_title">Settings</string>
     <string name="contact_picker_settings_title">Contact Picker</string>
@@ -16,10 +15,9 @@
     <string name="reset_ringtones_summary">This will clear all custom ringtones for all your contacts</string>
     <string name="tts_settings_title">Text to Speech</string>
     <string name="launch_tts_settings_title">Open Text to Speech Settings</string>
+    <string name="use_nicknames">Use nicknames when available</string>
 
-    <string name="voice_picker_title">Select a Voice</string>
     <string name="contact_picker_title">Select Contacts</string>
-    <string name="contact_picker_missing_permission">We need your permission to see your contacts, so we can retrieve information about them and create a personalised ringtone for them.</string>
 
     <string name="progress_getting_ready">Getting Ready</string>
     <string name="progress_generating">Generating</string>
@@ -27,32 +25,6 @@
     <string name="status_getting_ready">Preparing to create your Ringtones</string>
     <string name="status_generating">Creating ringtone for %s</string>
     <string name="status_complete">%s successful, %s failed</string>
-    <string name="contact_picker_dialog_title">@string/contact_picker_title</string>
-
-    <string name="use_nicknames">Use nicknames when available</string>
-
-    <string name="voice_quality_info">Quality: %s</string>
-    <string name="voice_latency_info">Latency: %s</string>
-    <string name="voice_name_default">Default</string>
-    <string name="voice_name_male">Male</string>
-    <string name="voice_name_female">Female</string>
-
-    <string name="speech_rate_multiplier_title">Speech Rate</string>
-    <string name="speech_rate_multiplier_text">%.1fx</string>
-
-    <string name="ringtone_message_hint">Ringtone Message</string>
-    <string name="ringtone_message_default">%NAME is calling</string>
-
-    <string name="preview_button_text">Preview</string>
-    <string name="generate_button_text">Generate</string>
-
-    <string name="dialog_button_done">Done</string>
-
-    <string name="very_high">Very High</string>
-    <string name="high">High</string>
-    <string name="average">Average</string>
-    <string name="low">Low</string>
-    <string name="very_low">Very Low</string>
     <string name="ringtone_creator_no_content">Choose an item below to start building your ringtone</string>
 
     <string name="search_hint">Search</string>
