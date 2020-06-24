@@ -11,7 +11,6 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.boswelja.contactringtonegenerator.Extensions.dp
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
@@ -59,7 +58,7 @@ class ContactPickerFragment : FragmentEasyModeList<ArrayList<Contact>>(), Contac
     }
 
     override fun onCreateWidgetView(): View? {
-        val widgetPadding = 8.dp.toInt()
+        val widgetPadding = resources.getDimensionPixelSize(R.dimen.list_widget_padding)
         searchBox = AppCompatEditText(context).apply {
             layoutParams = ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT,
@@ -77,7 +76,7 @@ class ContactPickerFragment : FragmentEasyModeList<ArrayList<Contact>>(), Contac
                 setLoading(false)
             }
         }.also {
-            ViewCompat.setElevation(it, 2.dp)
+            ViewCompat.setElevation(it, resources.getDimension(R.dimen.list_widget_elevation))
         }
         return searchBox
     }

@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <dimen name="content_side_margins">16dp</dimen>
+
+    <dimen name="list_widget_padding">8dp</dimen>
+    <dimen name="list_widget_elevation">2dp</dimen>
+
+    <dimen name="adapter_gesture_elevation">2dp</dimen>
 </resources>

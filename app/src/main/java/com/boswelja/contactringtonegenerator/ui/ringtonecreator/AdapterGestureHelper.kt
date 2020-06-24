@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.ItemTouchHelper.END
 import androidx.recyclerview.widget.ItemTouchHelper.START
 import androidx.recyclerview.widget.ItemTouchHelper.UP
 import androidx.recyclerview.widget.RecyclerView
-import com.boswelja.contactringtonegenerator.Extensions.dp
+import com.boswelja.contactringtonegenerator.R
 
 class AdapterGestureHelper(val adapter: RingtoneCreatorAdapter) :
     ItemTouchHelper.SimpleCallback(UP or DOWN, START or END) {
@@ -74,7 +74,9 @@ class AdapterGestureHelper(val adapter: RingtoneCreatorAdapter) :
     private fun updateElevation(viewHolder: RecyclerView.ViewHolder, elevate: Boolean) {
         if (elevate) {
             isElevated = true
-            ViewCompat.setElevation(viewHolder.itemView, 2.dp)
+            ViewCompat.setElevation(
+                    viewHolder.itemView,
+                    viewHolder.itemView.resources.getDimension(R.dimen.adapter_gesture_elevation))
         } else {
             isElevated = false
             ViewCompat.setElevation(viewHolder.itemView, 0f)
