@@ -67,6 +67,8 @@ class RingtoneGeneratorTest {
 
         await.atMost(30, TimeUnit.SECONDS).until(ringtoneGenerator::state, stateMatcher(RingtoneGenerator.State.FINISHED))
         verify(stateListener, times(1)).onStateChanged(RingtoneGenerator.State.FINISHED)
+
+        ringtoneGenerator.destroy()
     }
 
     @Test
@@ -82,6 +84,8 @@ class RingtoneGeneratorTest {
             verify(progressListener, times(1)).onJobStarted(it)
         }
         verify(progressListener, times(TRUE_JOB_COUNT)).onJobCompleted(ArgumentMatchers.anyBoolean(), MockitoHelper.anyObject())
+
+        ringtoneGenerator.destroy()
     }
 
     /**
