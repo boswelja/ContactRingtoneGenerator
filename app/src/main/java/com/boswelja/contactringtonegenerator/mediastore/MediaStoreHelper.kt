@@ -43,26 +43,31 @@ object MediaStoreHelper {
             // Delete the ringtone if it already exists
             deleteRingtones(context, arrayOf(file.name))
 
-            val uri = contentResolver.insert(RINGTONE_COLLECTION, values)
-            uri?.let {
-                FileInputStream(file).use { inStream ->
-                    contentResolver.openOutputStream(it)?.use { outStream ->
-                        var byte = inStream.read()
-                        while (byte != -1) {
-                            outStream.write(byte)
-                            byte = inStream.read()
+            return@withContext try {
+                val uri = contentResolver.insert(RINGTONE_COLLECTION, values)
+                uri?.let {
+                    FileInputStream(file).use { inStream ->
+                        contentResolver.openOutputStream(it)?.use { outStream ->
+                            var byte = inStream.read()
+                            while (byte != -1) {
+                                outStream.write(byte)
+                                byte = inStream.read()
+                            }
+                            outStream.close()
                         }
-                        outStream.close()
+                        inStream.close()
                     }
-                    inStream.close()
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                        values.clear()
+                        values.put(MediaStore.Audio.Media.IS_PENDING, 0)
+                        contentResolver.update(it, values, null, null)
+                    }
                 }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    values.clear()
-                    values.put(MediaStore.Audio.Media.IS_PENDING, 0)
-                    contentResolver.update(it, values, null, null)
-                }
+                uri
+            } catch (e: Exception) {
+                Timber.w(e)
+                null
             }
-            return@withContext uri
         }
     }
 
