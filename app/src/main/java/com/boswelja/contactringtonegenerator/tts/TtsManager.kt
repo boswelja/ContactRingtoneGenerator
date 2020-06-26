@@ -20,7 +20,7 @@ class TtsManager(context: Context) :
     private val cacheDirectory = context.cacheDir
     private val synthesisJobs = ArrayList<SynthesisJob>()
     private val synthesisResults = ArrayList<SynthesisResult>()
-    private val startedJobIds = ArrayList<String>()
+    private val startedJobIds by lazy { ArrayList<String>() }
     private val tts: TextToSpeech = TextToSpeech(context, this)
 
     /**
