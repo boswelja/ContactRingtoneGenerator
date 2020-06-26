@@ -55,8 +55,8 @@ class TtsManager(context: Context) :
         Timber.d("onStart($utteranceId) called")
         val utteranceJob = getSynthesisJob(utteranceId)
         if (utteranceJob != null) {
-            // onStart seems to get called twice per job on API versions 25 and lower, work around this by keeping track of which job IDs have been called
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.N_MR1) {
+            // onStart seems to get called twice per job on API versions 28 and lower, work around this by keeping track of which job IDs have been called
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
                 jobProgressListener?.onJobStarted(utteranceJob)
             } else {
                 if (!startedJobIds.contains(utteranceId)) {
