@@ -15,13 +15,13 @@ import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.ui.MainActivity
-import com.boswelja.contactringtonegenerator.ui.common.FragmentEasyModeList
+import com.boswelja.contactringtonegenerator.ui.common.ListFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
-class ContactPickerFragment : FragmentEasyModeList<ArrayList<Contact>>(), ContactSelectionListener {
+class ContactPickerFragment : ListFragment<ArrayList<Contact>>(), ContactSelectionListener {
 
     private val selectedContacts = ArrayList<Contact>()
     private val coroutineScope = MainScope()

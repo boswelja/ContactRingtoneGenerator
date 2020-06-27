@@ -4,16 +4,16 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.boswelja.contactringtonegenerator.databinding.FragmentEasyModeListBinding
+import com.boswelja.contactringtonegenerator.databinding.CommonFragmentListBinding
 
-abstract class FragmentEasyModeList<T> : BaseDataFragment<T>() {
+abstract class ListFragment<T> : BaseDataFragment<T>() {
 
-    protected lateinit var binding: FragmentEasyModeListBinding
+    protected lateinit var binding: CommonFragmentListBinding
 
     open fun onCreateWidgetView(): View? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentEasyModeListBinding.inflate(inflater, container, false)
+        binding = CommonFragmentListBinding.inflate(inflater, container, false)
         val widgetView = onCreateWidgetView()
         if (widgetView != null) binding.widgetContainer.addView(widgetView, 0)
         return binding.root
