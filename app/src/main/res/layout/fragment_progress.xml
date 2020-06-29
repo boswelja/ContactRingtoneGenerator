@@ -11,6 +11,8 @@
         android:text="@string/progress_title_getting_ready"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/loading_status"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
         style="@style/WizardTextTitle" />
 

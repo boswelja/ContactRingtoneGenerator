@@ -22,6 +22,8 @@
         android:id="@+id/status_title"
         app:layout_constraintTop_toBottomOf="@id/status_indicator"
         app:layout_constraintBottom_toTopOf="@id/status_description"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:text="@string/finished_title_unknown"
         style="@style/WizardTextTitle" />
 
@@ -29,6 +31,8 @@
         android:id="@+id/status_description"
         app:layout_constraintTop_toBottomOf="@id/status_title"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         tools:text="@string/finished_status_unknown"
         style="@style/WizardTextStatus" />
 
