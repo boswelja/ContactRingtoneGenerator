@@ -6,4 +6,8 @@
 
     <color name="progressSuccessColor">@color/colorPrimary</color>
     <color name="progressFailedColor">#B00020</color>
+
+    <color name="successColor">#4CAF50</color>
+    <color name="failColor">#F44336</color>
+    <color name="mixedColor">#FFEB3B</color>
 </resources>
