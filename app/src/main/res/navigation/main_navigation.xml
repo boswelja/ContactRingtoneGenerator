@@ -58,7 +58,7 @@
         android:name="com.boswelja.contactringtonegenerator.ui.ProgressFragment"
         tools:layout="@layout/fragment_progress" >
         <action
-            android:id="@+id/action_loadingFragment_to_finishedFragment"
+            android:id="@+id/to_finishedFragment"
             app:destination="@id/finishedFragment" />
     </fragment>
     <fragment
@@ -68,7 +68,6 @@
     <fragment
         android:id="@+id/finishedFragment"
         android:name="com.boswelja.contactringtonegenerator.ui.FinishedFragment"
-        android:label="FinishedFragment"
         tools:layout="@layout/fragment_finished" >
         <argument
             android:name="success_count"

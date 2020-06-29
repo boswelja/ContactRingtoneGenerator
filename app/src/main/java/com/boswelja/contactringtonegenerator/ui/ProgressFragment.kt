@@ -5,9 +5,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
-import com.boswelja.contactringtonegenerator.databinding.FragmentLoadingBinding
+import com.boswelja.contactringtonegenerator.databinding.FragmentProgressBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
 import com.boswelja.contactringtonegenerator.tts.SynthesisResult
 import timber.log.Timber
@@ -17,7 +18,7 @@ class ProgressFragment :
     RingtoneGenerator.ProgressListener,
     RingtoneGenerator.StateListener {
 
-    private lateinit var binding: FragmentLoadingBinding
+    private lateinit var binding: FragmentProgressBinding
     private lateinit var ringtoneGenerator: RingtoneGenerator
 
     override fun onStateChanged(state: RingtoneGenerator.State) {
@@ -39,12 +40,7 @@ class ProgressFragment :
                 binding.apply {
                     val successes = progressBar.progress
                     val failures = progressBar.secondaryProgress - progressBar.progress
-                    loadingTitle.text = getString(R.string.progress_complete)
-                    loadingStatus.text = getString(
-                        R.string.status_complete,
-                        successes.toString(),
-                        failures.toString()
-                    )
+                    findNavController().navigate(ProgressFragmentDirections.toFinishedFragment(successes, failures))
                 }
                 ringtoneGenerator.destroy()
             }
@@ -72,7 +68,7 @@ class ProgressFragment :
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentLoadingBinding.inflate(inflater, container, false)
+        binding = FragmentProgressBinding.inflate(inflater, container, false)
         return binding.root
     }
 

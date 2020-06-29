@@ -24,7 +24,6 @@
     <string name="progress_complete">Finished</string>
     <string name="status_getting_ready">Preparing to create your Ringtones</string>
     <string name="status_generating">Creating ringtone for %s</string>
-    <string name="status_complete">%s successful, %s failed</string>
     <string name="ringtone_creator_no_content">Choose an item below to start building your ringtone</string>
 
     <string name="search_hint">Search</string>
