@@ -34,7 +34,7 @@ class ProgressFragment :
                     secondaryProgress = 0
                     max = ringtoneGenerator.totalJobCount
                 }
-                binding.loadingTitle.text = getString(R.string.progress_generating)
+                binding.loadingTitle.text = getString(R.string.progress_title_generating)
             }
             RingtoneGenerator.State.FINISHED -> {
                 binding.apply {
@@ -52,7 +52,7 @@ class ProgressFragment :
 
     override fun onJobStarted(contact: Contact) {
         Timber.d("onJobStarted($contact)")
-        binding.loadingStatus.text = getString(R.string.status_generating, contact.nickname ?: contact.name)
+        binding.loadingStatus.text = getString(R.string.progress_status_generating, contact.nickname ?: contact.name)
     }
 
     override fun onJobCompleted(success: Boolean, synthesisResult: SynthesisResult) {

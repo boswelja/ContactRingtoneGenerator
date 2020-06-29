@@ -19,11 +19,10 @@
 
     <string name="contact_picker_title">Select Contacts</string>
 
-    <string name="progress_getting_ready">Getting Ready</string>
-    <string name="progress_generating">Generating</string>
-    <string name="progress_complete">Finished</string>
-    <string name="status_getting_ready">Preparing to create your Ringtones</string>
-    <string name="status_generating">Creating ringtone for %s</string>
+    <string name="progress_title_getting_ready">Getting Ready</string>
+    <string name="progress_title_generating">Generating</string>
+    <string name="progress_status_getting_ready">Preparing to create your Ringtones</string>
+    <string name="progress_status_generating">Creating ringtone for %s</string>
     <string name="ringtone_creator_no_content">Choose an item below to start building your ringtone</string>
 
     <string name="search_hint">Search</string>
