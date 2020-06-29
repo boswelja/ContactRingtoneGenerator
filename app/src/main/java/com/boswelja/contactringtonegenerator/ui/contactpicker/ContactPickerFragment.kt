@@ -8,6 +8,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.view.ViewCompat
 import androidx.core.view.setPadding
 import androidx.core.widget.doAfterTextChanged
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -17,14 +18,12 @@ import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.ui.MainActivity
 import com.boswelja.contactringtonegenerator.ui.common.ListFragment
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class ContactPickerFragment : ListFragment<ArrayList<Contact>>(), ContactSelectionListener {
 
     private val selectedContacts = ArrayList<Contact>()
-    private val coroutineScope = MainScope()
     private val sharedPreferences: SharedPreferences by lazy {
         PreferenceManager.getDefaultSharedPreferences(requireContext())
     }
@@ -103,7 +102,7 @@ class ContactPickerFragment : ListFragment<ArrayList<Contact>>(), ContactSelecti
     }
 
     private fun updateContacts() {
-        coroutineScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch(Dispatchers.IO) {
             val contacts = ContactsHelper.getContacts(requireContext())
             withContext(Dispatchers.Main) {
                 adapter.setContacts(contacts)
