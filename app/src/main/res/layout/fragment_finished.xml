@@ -40,13 +40,10 @@
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/finish_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="@dimen/content_side_margins"
-        android:layout_marginEnd="@dimen/content_side_margins"
         android:text="@string/finish"
         app:icon="@drawable/ic_check"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent"
+        style="@style/WizardContinueFab" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
