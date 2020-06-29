@@ -7,6 +7,7 @@
 
     <string name="grant">Grant</string>
     <string name="next">Next</string>
+    <string name="finish">Finish</string>
 
     <string name="settings_title">Settings</string>
     <string name="contact_picker_settings_title">Contact Picker</string>
@@ -23,6 +24,16 @@
     <string name="progress_title_generating">Generating</string>
     <string name="progress_status_getting_ready">Preparing to create your Ringtones</string>
     <string name="progress_status_generating">Creating ringtone for %s</string>
+
+    <string name="finished_title_success">Success</string>
+    <string name="finished_title_mixed">Partial Success</string>
+    <string name="finished_title_error">Failed</string>
+    <string name="finished_title_unknown">Unknown</string>
+    <string name="finished_status_success">Applied %s contact\'s ringtones</string>
+    <string name="finished_status_mixed">Applied %s contact ringtones,\nFailed to create %s ringtones</string>
+    <string name="finished_status_error">Failed to create %s ringtones</string>
+    <string name="finished_status_unknown">Status unknown</string>
+
     <string name="ringtone_creator_no_content">Choose an item below to start building your ringtone</string>
 
     <string name="search_hint">Search</string>

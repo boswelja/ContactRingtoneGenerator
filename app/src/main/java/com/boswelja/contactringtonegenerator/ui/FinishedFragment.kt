@@ -21,7 +21,47 @@ class FinishedFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+        binding.finishButton.setOnClickListener {
+            activity?.finish()
+        }
+        updateStatus(args.successCount, args.failureCount)
+    }
+
+    private fun updateStatus(successCount: Int, failCount: Int) {
+        val statusIndicatorRes: Int
+        val statusTitleRes: Int
+        val statusDesc: String
+        when (getState(successCount, failCount)) {
+            State.SUCCESSFUL -> {
+                statusIndicatorRes = R.drawable.ic_success_indicator
+                statusTitleRes = R.string.finished_title_success
+                statusDesc = getString(R.string.finished_status_success, successCount.toString())
+            }
+            State.FAILED -> {
+                statusIndicatorRes = R.drawable.ic_error_indicator
+                statusTitleRes = R.string.finished_title_error
+                statusDesc = getString(R.string.finished_status_error, failCount.toString())
+            }
+            State.MIXED -> {
+                statusIndicatorRes = R.drawable.ic_mixed_indicator
+                statusTitleRes = R.string.finished_title_mixed
+                statusDesc = getString(
+                        R.string.finished_status_mixed,
+                        successCount.toString(),
+                        failCount.toString())
+            }
+            State.UNKNOWN -> {
+                statusIndicatorRes = R.drawable.ic_unknown_indicator
+                statusTitleRes = R.string.finished_title_unknown
+                statusDesc = getString(R.string.finished_status_unknown)
+            }
+        }
+
+        binding.apply {
+            statusIndicator.setImageResource(statusIndicatorRes)
+            statusTitle.setText(statusTitleRes)
+            statusDescription.text = statusDesc
+        }
     }
 
     private fun getState(successCount: Int, failCount: Int): State {
