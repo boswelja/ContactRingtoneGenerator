@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
@@ -17,6 +18,8 @@ class ProgressFragment :
     Fragment(),
     RingtoneGenerator.ProgressListener,
     RingtoneGenerator.StateListener {
+
+    private val dataModel: WizardDataViewModel by activityViewModels()
 
     private lateinit var binding: FragmentProgressBinding
     private lateinit var ringtoneGenerator: RingtoneGenerator
@@ -74,12 +77,9 @@ class ProgressFragment :
 
     override fun onStart() {
         super.onStart()
-        val activity = requireActivity()
-        if (activity is MainActivity) {
-            ringtoneGenerator = activity.createRingtoneGenerator().apply {
-                progressListener = this@ProgressFragment
-                stateListener = this@ProgressFragment
-            }
+        ringtoneGenerator = dataModel.createRingtoneGenerator(requireContext()).apply {
+            progressListener = this@ProgressFragment
+            stateListener = this@ProgressFragment
         }
     }
 }

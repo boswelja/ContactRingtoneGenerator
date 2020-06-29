@@ -26,5 +26,5 @@ class WizardDataViewModel : ViewModel() {
     }
 
     fun createRingtoneGenerator(context: Context): RingtoneGenerator =
-            RingtoneGenerator(context, ringtoneStructure, selectedContacts)
+        RingtoneGenerator(context, ringtoneStructure, selectedContacts)
 }

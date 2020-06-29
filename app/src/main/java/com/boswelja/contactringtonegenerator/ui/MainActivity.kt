@@ -7,15 +7,9 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ActivityMainBinding
-import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
-import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 
 class MainActivity : AppCompatActivity() {
-
-    val selectedContacts = ArrayList<Contact>()
-    val ringtoneItems = ArrayList<BaseItem>()
 
     private lateinit var binding: ActivityMainBinding
 
@@ -54,7 +48,4 @@ class MainActivity : AppCompatActivity() {
             layoutTransition = LayoutTransition()
         }
     }
-
-    fun createRingtoneGenerator(): RingtoneGenerator =
-        RingtoneGenerator(this, ringtoneItems, selectedContacts)
 }

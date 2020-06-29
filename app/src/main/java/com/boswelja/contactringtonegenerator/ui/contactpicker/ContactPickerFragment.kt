@@ -8,6 +8,7 @@ import androidx.appcompat.widget.AppCompatEditText
 import androidx.core.view.ViewCompat
 import androidx.core.view.setPadding
 import androidx.core.widget.doAfterTextChanged
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,6 +16,7 @@ import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.ui.MainActivity
+import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
 import com.boswelja.contactringtonegenerator.ui.common.ListFragment
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -23,6 +25,7 @@ import kotlinx.coroutines.withContext
 
 class ContactPickerFragment : ListFragment<ArrayList<Contact>>(), ContactSelectionListener {
 
+    private val dataModel: WizardDataViewModel by activityViewModels()
     private val selectedContacts = ArrayList<Contact>()
     private val coroutineScope = MainScope()
     private val sharedPreferences: SharedPreferences by lazy {
@@ -37,10 +40,7 @@ class ContactPickerFragment : ListFragment<ArrayList<Contact>>(), ContactSelecti
     override fun requestData(): ArrayList<Contact>? = adapter.getSelectedContacts()
 
     override fun onSaveData(activity: MainActivity, data: ArrayList<Contact>) {
-        activity.selectedContacts.apply {
-            clear()
-            addAll(data)
-        }
+        dataModel.setSelectedContacts(data)
     }
 
     override fun onContactDeselected(contact: Contact) {

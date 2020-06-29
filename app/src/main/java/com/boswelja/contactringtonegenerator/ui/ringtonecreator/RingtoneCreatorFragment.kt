@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.databinding.FragmentRingtoneCreatorBinding
@@ -13,11 +14,13 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.ContactName
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
 import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
 import com.boswelja.contactringtonegenerator.ui.MainActivity
+import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
 import com.boswelja.contactringtonegenerator.ui.common.BaseDataFragment
 import com.google.android.material.chip.Chip
 
 class RingtoneCreatorFragment : BaseDataFragment<ArrayList<BaseItem>>(), RingtoneCreatorAdapter.DataEventListener {
 
+    private val dataModel: WizardDataViewModel by activityViewModels()
     private val adapter = RingtoneCreatorAdapter(this)
 
     private val onAvailableItemClickListener = View.OnClickListener {
@@ -36,10 +39,7 @@ class RingtoneCreatorFragment : BaseDataFragment<ArrayList<BaseItem>>(), Rington
     private lateinit var binding: FragmentRingtoneCreatorBinding
 
     override fun onSaveData(activity: MainActivity, data: ArrayList<BaseItem>) {
-        activity.ringtoneItems.apply {
-            clear()
-            addAll(data)
-        }
+        dataModel.setRingtoneStructure(data)
     }
 
     override fun requestData(): ArrayList<BaseItem>? = adapter.getItems()
