@@ -8,28 +8,23 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/loading_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
         android:text="@string/progress_title_getting_ready"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/loading_status"
         app:layout_constraintVertical_chainStyle="packed"
-        style="@style/TextAppearance.MaterialComponents.Headline4" />
+        style="@style/WizardTextTitle" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/loading_status"
         android:layout_width="240dp"
-        android:layout_height="wrap_content"
         android:layout_marginBottom="8dp"
-        android:textAlignment="center"
         android:text="@string/progress_status_getting_ready"
         app:layout_constraintTop_toBottomOf="@id/loading_title"
         app:layout_constraintBottom_toTopOf="@id/progress_bar"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintVertical_chainStyle="packed"
-        style="@style/TextAppearance.MaterialComponents.Headline5" />
+        style="@style/WizardTextStatus" />
 
     <ProgressBar
         android:id="@+id/progress_bar"

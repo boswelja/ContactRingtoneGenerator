@@ -20,23 +20,17 @@
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/status_title"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
         app:layout_constraintTop_toBottomOf="@id/status_indicator"
         app:layout_constraintBottom_toTopOf="@id/status_description"
         tools:text="@string/finished_title_unknown"
-        style="@style/TextAppearance.MaterialComponents.Headline4" />
+        style="@style/WizardTextTitle" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/status_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textAlignment="center"
         app:layout_constraintTop_toBottomOf="@id/status_title"
         app:layout_constraintBottom_toBottomOf="parent"
         tools:text="@string/finished_status_unknown"
-        style="@style/TextAppearance.MaterialComponents.Headline5" />
+        style="@style/WizardTextStatus" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/finish_button"
@@ -44,6 +38,6 @@
         app:icon="@drawable/ic_check"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        style="@style/WizardContinueFab" />
+        style="@style/WizardFabContinue" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -57,6 +57,6 @@
         app:icon="@drawable/ic_navigate_forward"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        style="@style/WizardContinueFab" />
+        style="@style/WizardFabContinue" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -18,11 +18,23 @@
         <item name="cornerSize">50%</item>
     </style>
 
-    <style name="WizardContinueFab">
+    <style name="WizardFabContinue">
         <item name="android:layout_width">wrap_content</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:layout_marginBottom">@dimen/content_side_margins</item>
         <item name="android:layout_marginEnd">@dimen/content_side_margins</item>
+    </style>
+
+    <style name="WizardTextTitle" parent="TextAppearance.MaterialComponents.Headline4">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAlignment">center</item>
+    </style>
+
+    <style name="WizardTextStatus" parent="TextAppearance.MaterialComponents.Headline5">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:textAlignment">center</item>
     </style>
 
 </resources>
