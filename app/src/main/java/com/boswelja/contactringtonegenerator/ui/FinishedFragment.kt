@@ -46,9 +46,10 @@ class FinishedFragment : Fragment() {
                 statusIndicatorRes = R.drawable.ic_mixed_indicator
                 statusTitleRes = R.string.finished_title_mixed
                 statusDesc = getString(
-                        R.string.finished_status_mixed,
-                        successCount.toString(),
-                        failCount.toString())
+                    R.string.finished_status_mixed,
+                    successCount.toString(),
+                    failCount.toString()
+                )
             }
             State.UNKNOWN -> {
                 statusIndicatorRes = R.drawable.ic_unknown_indicator
