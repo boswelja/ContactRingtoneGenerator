@@ -41,17 +41,18 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
         isDataEmpty = false
         updateNoDataViewVisibility()
         binding.messageBuilderView.smoothScrollToPosition(adapter.itemCount - 1)
-        if (isDataValid) dataModel.setRingtoneStructure(adapter.getItems())
+        dataModel.ringtoneStructure.add(item)
     }
 
     override fun onItemRemoved(position: Int, isEmpty: Boolean) {
         isDataEmpty = isEmpty
         updateNoDataViewVisibility()
-        if (isDataValid) dataModel.setRingtoneStructure(adapter.getItems())
+        dataModel.ringtoneStructure.removeAt(position)
     }
 
     override fun onItemMoved(fromPosition: Int, toPosition: Int) {
-
+        val item = dataModel.ringtoneStructure.removeAt(fromPosition)
+        dataModel.ringtoneStructure.add(toPosition, item)
     }
 
     override fun onDataValidityChanged(isDataValid: Boolean) {

@@ -9,14 +9,7 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 class WizardDataViewModel : ViewModel() {
 
     val selectedContacts = ArrayList<Contact>()
-    private val ringtoneStructure = ArrayList<BaseItem>()
-
-    fun setRingtoneStructure(newStructure: List<BaseItem>) {
-        ringtoneStructure.apply {
-            clear()
-            addAll(newStructure)
-        }
-    }
+    val ringtoneStructure = ArrayList<BaseItem>()
 
     fun createRingtoneGenerator(context: Context): RingtoneGenerator =
         RingtoneGenerator(context, ringtoneStructure, selectedContacts)
