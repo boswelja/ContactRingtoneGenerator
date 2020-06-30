@@ -34,15 +34,15 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     private lateinit var searchBox: AppCompatEditText
 
     override fun onContactDeselected(contact: Contact) {
+        dataModel.selectedContacts.remove(contact)
         updateSelectedContactsView()
         updateNextEnabled()
-        dataModel.selectedContacts.remove(contact)
     }
 
     override fun onContactSelected(contact: Contact) {
+        dataModel.selectedContacts.add(contact)
         updateSelectedContactsView()
         updateNextEnabled()
-        dataModel.selectedContacts.add(contact)
     }
 
     override fun onCreateWidgetView(): View? {
