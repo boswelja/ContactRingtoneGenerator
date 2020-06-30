@@ -2,16 +2,14 @@ package com.boswelja.contactringtonegenerator.tts
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
-import com.boswelja.contactringtonegenerator.MockitoHelper
+import io.mockk.MockKAnnotations
+import io.mockk.confirmVerified
+import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import org.awaitility.kotlin.await
 import org.junit.Assert.* // ktlint-disable
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mock
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
 
@@ -23,9 +21,9 @@ class TtsManagerTest {
         SynthesisJob("id3", "text")
     )
 
-    @Mock
+    @MockK
     lateinit var engineEventListener: TtsManager.EngineEventListener
-    @Mock
+    @MockK
     lateinit var progressListener: TtsManager.JobProgressListener
 
     private lateinit var context: Context
@@ -33,7 +31,7 @@ class TtsManagerTest {
     @Before
     fun setUp() {
         context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
-        MockitoAnnotations.initMocks(this)
+        MockKAnnotations.init(this, relaxed = true)
     }
 
     @Test
@@ -53,7 +51,9 @@ class TtsManagerTest {
             engineEventListener = this@TtsManagerTest.engineEventListener
         }
         await.atMost(5, TimeUnit.SECONDS).until(ttsManager::isEngineReady)
-        verify(engineEventListener, times(1)).onInitialised(ttsManager.isEngineReady)
+        verify(exactly = 1) { engineEventListener.onInitialised(any())}
+
+        confirmVerified(engineEventListener)
         ttsManager.destroy()
     }
 
@@ -76,10 +76,11 @@ class TtsManagerTest {
         await.atMost(30, TimeUnit.SECONDS).until(callable)
 
         testJobs.forEach {
-            verify(progressListener, times(1)).onJobStarted(it)
+            verify(exactly = 1) { progressListener.onJobStarted(it) }
         }
-        verify(progressListener, times(3)).onJobCompleted(ArgumentMatchers.anyBoolean(), MockitoHelper.anyObject())
+        verify(exactly = 3) { progressListener.onJobCompleted(any(), any()) }
 
+        confirmVerified(progressListener)
         ttsManager.destroy()
     }
 }

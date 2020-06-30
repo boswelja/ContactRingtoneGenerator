@@ -2,21 +2,19 @@ package com.boswelja.contactringtonegenerator.ringtonegen
 
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
-import com.boswelja.contactringtonegenerator.MockitoHelper
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ContactName
 import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
+import io.mockk.MockKAnnotations
+import io.mockk.confirmVerified
+import io.mockk.impl.annotations.MockK
+import io.mockk.verify
 import org.awaitility.kotlin.await
 import org.hamcrest.BaseMatcher
 import org.hamcrest.Description
 import org.junit.Assert.* // ktlint-disable
 import org.junit.Before
 import org.junit.Test
-import org.mockito.ArgumentMatchers
-import org.mockito.Mock
-import org.mockito.Mockito.times
-import org.mockito.Mockito.verify
-import org.mockito.MockitoAnnotations
 import java.util.concurrent.TimeUnit
 
 class RingtoneGeneratorTest {
@@ -31,9 +29,9 @@ class RingtoneGeneratorTest {
         }
     }
 
-    @Mock
+    @MockK
     lateinit var progressListener: RingtoneGenerator.ProgressListener
-    @Mock
+    @MockK
     lateinit var stateListener: RingtoneGenerator.StateListener
 
     private lateinit var context: Context
@@ -41,7 +39,7 @@ class RingtoneGeneratorTest {
     @Before
     fun setUp() {
         context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
-        MockitoAnnotations.initMocks(this)
+        MockKAnnotations.init(this, relaxed = true)
     }
 
     @Test
@@ -60,14 +58,15 @@ class RingtoneGeneratorTest {
         assertEquals(RingtoneGenerator.State.NOT_READY, ringtoneGenerator.state)
 
         await.atMost(10, TimeUnit.SECONDS).until(ringtoneGenerator::state, stateMatcher(RingtoneGenerator.State.READY))
-        verify(stateListener, times(1)).onStateChanged(RingtoneGenerator.State.READY)
+        verify(exactly = 1) { stateListener.onStateChanged(RingtoneGenerator.State.READY) }
 
         ringtoneGenerator.start()
-        verify(stateListener, times(1)).onStateChanged(RingtoneGenerator.State.GENERATING)
+        verify(exactly = 1) { stateListener.onStateChanged(RingtoneGenerator.State.GENERATING) }
 
         await.atMost(30, TimeUnit.SECONDS).until(ringtoneGenerator::state, stateMatcher(RingtoneGenerator.State.FINISHED))
-        verify(stateListener, times(1)).onStateChanged(RingtoneGenerator.State.FINISHED)
+        verify(exactly = 1) { stateListener.onStateChanged(RingtoneGenerator.State.FINISHED) }
 
+        confirmVerified(stateListener)
         ringtoneGenerator.destroy()
     }
 
@@ -81,10 +80,11 @@ class RingtoneGeneratorTest {
 
         await.atMost(30, TimeUnit.SECONDS).until(ringtoneGenerator::state, stateMatcher(RingtoneGenerator.State.FINISHED))
         testContacts.forEach {
-            verify(progressListener, times(1)).onJobStarted(it)
+            verify(exactly = 1) { progressListener.onJobStarted(it) }
         }
-        verify(progressListener, times(TRUE_JOB_COUNT)).onJobCompleted(ArgumentMatchers.anyBoolean(), MockitoHelper.anyObject())
+        verify(exactly = TRUE_JOB_COUNT) { progressListener.onJobCompleted(any(), any() ) }
 
+        confirmVerified(progressListener)
         ringtoneGenerator.destroy()
     }
 
