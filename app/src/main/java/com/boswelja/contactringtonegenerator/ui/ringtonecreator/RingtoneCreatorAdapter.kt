@@ -78,13 +78,19 @@ class RingtoneCreatorAdapter(private val listener: DataEventListener) :
         items.removeAt(position)
         isDataValid.removeAt(position)
         notifyItemRemoved(position)
-        listener.onItemRemoved(position, items.isEmpty())
+        listener.onItemRemoved(position)
         listener.onDataValidityChanged(isDataValid.none { !it })
+    }
+
+    fun updateItems(newItems: List<BaseItem>) {
+        items.clear()
+        items.addAll(newItems)
+        notifyDataSetChanged()
     }
 
     interface DataEventListener {
         fun onItemAdded(item: BaseItem)
-        fun onItemRemoved(position: Int, isEmpty: Boolean)
+        fun onItemRemoved(position: Int)
         fun onItemMoved(fromPosition: Int, toPosition: Int)
         fun onDataValidityChanged(isDataValid: Boolean)
     }
