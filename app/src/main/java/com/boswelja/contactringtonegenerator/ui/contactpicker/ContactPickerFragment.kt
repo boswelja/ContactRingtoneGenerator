@@ -1,6 +1,5 @@
 package com.boswelja.contactringtonegenerator.ui.contactpicker
 
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.view.View
 import android.view.ViewGroup
@@ -27,16 +26,14 @@ class ContactPickerFragment : ListFragment<ArrayList<Contact>>(), ContactSelecti
 
     private val dataModel: WizardDataViewModel by activityViewModels()
     private val selectedContacts = ArrayList<Contact>()
-    private val sharedPreferences: SharedPreferences by lazy {
-        PreferenceManager.getDefaultSharedPreferences(requireContext())
-    }
     private val adapter: ContactPickerAdapter by lazy {
-        ContactPickerAdapter(sharedPreferences.getBoolean("use_nicknames", true), this)
+        ContactPickerAdapter(PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getBoolean("use_nicknames", true), this)
     }
 
     private lateinit var searchBox: AppCompatEditText
 
-    override fun requestData(): ArrayList<Contact>? = adapter.getSelectedContacts()
+    override fun requestData(): ArrayList<Contact>? = selectedContacts
 
     override fun onSaveData(activity: MainActivity, data: ArrayList<Contact>) {
         dataModel.setSelectedContacts(data)
