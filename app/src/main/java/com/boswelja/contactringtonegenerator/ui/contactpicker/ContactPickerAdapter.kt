@@ -20,6 +20,8 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
     private val selectedContacts = ArrayList<Contact>()
     private val filter = ItemFilter()
 
+    val canSelectAllContacts: Boolean get() = selectedContacts.count() < allContacts.count()
+
     override fun getItemCount(): Int = filteredContacts.count()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
@@ -85,6 +87,22 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
         filteredContacts.clear()
         filteredContacts.addAll(newContacts)
         sortContacts()
+        notifyDataSetChanged()
+    }
+
+    fun selectAllContacts() {
+        allContacts.minus(selectedContacts).forEach {
+            selectedContacts.add(it)
+            listener.onContactSelected(it)
+        }
+        notifyDataSetChanged()
+    }
+
+    fun deselectAllContacts() {
+        selectedContacts.forEach {
+            listener.onContactDeselected(it)
+        }
+        selectedContacts.clear()
         notifyDataSetChanged()
     }
 

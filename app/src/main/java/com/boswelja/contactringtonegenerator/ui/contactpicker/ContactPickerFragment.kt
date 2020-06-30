@@ -2,10 +2,6 @@ package com.boswelja.contactringtonegenerator.ui.contactpicker
 
 import android.os.Bundle
 import android.view.View
-import android.view.ViewGroup
-import androidx.appcompat.widget.AppCompatEditText
-import androidx.core.view.ViewCompat
-import androidx.core.view.setPadding
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -14,6 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactsViewModel
+import com.boswelja.contactringtonegenerator.databinding.ContactPickerWidgetBinding
 import com.boswelja.contactringtonegenerator.ui.MainActivity
 import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
 import com.boswelja.contactringtonegenerator.ui.common.ListFragment
@@ -31,7 +28,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
         )
     }
 
-    private lateinit var searchBox: AppCompatEditText
+    private lateinit var widgetBinding: ContactPickerWidgetBinding
 
     override fun onContactDeselected(contact: Contact) {
         dataModel.selectedContacts.remove(contact)
@@ -46,27 +43,19 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     }
 
     override fun onCreateWidgetView(): View? {
-        val widgetPadding = resources.getDimensionPixelSize(R.dimen.list_widget_padding)
-        searchBox = AppCompatEditText(context).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            setCompoundDrawablesRelativeWithIntrinsicBounds(R.drawable.ic_search, 0, 0, 0)
-            compoundDrawablePadding = widgetPadding
-            setPadding(widgetPadding)
-            isSingleLine = true
-            setBackgroundResource(R.drawable.search_background)
-            setHint(R.string.search_hint)
-            doAfterTextChanged {
+        widgetBinding = ContactPickerWidgetBinding.inflate(layoutInflater)
+        widgetBinding.apply {
+            checkBox.setOnCheckedChangeListener { _, checked ->
+                if (checked) adapter.selectAllContacts()
+                else adapter.deselectAllContacts()
+            }
+            searchView.doAfterTextChanged {
                 setLoading(true)
                 adapter.filter.filter(it.toString())
                 setLoading(false)
             }
-        }.also {
-            ViewCompat.setElevation(it, resources.getDimension(R.dimen.list_widget_elevation))
         }
-        return searchBox
+        return widgetBinding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -95,6 +84,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     private fun updateContacts(contacts: List<Contact>) {
         adapter.setContacts(contacts)
         setLoading(false)
+        widgetBinding.checkBox.isChecked = !adapter.canSelectAllContacts
     }
 
     private fun updateSelectedContactsView() {
