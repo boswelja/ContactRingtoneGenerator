@@ -44,8 +44,6 @@ class RingtoneCreatorAdapter(private val listener: DataEventListener) :
         }
     }
 
-    fun getItems(): ArrayList<BaseItem> = items
-
     fun setIsDataValid(position: Int, isValid: Boolean) {
         if (position in isDataValid.indices) {
             if (isDataValid[position] != isValid) {
