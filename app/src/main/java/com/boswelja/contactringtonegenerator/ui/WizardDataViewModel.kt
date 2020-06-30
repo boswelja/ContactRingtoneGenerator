@@ -8,15 +8,8 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 
 class WizardDataViewModel : ViewModel() {
 
-    private val selectedContacts = ArrayList<Contact>()
+    val selectedContacts = ArrayList<Contact>()
     private val ringtoneStructure = ArrayList<BaseItem>()
-
-    fun setSelectedContacts(newContacts: List<Contact>) {
-        selectedContacts.apply {
-            clear()
-            addAll(newContacts)
-        }
-    }
 
     fun setRingtoneStructure(newStructure: List<BaseItem>) {
         ringtoneStructure.apply {

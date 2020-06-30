@@ -23,7 +23,6 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     private val dataModel: WizardDataViewModel by activityViewModels()
     private val contactsModel: ContactsViewModel by activityViewModels()
 
-    private val selectedContacts = ArrayList<Contact>()
     private val adapter: ContactPickerAdapter by lazy {
         ContactPickerAdapter(
             PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -35,17 +34,15 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     private lateinit var searchBox: AppCompatEditText
 
     override fun onContactDeselected(contact: Contact) {
-        selectedContacts.remove(contact)
         updateSelectedContactsView()
         updateNextEnabled()
-        dataModel.setSelectedContacts(selectedContacts)
+        dataModel.selectedContacts.remove(contact)
     }
 
     override fun onContactSelected(contact: Contact) {
-        selectedContacts.add(contact)
         updateSelectedContactsView()
         updateNextEnabled()
-        dataModel.setSelectedContacts(selectedContacts)
+        dataModel.selectedContacts.add(contact)
     }
 
     override fun onCreateWidgetView(): View? {
@@ -101,7 +98,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     }
 
     private fun updateSelectedContactsView() {
-        val count = selectedContacts.count()
+        val count = dataModel.selectedContacts.count()
         val activity = requireActivity()
         if (activity is MainActivity) {
             activity.setSubtitle(resources.getQuantityString(R.plurals.selected_contacts_summary, count, count))
@@ -116,6 +113,6 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     }
 
     private fun updateNextEnabled() {
-        binding.nextButton.isEnabled = selectedContacts.isNotEmpty()
+        binding.nextButton.isEnabled = dataModel.selectedContacts.isNotEmpty()
     }
 }
