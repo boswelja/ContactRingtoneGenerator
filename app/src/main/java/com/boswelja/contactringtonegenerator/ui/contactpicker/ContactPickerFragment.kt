@@ -113,6 +113,10 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     }
 
     private fun updateNextEnabled() {
-        binding.nextButton.isEnabled = dataModel.selectedContacts.isNotEmpty()
+        binding.nextButton.apply {
+            isEnabled = dataModel.selectedContacts.isNotEmpty()
+            if (isEnabled) extend()
+            else shrink()
+        }
     }
 }
