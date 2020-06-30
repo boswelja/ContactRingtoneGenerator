@@ -4,21 +4,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.databinding.FragmentRingtoneCreatorBinding
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorAvailableItemBinding
-import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ContactName
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
 import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
-import com.boswelja.contactringtonegenerator.ui.MainActivity
 import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
-import com.boswelja.contactringtonegenerator.ui.common.BaseDataFragment
 import com.google.android.material.chip.Chip
 
-class RingtoneCreatorFragment : BaseDataFragment<ArrayList<BaseItem>>(), RingtoneCreatorAdapter.DataEventListener {
+class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventListener {
 
     private val dataModel: WizardDataViewModel by activityViewModels()
     private val adapter = RingtoneCreatorAdapter(this)
@@ -38,23 +36,17 @@ class RingtoneCreatorFragment : BaseDataFragment<ArrayList<BaseItem>>(), Rington
 
     private lateinit var binding: FragmentRingtoneCreatorBinding
 
-    override fun onSaveData(activity: MainActivity, data: ArrayList<BaseItem>) {
-        dataModel.setRingtoneStructure(data)
-    }
-
-    override fun requestData(): ArrayList<BaseItem>? = adapter.getItems()
-
     override fun onItemAdded() {
         isDataEmpty = false
         updateNoDataViewVisibility()
         binding.messageBuilderView.smoothScrollToPosition(adapter.itemCount - 1)
-        if (isDataValid) saveData()
+        if (isDataValid) dataModel.setRingtoneStructure(adapter.getItems())
     }
 
     override fun onItemRemoved(isEmpty: Boolean) {
         isDataEmpty = isEmpty
         updateNoDataViewVisibility()
-        if (isDataValid) saveData()
+        if (isDataValid) dataModel.setRingtoneStructure(adapter.getItems())
     }
 
     override fun onDataValidityChanged(isDataValid: Boolean) {

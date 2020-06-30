@@ -18,37 +18,34 @@ import com.boswelja.contactringtonegenerator.ui.MainActivity
 import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
 import com.boswelja.contactringtonegenerator.ui.common.ListFragment
 
-class ContactPickerFragment : ListFragment<ArrayList<Contact>>(), ContactSelectionListener {
+class ContactPickerFragment : ListFragment(), ContactSelectionListener {
 
     private val dataModel: WizardDataViewModel by activityViewModels()
     private val contactsModel: ContactsViewModel by activityViewModels()
 
     private val selectedContacts = ArrayList<Contact>()
     private val adapter: ContactPickerAdapter by lazy {
-        ContactPickerAdapter(PreferenceManager.getDefaultSharedPreferences(requireContext())
-                .getBoolean("use_nicknames", true), this)
+        ContactPickerAdapter(
+            PreferenceManager.getDefaultSharedPreferences(requireContext())
+                .getBoolean("use_nicknames", true),
+            this
+        )
     }
 
     private lateinit var searchBox: AppCompatEditText
-
-    override fun requestData(): ArrayList<Contact>? = selectedContacts
-
-    override fun onSaveData(activity: MainActivity, data: ArrayList<Contact>) {
-        dataModel.setSelectedContacts(data)
-    }
 
     override fun onContactDeselected(contact: Contact) {
         selectedContacts.remove(contact)
         updateSelectedContactsView()
         updateNextEnabled()
-        saveData()
+        dataModel.setSelectedContacts(selectedContacts)
     }
 
     override fun onContactSelected(contact: Contact) {
         selectedContacts.add(contact)
         updateSelectedContactsView()
         updateNextEnabled()
-        saveData()
+        dataModel.setSelectedContacts(selectedContacts)
     }
 
     override fun onCreateWidgetView(): View? {
