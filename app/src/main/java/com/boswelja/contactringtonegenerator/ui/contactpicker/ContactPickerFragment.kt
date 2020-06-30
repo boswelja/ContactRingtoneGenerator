@@ -8,23 +8,21 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.setPadding
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
-import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
+import com.boswelja.contactringtonegenerator.contacts.ContactsViewModel
 import com.boswelja.contactringtonegenerator.ui.MainActivity
 import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
 import com.boswelja.contactringtonegenerator.ui.common.ListFragment
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 class ContactPickerFragment : ListFragment<ArrayList<Contact>>(), ContactSelectionListener {
 
     private val dataModel: WizardDataViewModel by activityViewModels()
+    private val contactsModel: ContactsViewModel by activityViewModels()
+
     private val selectedContacts = ArrayList<Contact>()
     private val adapter: ContactPickerAdapter by lazy {
         ContactPickerAdapter(PreferenceManager.getDefaultSharedPreferences(requireContext())
@@ -90,7 +88,9 @@ class ContactPickerFragment : ListFragment<ArrayList<Contact>>(), ContactSelecti
                 adapter = this@ContactPickerFragment.adapter
             }
         }
-        updateContacts()
+        contactsModel.contacts.observe(viewLifecycleOwner) {
+            updateContacts(it)
+        }
     }
 
     override fun onStop() {
@@ -98,14 +98,9 @@ class ContactPickerFragment : ListFragment<ArrayList<Contact>>(), ContactSelecti
         removeSubtitle()
     }
 
-    private fun updateContacts() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val contacts = ContactsHelper.getContacts(requireContext())
-            withContext(Dispatchers.Main) {
-                adapter.setContacts(contacts)
-                setLoading(false)
-            }
-        }
+    private fun updateContacts(contacts: List<Contact>) {
+        adapter.setContacts(contacts)
+        setLoading(false)
     }
 
     private fun updateSelectedContactsView() {
