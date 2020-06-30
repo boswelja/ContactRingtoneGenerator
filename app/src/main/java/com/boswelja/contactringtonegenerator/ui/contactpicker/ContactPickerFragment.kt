@@ -60,6 +60,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setLoading(true)
+        adapter.setSelectedContacts(dataModel.selectedContacts)
         updateSelectedContactsView()
         updateNextEnabled()
         binding.apply {

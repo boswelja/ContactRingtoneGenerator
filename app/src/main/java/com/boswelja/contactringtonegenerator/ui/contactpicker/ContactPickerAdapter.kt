@@ -73,7 +73,11 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
 
     override fun getFilter(): Filter = filter
 
-    fun getSelectedContacts(): ArrayList<Contact> = selectedContacts
+    fun setSelectedContacts(newSelection: List<Contact>) {
+        selectedContacts.clear()
+        selectedContacts.addAll(newSelection)
+        notifyDataSetChanged()
+    }
 
     fun setContacts(newContacts: List<Contact>) {
         ArrayList(newContacts).apply {
