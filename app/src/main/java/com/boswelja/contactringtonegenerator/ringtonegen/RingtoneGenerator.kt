@@ -97,6 +97,7 @@ class RingtoneGenerator(
         return withContext(Dispatchers.IO) {
             val uri = MediaStoreHelper.scanNewFile(context, synthesisResult.result)
             return@withContext if (uri != null) {
+                synthesisResult.result.delete()
                 ContactsHelper.setContactRingtone(context, contact, uri)
                 true
             } else false
