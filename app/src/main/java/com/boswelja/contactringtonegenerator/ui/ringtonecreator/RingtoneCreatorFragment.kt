@@ -10,6 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.databinding.FragmentRingtoneCreatorBinding
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorAvailableItemBinding
+import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ContactName
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
 import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
@@ -36,17 +37,21 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
 
     private lateinit var binding: FragmentRingtoneCreatorBinding
 
-    override fun onItemAdded() {
+    override fun onItemAdded(item: BaseItem) {
         isDataEmpty = false
         updateNoDataViewVisibility()
         binding.messageBuilderView.smoothScrollToPosition(adapter.itemCount - 1)
         if (isDataValid) dataModel.setRingtoneStructure(adapter.getItems())
     }
 
-    override fun onItemRemoved(isEmpty: Boolean) {
+    override fun onItemRemoved(position: Int, isEmpty: Boolean) {
         isDataEmpty = isEmpty
         updateNoDataViewVisibility()
         if (isDataValid) dataModel.setRingtoneStructure(adapter.getItems())
+    }
+
+    override fun onItemMoved(fromPosition: Int, toPosition: Int) {
+
     }
 
     override fun onDataValidityChanged(isDataValid: Boolean) {
