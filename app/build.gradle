@@ -74,6 +74,7 @@ dependencies {
 
     testImplementation "androidx.arch.core:core-testing:$arch_version"
     testImplementation 'junit:junit:4.13'
+    testImplementation "io.mockk:mockk:$mockk_version"
 
     androidTestImplementation 'org.awaitility:awaitility-kotlin:4.0.3'
     androidTestImplementation "io.mockk:mockk-android:$mockk_version"
