@@ -1,6 +1,5 @@
 package com.boswelja.contactringtonegenerator.tts
 
-import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
@@ -26,11 +25,10 @@ class TtsManagerTest {
     @MockK
     lateinit var progressListener: TtsManager.JobProgressListener
 
-    private lateinit var context: Context
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
 
     @Before
     fun setUp() {
-        context = InstrumentationRegistry.getInstrumentation().targetContext.applicationContext
         MockKAnnotations.init(this, relaxed = true)
     }
 
