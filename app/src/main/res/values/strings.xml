@@ -16,7 +16,7 @@
     <string name="reset_ringtones_summary">This will clear all custom ringtones for all your contacts</string>
     <string name="tts_settings_title">Text to Speech</string>
     <string name="launch_tts_settings_title">Open Text to Speech Settings</string>
-    <string name="use_nicknames">Use nicknames when available</string>
+    <string name="use_nicknames">Show nicknames instead of full names when possible</string>
 
     <string name="contact_picker_title">Select Contacts</string>
 
