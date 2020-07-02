@@ -20,4 +20,5 @@ abstract class StructureItem(val id: ID) {
     override fun hashCode(): Int {
         return id.hashCode()
     }
+
 }

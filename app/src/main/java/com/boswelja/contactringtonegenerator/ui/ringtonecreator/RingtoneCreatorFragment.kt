@@ -96,19 +96,14 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
         ID.values().forEach {
             val chipBinding = RingtoneCreatorAvailableItemBinding.inflate(layoutInflater)
             chipBinding.root.apply {
-                // TODO There must be a better way of getting the label for an item
                 text = when (it) {
-                    ID.FIRST_NAME -> {
-                        FirstName().getLabel()
-                    }
-                    ID.TEXT_ITEM -> {
-                        TextItem().getLabel()
-                    }
-                    ID.MIDDLE_NAME -> MiddleName().getLabel()
-                    ID.LAST_NAME -> LastName().getLabel()
-                    ID.PREFIX -> NamePrefix().getLabel()
-                    ID.SUFFIX -> NameSuffix().getLabel()
-                    ID.NICKNAME -> Nickname().getLabel()
+                    ID.FIRST_NAME -> FirstName.label
+                    ID.TEXT_ITEM -> TextItem.label
+                    ID.MIDDLE_NAME -> MiddleName.label
+                    ID.LAST_NAME -> LastName.label
+                    ID.PREFIX -> NamePrefix.label
+                    ID.SUFFIX -> NameSuffix.label
+                    ID.NICKNAME -> Nickname.label
                 }
                 id = it.ordinal
                 setOnClickListener(onAvailableItemClickListener)

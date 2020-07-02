@@ -6,9 +6,10 @@ class TextItem : StructureItem(ID.TEXT_ITEM) {
 
     var text: String = ""
 
-    override fun getLabel(): String {
-        return "Custom Text"
-    }
-
+    override fun getLabel(): String = label
     override fun getEngineText(): String = text
+
+    companion object {
+        const val label: String = "Custom Text"
+    }
 }
