@@ -5,22 +5,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.google.android.material.chip.ChipGroup
-        android:id="@+id/available_items"
+    <HorizontalScrollView
+        android:id="@+id/chip_scroller"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginStart="@dimen/content_side_margins"
-        android:layout_marginEnd="@dimen/content_side_margins"
         android:layout_marginBottom="72dp"
-        app:chipSpacingHorizontal="8dp"
-        app:layout_constraintBottom_toBottomOf="parent" />
+        android:requiresFadingEdge="horizontal"
+        android:fadingEdgeLength="16dp"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/available_items"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingStart="@dimen/content_side_margins"
+            android:paddingEnd="@dimen/content_side_margins"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:clipToPadding="false"
+            app:chipSpacingHorizontal="8dp"
+            app:singleLine="true" />
+
+    </HorizontalScrollView>
 
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="?android:listDivider"
-        app:layout_constraintBottom_toTopOf="@id/available_items" />
+        app:layout_constraintBottom_toTopOf="@id/chip_scroller" />
 
     <FrameLayout
         android:layout_width="match_parent"
