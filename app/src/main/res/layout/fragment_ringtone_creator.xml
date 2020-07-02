@@ -12,7 +12,7 @@
         android:layout_marginStart="@dimen/content_side_margins"
         android:layout_marginEnd="@dimen/content_side_margins"
         android:layout_marginBottom="72dp"
-        app:chipSpacing="8dp"
+        app:chipSpacingHorizontal="8dp"
         app:layout_constraintBottom_toBottomOf="parent" />
 
     <View
