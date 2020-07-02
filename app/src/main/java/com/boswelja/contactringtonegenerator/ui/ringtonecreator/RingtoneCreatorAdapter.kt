@@ -17,8 +17,8 @@ class RingtoneCreatorAdapter(private val listener: DataEventListener) :
     override fun getItemCount(): Int = items.count()
 
     override fun getItemViewType(position: Int): Int =
-            if (getItem(position).isDynamic) DYNAMIC_ITEM
-            else NON_DYNAMIC_ITEM
+        if (getItem(position).isDynamic) DYNAMIC_ITEM
+        else NON_DYNAMIC_ITEM
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         if (layoutInflater == null) layoutInflater = LayoutInflater.from(parent.context)
