@@ -82,7 +82,7 @@ class RingtoneGeneratorTest {
         testContacts.forEach {
             verify(exactly = 1) { progressListener.onJobStarted(it) }
         }
-        verify(exactly = TRUE_JOB_COUNT) { progressListener.onJobCompleted(any(), any() ) }
+        verify(exactly = TRUE_JOB_COUNT) { progressListener.onJobCompleted(any(), any()) }
 
         confirmVerified(progressListener)
         ringtoneGenerator.destroy()

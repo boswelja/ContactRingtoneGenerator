@@ -49,7 +49,7 @@ class TtsManagerTest {
             engineEventListener = this@TtsManagerTest.engineEventListener
         }
         await.atMost(5, TimeUnit.SECONDS).until(ttsManager::isEngineReady)
-        verify(exactly = 1) { engineEventListener.onInitialised(any())}
+        verify(exactly = 1) { engineEventListener.onInitialised(any()) }
 
         confirmVerified(engineEventListener)
         ttsManager.destroy()
