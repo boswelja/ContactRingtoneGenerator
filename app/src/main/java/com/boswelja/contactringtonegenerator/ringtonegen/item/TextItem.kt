@@ -1,6 +1,8 @@
 package com.boswelja.contactringtonegenerator.ringtonegen.item
 
-class TextItem : BaseItem(ID.TEXT_ITEM) {
+class TextItem : StructureItem(ID.TEXT_ITEM) {
+
+    override val isDynamic: Boolean = true
 
     var text: String = ""
 

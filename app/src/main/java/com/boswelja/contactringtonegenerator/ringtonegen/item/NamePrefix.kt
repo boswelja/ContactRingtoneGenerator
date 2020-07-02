@@ -1,6 +1,6 @@
 package com.boswelja.contactringtonegenerator.ringtonegen.item
 
-class NamePrefix : BaseItem(ID.PREFIX) {
+class NamePrefix : BaseNameItem(ID.PREFIX) {
 
     override fun getLabel(): String {
         return "Name Prefix"

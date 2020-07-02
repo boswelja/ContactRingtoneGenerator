@@ -1,6 +1,6 @@
 package com.boswelja.contactringtonegenerator.ringtonegen.item
 
-class MiddleName : BaseItem(ID.MIDDLE_NAME) {
+class MiddleName : BaseNameItem(ID.MIDDLE_NAME) {
 
     override fun getLabel(): String {
         return "Middle Name"

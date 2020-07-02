@@ -1,12 +1,17 @@
 package com.boswelja.contactringtonegenerator.ringtonegen.item
 
-abstract class BaseItem(val id: ID) {
+abstract class StructureItem(val id: ID) {
+
+    /**
+     * Indicates whether this [StructureItem] is a user-adjustable item.
+     */
+    abstract val isDynamic: Boolean
 
     abstract fun getLabel(): String
     abstract fun getEngineText(): String
 
     override fun equals(other: Any?): Boolean {
-        if (other is BaseItem) {
+        if (other is StructureItem) {
             return other.id == id
         }
         return super.equals(other)

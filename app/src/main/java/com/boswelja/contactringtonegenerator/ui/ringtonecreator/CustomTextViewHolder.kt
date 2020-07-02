@@ -5,7 +5,7 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.core.widget.doAfterTextChanged
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorItemBinding
-import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -47,7 +47,7 @@ class CustomTextViewHolder(
         }
     }
 
-    override fun bind(item: BaseItem) {
+    override fun bind(item: StructureItem) {
         if (item is TextItem) {
             (widgetView as TextInputLayout).editText?.setText(item.text)
         }

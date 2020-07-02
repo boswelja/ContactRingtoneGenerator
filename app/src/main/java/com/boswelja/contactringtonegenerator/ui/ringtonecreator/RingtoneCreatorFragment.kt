@@ -10,7 +10,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.databinding.FragmentRingtoneCreatorBinding
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorAvailableItemBinding
-import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.FirstName
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
 import com.boswelja.contactringtonegenerator.ringtonegen.item.LastName
@@ -47,7 +47,7 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
 
     private lateinit var binding: FragmentRingtoneCreatorBinding
 
-    override fun onItemAdded(item: BaseItem) {
+    override fun onItemAdded(item: StructureItem) {
         dataModel.ringtoneStructure.add(item)
         updateNoDataViewVisibility()
         binding.messageBuilderView.smoothScrollToPosition(adapter.itemCount - 1)

@@ -4,13 +4,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorItemBinding
-import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
 
 class RingtoneCreatorAdapter(private val listener: DataEventListener) :
     RecyclerView.Adapter<BaseViewHolder>() {
 
-    private val items: ArrayList<BaseItem> = ArrayList()
+    private val items: ArrayList<StructureItem> = ArrayList()
     private val isDataValid: ArrayList<Boolean> = ArrayList()
 
     private var layoutInflater: LayoutInflater? = null
@@ -53,9 +53,9 @@ class RingtoneCreatorAdapter(private val listener: DataEventListener) :
         }
     }
 
-    fun getItem(position: Int): BaseItem = items[position]
+    fun getItem(position: Int): StructureItem = items[position]
 
-    fun addItem(item: BaseItem) {
+    fun addItem(item: StructureItem) {
         if (items.add(item)) {
             notifyItemInserted(items.lastIndex)
             listener.onItemAdded(item)
@@ -77,14 +77,14 @@ class RingtoneCreatorAdapter(private val listener: DataEventListener) :
         listener.onDataValidityChanged(isDataValid.none { !it })
     }
 
-    fun updateItems(newItems: List<BaseItem>) {
+    fun updateItems(newItems: List<StructureItem>) {
         items.clear()
         items.addAll(newItems)
         notifyDataSetChanged()
     }
 
     interface DataEventListener {
-        fun onItemAdded(item: BaseItem)
+        fun onItemAdded(item: StructureItem)
         fun onItemRemoved(position: Int)
         fun onItemMoved(fromPosition: Int, toPosition: Int)
         fun onDataValidityChanged(isDataValid: Boolean)
