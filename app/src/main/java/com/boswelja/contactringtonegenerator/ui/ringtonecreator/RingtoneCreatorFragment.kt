@@ -96,15 +96,17 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
         ID.values().forEach {
             val chipBinding = RingtoneCreatorAvailableItemBinding.inflate(layoutInflater)
             chipBinding.root.apply {
-                setText(when (it) {
-                    ID.FIRST_NAME -> FirstName.labelRes
-                    ID.TEXT_ITEM -> TextItem.labelRes
-                    ID.MIDDLE_NAME -> MiddleName.labelRes
-                    ID.LAST_NAME -> LastName.labelRes
-                    ID.PREFIX -> NamePrefix.labelRes
-                    ID.SUFFIX -> NameSuffix.labelRes
-                    ID.NICKNAME -> Nickname.labelRes
-                })
+                setText(
+                    when (it) {
+                        ID.FIRST_NAME -> FirstName.labelRes
+                        ID.TEXT_ITEM -> TextItem.labelRes
+                        ID.MIDDLE_NAME -> MiddleName.labelRes
+                        ID.LAST_NAME -> LastName.labelRes
+                        ID.PREFIX -> NamePrefix.labelRes
+                        ID.SUFFIX -> NameSuffix.labelRes
+                        ID.NICKNAME -> Nickname.labelRes
+                    }
+                )
                 id = it.ordinal
                 setOnClickListener(onAvailableItemClickListener)
             }

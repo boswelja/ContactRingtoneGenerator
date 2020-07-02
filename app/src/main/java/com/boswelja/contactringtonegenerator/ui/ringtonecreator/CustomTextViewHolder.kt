@@ -51,7 +51,7 @@ class CustomTextViewHolder(
             (widgetView as TextInputLayout).editText?.apply {
                 setText(item.text)
                 setHint(item.getLabelRes())
-            }.
+            }
         }
     }
 }
