@@ -56,7 +56,7 @@ class ProgressFragment :
 
     override fun onJobStarted(contact: Contact) {
         Timber.d("onJobStarted($contact)")
-        binding.loadingStatus.text = getString(R.string.progress_status_generating, contact.nickname ?: contact.name)
+        binding.loadingStatus.text = getString(R.string.progress_status_generating, contact.nickname ?: contact.displayName)
     }
 
     override fun onJobCompleted(success: Boolean, synthesisResult: SynthesisResult) {

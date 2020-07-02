@@ -13,8 +13,16 @@ object ContactsHelper {
 
     private val CONTACTS_PROJECTION = arrayOf(
         ContactsContract.Contacts._ID,
-        ContactsContract.Contacts.LOOKUP_KEY,
-        ContactsContract.CommonDataKinds.Identity.DISPLAY_NAME
+        ContactsContract.Contacts.LOOKUP_KEY
+    )
+
+    private val CONTACT_NAME_PROJECTION = arrayOf(
+            ContactsContract.CommonDataKinds.StructuredName._ID,
+            ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
+            ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME,
+            ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
+            ContactsContract.CommonDataKinds.StructuredName.PREFIX,
+            ContactsContract.CommonDataKinds.StructuredName.SUFFIX
     )
 
     private val CONTACT_NICKNAME_PROJECTION = arrayOf(
@@ -33,15 +41,19 @@ object ContactsHelper {
             if (cursor != null) {
                 val idColumn = cursor.getColumnIndex(ContactsContract.Contacts._ID)
                 val lookupKeyColumn = cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)
-                val displayNameColumn = cursor.getColumnIndex(ContactsContract.CommonDataKinds.Identity.DISPLAY_NAME)
                 while (cursor.moveToNext()) {
                     val id = cursor.getLong(idColumn)
                     val lookupKey = cursor.getString(lookupKeyColumn)
+                    val structuredName = getContactStructuredName(context, lookupKey)!!
                     val contact =
                         Contact(
                             id,
                             lookupKey,
-                            cursor.getString(displayNameColumn),
+                                structuredName[1]!!,
+                                structuredName[3],
+                                structuredName[2],
+                                structuredName[0],
+                                structuredName[4],
                             getContactNickname(context, lookupKey),
                             getContactPhotoUri(context, id)
                         )
@@ -53,7 +65,7 @@ object ContactsHelper {
             }
         }
         return withContext(Dispatchers.Default) {
-            return@withContext contacts.sortedBy { it.nickname ?: it.name }
+            return@withContext contacts.sortedBy { it.nickname ?: it.firstName }
         }
     }
 
@@ -89,6 +101,32 @@ object ContactsHelper {
             }
             cursor.close()
             return@withContext photoUri
+        }
+    }
+
+    private suspend fun getContactStructuredName(context: Context, lookupKey: String): Array<String?>? {
+        return withContext(Dispatchers.IO) {
+            val cursor = context.contentResolver.query(
+                    ContactsContract.Data.CONTENT_URI,
+                    CONTACT_NAME_PROJECTION,
+                    "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.StructuredName.MIMETYPE} = ?",
+                    arrayOf(lookupKey, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE), null
+            )
+            if (cursor == null || !cursor.moveToFirst()) {
+                return@withContext null
+            }
+            val firstNameColumn = cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME)
+            val middleNameColumn = cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME)
+            val lastNameColumn = cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME)
+            val prefixColumn = cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.PREFIX)
+            val suffixColumn = cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.SUFFIX)
+            val firstName = cursor.getString(firstNameColumn)
+            val middleName = cursor.getStringOrNull(middleNameColumn)
+            val lastName = cursor.getStringOrNull(lastNameColumn)
+            val prefix = cursor.getStringOrNull(prefixColumn)
+            val suffix = cursor.getStringOrNull(suffixColumn)
+            cursor.close()
+            return@withContext arrayOf(prefix, firstName, middleName, lastName, suffix)
         }
     }
 
