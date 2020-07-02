@@ -15,13 +15,13 @@ data class Contact(
     val photoUri: Uri? = null
 ) {
     val displayName: String =
-            StringJoinerCompat(" ").apply {
-                if (prefix != null) add(prefix)
-                add(firstName)
-                if (middleName != null) add(middleName)
-                if (lastName != null) add(lastName)
-                if (suffix != null) add(suffix)
-            }.toString()
+        StringJoinerCompat(" ").apply {
+            if (prefix != null) add(prefix)
+            add(firstName)
+            if (middleName != null) add(middleName)
+            if (lastName != null) add(lastName)
+            if (suffix != null) add(suffix)
+        }.toString()
 
     override fun equals(other: Any?): Boolean {
         if (other is Contact) {

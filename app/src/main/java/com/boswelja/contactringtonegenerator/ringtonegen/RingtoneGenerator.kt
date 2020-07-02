@@ -82,10 +82,14 @@ class RingtoneGenerator(
             ringtoneStructure.forEach {
                 messageBuilder.add(it.getEngineText())
             }
-            val contactName = contact.nickname ?: contact.displayName
             val message = messageBuilder.toString()
-                .replace(Constants.CONTACT_NAME_PLACEHOLDER, contactName)
-            val synthesisId = contactName.replace(" ", "_") + "-generated-ringtone"
+                .replace(Constants.FIRST_NAME_PLACEHOLDER, contact.firstName)
+                .replace(Constants.MIDDLE_NAME_PLACEHOLDER, contact.middleName ?: "")
+                .replace(Constants.LAST_NAME_PLACEHOLDER, contact.lastName ?: "")
+                .replace(Constants.NAME_PREFIX_PLACEHOLDER, contact.prefix ?: "")
+                .replace(Constants.NAME_SUFFIX_PLACEHOLDER, contact.suffix ?: "")
+                .replace(Constants.NICKNAME_PLACEHOLDER, contact.nickname ?: "")
+            val synthesisId = contact.displayName.replace(" ", "_") + "-generated-ringtone"
             SynthesisJob(synthesisId, message).also {
                 ttsManager.enqueueJob(it)
                 remainingJobs[it.id] = contact

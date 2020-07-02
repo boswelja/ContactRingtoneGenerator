@@ -3,7 +3,7 @@ package com.boswelja.contactringtonegenerator.ringtonegen
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import com.boswelja.contactringtonegenerator.contacts.Contact
-import com.boswelja.contactringtonegenerator.ringtonegen.item.ContactName
+import com.boswelja.contactringtonegenerator.ringtonegen.item.FirstName
 import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit
 class RingtoneGeneratorTest {
 
     private val testRingtoneStructure = listOf(
-        ContactName(),
+        FirstName(),
         TextItem().apply { text = "is calling" }
     )
     private val testContacts: List<Contact> = ArrayList<Contact>().apply {

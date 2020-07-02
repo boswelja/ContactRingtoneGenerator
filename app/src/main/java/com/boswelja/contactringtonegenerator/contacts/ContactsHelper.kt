@@ -17,12 +17,12 @@ object ContactsHelper {
     )
 
     private val CONTACT_NAME_PROJECTION = arrayOf(
-            ContactsContract.CommonDataKinds.StructuredName._ID,
-            ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
-            ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME,
-            ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
-            ContactsContract.CommonDataKinds.StructuredName.PREFIX,
-            ContactsContract.CommonDataKinds.StructuredName.SUFFIX
+        ContactsContract.CommonDataKinds.StructuredName._ID,
+        ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
+        ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME,
+        ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME,
+        ContactsContract.CommonDataKinds.StructuredName.PREFIX,
+        ContactsContract.CommonDataKinds.StructuredName.SUFFIX
     )
 
     private val CONTACT_NICKNAME_PROJECTION = arrayOf(
@@ -49,11 +49,11 @@ object ContactsHelper {
                         Contact(
                             id,
                             lookupKey,
-                                structuredName[1]!!,
-                                structuredName[3],
-                                structuredName[2],
-                                structuredName[0],
-                                structuredName[4],
+                            structuredName[1]!!,
+                            structuredName[3],
+                            structuredName[2],
+                            structuredName[0],
+                            structuredName[4],
                             getContactNickname(context, lookupKey),
                             getContactPhotoUri(context, id)
                         )
@@ -107,10 +107,10 @@ object ContactsHelper {
     private suspend fun getContactStructuredName(context: Context, lookupKey: String): Array<String?>? {
         return withContext(Dispatchers.IO) {
             val cursor = context.contentResolver.query(
-                    ContactsContract.Data.CONTENT_URI,
-                    CONTACT_NAME_PROJECTION,
-                    "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.StructuredName.MIMETYPE} = ?",
-                    arrayOf(lookupKey, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE), null
+                ContactsContract.Data.CONTENT_URI,
+                CONTACT_NAME_PROJECTION,
+                "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.StructuredName.MIMETYPE} = ?",
+                arrayOf(lookupKey, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE), null
             )
             if (cursor == null || !cursor.moveToFirst()) {
                 return@withContext null
