@@ -25,20 +25,17 @@ class RingtoneCreatorAdapter(private val listener: DataEventListener) :
         if (layoutInflater == null) layoutInflater = LayoutInflater.from(parent.context)
         val itemBinding = RingtoneCreatorItemBinding.inflate(layoutInflater!!, parent, false)
         return when (viewType) {
-            ID.FIRST_NAME.id -> {
-                ContactNameViewHolder(itemBinding)
-            }
             ID.TEXT_ITEM.id -> {
                 CustomTextViewHolder(this, itemBinding)
             }
-            else -> throw Exception("Invalid item in adapter")
+            else -> ContactDataViewHolder(itemBinding)
         }
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         holder.bind(getItem(position))
         when (holder) {
-            is ContactNameViewHolder -> {
+            is ContactDataViewHolder -> {
                 setIsDataValid(position, true)
             }
         }

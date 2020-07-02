@@ -7,7 +7,7 @@ import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorItemBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.item.BaseItem
 
-class ContactNameViewHolder(binding: RingtoneCreatorItemBinding) : BaseViewHolder(binding) {
+class ContactDataViewHolder(binding: RingtoneCreatorItemBinding) : BaseViewHolder(binding) {
 
     init {
         initWidgetView()
