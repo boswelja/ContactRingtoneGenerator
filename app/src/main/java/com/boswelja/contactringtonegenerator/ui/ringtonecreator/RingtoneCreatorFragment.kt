@@ -29,7 +29,7 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
 
     private val onAvailableItemClickListener = View.OnClickListener {
         if (it is Chip) {
-            val item = when (ID.values().first { item -> item.id == it.id }) {
+            val item = when (ID.values().first { item -> item.ordinal == it.id }) {
                 ID.FIRST_NAME -> FirstName()
                 ID.TEXT_ITEM -> TextItem()
                 ID.MIDDLE_NAME -> MiddleName()
@@ -110,7 +110,7 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
                     ID.SUFFIX -> NameSuffix().getLabel()
                     ID.NICKNAME -> Nickname().getLabel()
                 }
-                id = it.id
+                id = it.ordinal
                 setOnClickListener(onAvailableItemClickListener)
             }
             binding.availableItems.addView(chipBinding.root)

@@ -5,7 +5,6 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorItemBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
 
 class RingtoneCreatorAdapter(private val listener: DataEventListener) :
     RecyclerView.Adapter<BaseViewHolder>() {
@@ -17,28 +16,25 @@ class RingtoneCreatorAdapter(private val listener: DataEventListener) :
 
     override fun getItemCount(): Int = items.count()
 
-    override fun getItemViewType(position: Int): Int {
-        return getItem(position).id.id
-    }
+    override fun getItemViewType(position: Int): Int =
+            if (getItem(position).isDynamic) DYNAMIC_ITEM
+            else NON_DYNAMIC_ITEM
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
         if (layoutInflater == null) layoutInflater = LayoutInflater.from(parent.context)
         val itemBinding = RingtoneCreatorItemBinding.inflate(layoutInflater!!, parent, false)
         return when (viewType) {
-            ID.TEXT_ITEM.id -> {
+            NON_DYNAMIC_ITEM -> NonDynamicViewHolder(itemBinding)
+            else -> {
                 CustomTextViewHolder(this, itemBinding)
             }
-            else -> ContactDataViewHolder(itemBinding)
         }
     }
 
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
-        holder.bind(getItem(position))
-        when (holder) {
-            is ContactDataViewHolder -> {
-                setIsDataValid(position, true)
-            }
-        }
+        val contact = getItem(position)
+        holder.bind(contact)
+        if (!contact.isDynamic) setIsDataValid(position, true)
     }
 
     fun setIsDataValid(position: Int, isValid: Boolean) {
@@ -88,5 +84,10 @@ class RingtoneCreatorAdapter(private val listener: DataEventListener) :
         fun onItemRemoved(position: Int)
         fun onItemMoved(fromPosition: Int, toPosition: Int)
         fun onDataValidityChanged(isDataValid: Boolean)
+    }
+
+    companion object {
+        private const val DYNAMIC_ITEM = 1
+        private const val NON_DYNAMIC_ITEM = 2
     }
 }
