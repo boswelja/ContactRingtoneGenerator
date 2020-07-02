@@ -7,7 +7,7 @@ abstract class StructureItem(val id: ID) {
      */
     abstract val isDynamic: Boolean
 
-    abstract fun getLabel(): String
+    abstract fun getLabelRes(): Int
     abstract fun getEngineText(): String
 
     override fun equals(other: Any?): Boolean {

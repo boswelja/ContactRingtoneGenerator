@@ -41,4 +41,12 @@
     <string name="permission_missing_title">We need your permission to:</string>
     <string name="permission_missing_read_contacts">\u2802 Get the names and nicknames of your contacts</string>
     <string name="permission_missing_write_contacts">\u2802 Set a ringtone for each of your contacts</string>
+
+    <string name="label_first_name">Given Name</string>
+    <string name="label_middle_name">Middle Name</string>
+    <string name="label_last_name">Family Name</string>
+    <string name="label_name_prefix">Name Prefix</string>
+    <string name="label_name_suffix">Name Suffix</string>
+    <string name="label_nickname">Nickname</string>
+    <string name="label_custom_text">Custom Text</string>
 </resources>

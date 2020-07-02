@@ -26,7 +26,6 @@ class CustomTextViewHolder(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 LinearLayout.LayoutParams.WRAP_CONTENT
             )
-            hint = "Custom Text"
             endIconMode = TextInputLayout.END_ICON_CLEAR_TEXT
             TextInputEditText(context).apply {
                 inputType = InputType.TYPE_CLASS_TEXT or
@@ -49,7 +48,10 @@ class CustomTextViewHolder(
 
     override fun bind(item: StructureItem) {
         if (item is TextItem) {
-            (widgetView as TextInputLayout).editText?.setText(item.text)
+            (widgetView as TextInputLayout).editText?.apply {
+                setText(item.text)
+                setHint(item.getLabelRes())
+            }.
         }
     }
 }

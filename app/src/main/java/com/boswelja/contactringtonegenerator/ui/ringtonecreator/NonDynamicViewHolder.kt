@@ -23,6 +23,6 @@ class NonDynamicViewHolder(binding: RingtoneCreatorItemBinding) : BaseViewHolder
     }
 
     override fun bind(item: StructureItem) {
-        (widgetView as AppCompatTextView).text = item.getLabel()
+        (widgetView as AppCompatTextView).setText(item.getLabelRes())
     }
 }
