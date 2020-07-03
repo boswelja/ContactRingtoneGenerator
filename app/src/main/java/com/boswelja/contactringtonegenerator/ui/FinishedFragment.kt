@@ -65,23 +65,25 @@ class FinishedFragment : Fragment() {
         }
     }
 
-    private fun getState(successCount: Int, failCount: Int): State {
-        val hasSuccesses = successCount > 0
-        val hasFailures = failCount > 0
-        return if (hasSuccesses && hasFailures)
-            State.MIXED
-        else if (hasSuccesses && !hasFailures)
-            State.SUCCESSFUL
-        else if (!hasSuccesses && hasFailures)
-            State.FAILED
-        else
-            State.UNKNOWN
-    }
-
-    private enum class State {
+    enum class State {
         FAILED,
         MIXED,
         SUCCESSFUL,
         UNKNOWN
+    }
+
+    companion object {
+        fun getState(successCount: Int, failCount: Int): State {
+            val hasSuccesses = successCount > 0
+            val hasFailures = failCount > 0
+            return if (hasSuccesses && hasFailures)
+                State.MIXED
+            else if (hasSuccesses && !hasFailures)
+                State.SUCCESSFUL
+            else if (!hasSuccesses && hasFailures)
+                State.FAILED
+            else
+                State.UNKNOWN
+        }
     }
 }
