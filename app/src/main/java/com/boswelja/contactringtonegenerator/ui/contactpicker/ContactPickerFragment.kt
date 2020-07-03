@@ -32,6 +32,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
 
     override fun onContactDeselected(contact: Contact) {
         dataModel.selectedContacts.remove(contact)
+        widgetBinding.checkBox.isChecked = false
         updateSelectedContactsView()
         updateNextEnabled()
     }
