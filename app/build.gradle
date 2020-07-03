@@ -67,6 +67,8 @@ dependencies {
 
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
+    implementation 'com.arthenica:mobile-ffmpeg-full:4.3.2'
+
     debugImplementation "androidx.fragment:fragment-testing:$fragment_version"
 
     testImplementation 'junit:junit:4.13'
