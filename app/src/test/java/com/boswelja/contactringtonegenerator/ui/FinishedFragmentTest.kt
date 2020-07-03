@@ -1,7 +1,7 @@
 package com.boswelja.contactringtonegenerator.ui
 
 import com.boswelja.contactringtonegenerator.ui.FinishedFragment.Companion.getState
-import org.junit.Assert.*
+import org.junit.Assert.* // ktlint-disable
 import org.junit.Test
 
 class FinishedFragmentTest {
