@@ -82,6 +82,14 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
         removeSubtitle()
     }
 
+    override fun setLoading(loading: Boolean) {
+        super.setLoading(loading)
+        widgetBinding.apply {
+            checkBox.isEnabled = !loading
+            searchView.isEnabled = !loading
+        }
+    }
+
     private fun updateContacts(contacts: List<Contact>) {
         adapter.setContacts(contacts)
         setLoading(false)
