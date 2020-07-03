@@ -20,7 +20,7 @@ abstract class ListFragment : Fragment() {
         return binding.root
     }
 
-    protected fun setLoading(loading: Boolean) {
+    protected open fun setLoading(loading: Boolean) {
         binding.apply {
             if (loading) {
                 loadingSpinner.visibility = View.VISIBLE
