@@ -49,6 +49,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
             checkBox.setOnCheckedChangeListener { _, checked ->
                 if (checked) adapter.selectAllContacts()
                 else adapter.deselectAllContacts()
+                adapter.notifyDataSetChanged()
             }
             searchView.doAfterTextChanged {
                 setLoading(true)
@@ -95,6 +96,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
         adapter.setContacts(contacts)
         setLoading(false)
         widgetBinding.checkBox.isChecked = !adapter.canSelectAllContacts
+        adapter.notifyDataSetChanged()
     }
 
     private fun updateSelectedContactsView() {

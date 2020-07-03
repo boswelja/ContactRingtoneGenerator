@@ -29,18 +29,15 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
             layoutInflater = LayoutInflater.from(parent.context)
         }
 
-        return ContactViewHolder(ContactPickerRecyclerviewItemBinding.inflate(layoutInflater!!, parent, false))
+        return ContactViewHolder(ContactPickerRecyclerviewItemBinding.inflate(layoutInflater!!, parent, false), useNicknames)
     }
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         val contact = filteredContacts[position]
         val selected = selectedContacts.contains(contact)
         holder.apply {
-            contactName.text = if (useNicknames) {
-                contact.nickname ?: contact.displayName
-            } else {
-                contact.displayName
-            }
+            bind(contact)
+            checkbox.isChecked = selected
             itemView.setOnClickListener {
                 if (holder.isChecked) {
                     selectedContacts.remove(contact)
@@ -52,21 +49,15 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
                     listener.onContactSelected(contact)
                 }
             }
-            checkbox.isChecked = selected
-            if (contact.photoUri != null) {
-                contactIcon.setImageURI(contact.photoUri)
-            } else {
-                contactIcon.setImageResource(R.drawable.ic_default_contact)
-            }
         }
     }
 
     private fun sortContacts() {
         filteredContacts.sortBy {
             if (useNicknames) {
-                it.nickname ?: it.firstName
+                it.nickname ?: it.displayName
             } else {
-                it.firstName
+                it.displayName
             }
         }
     }
@@ -76,7 +67,6 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
     fun setSelectedContacts(newSelection: List<Contact>) {
         selectedContacts.clear()
         selectedContacts.addAll(newSelection)
-        notifyDataSetChanged()
     }
 
     fun setContacts(newContacts: List<Contact>) {
@@ -91,7 +81,6 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
         filteredContacts.clear()
         filteredContacts.addAll(newContacts)
         sortContacts()
-        notifyDataSetChanged()
     }
 
     fun selectAllContacts() {
@@ -99,7 +88,6 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
             selectedContacts.add(it)
             listener.onContactSelected(it)
         }
-        notifyDataSetChanged()
     }
 
     fun deselectAllContacts() {
@@ -107,18 +95,30 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
             listener.onContactDeselected(it)
         }
         selectedContacts.clear()
-        notifyDataSetChanged()
     }
 
-    class ContactViewHolder(private val binding: ContactPickerRecyclerviewItemBinding) :
-        RecyclerView.ViewHolder(binding.root) {
+    class ContactViewHolder(
+        private val binding: ContactPickerRecyclerviewItemBinding,
+        private val useNicknames: Boolean
+    ) : RecyclerView.ViewHolder(binding.root) {
 
-        val contactName = binding.contactName
-        val contactIcon = binding.contactIcon
         val checkbox = binding.checkbox
 
         var isChecked: Boolean get() = binding.checkbox.isChecked
             set(value) { binding.checkbox.isChecked = value }
+
+        fun bind(contact: Contact) {
+            binding.contactName.text = if (useNicknames) {
+                contact.nickname ?: contact.displayName
+            } else {
+                contact.displayName
+            }
+            if (contact.photoUri != null) {
+                binding.contactIcon.setImageURI(contact.photoUri)
+            } else {
+                binding.contactIcon.setImageResource(R.drawable.ic_default_contact)
+            }
+        }
     }
 
     inner class ItemFilter : Filter() {
