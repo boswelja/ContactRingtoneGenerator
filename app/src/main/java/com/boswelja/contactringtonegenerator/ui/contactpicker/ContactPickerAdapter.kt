@@ -17,7 +17,7 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
 
     private val allContacts = ArrayList<Contact>()
     private val filteredContacts = ArrayList<Contact>(allContacts)
-    private val selectedContacts = ArrayList<Contact>()
+    private val selectedContacts = HashMap<Contact, Boolean>()
     private val filter = ItemFilter()
 
     val canSelectAllContacts: Boolean get() = selectedContacts.count() < allContacts.count()
@@ -34,17 +34,17 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         val contact = filteredContacts[position]
-        val selected = selectedContacts.contains(contact)
+        val selected = selectedContacts[contact] ?: false
         holder.apply {
             bind(contact)
             checkbox.isChecked = selected
             itemView.setOnClickListener {
                 if (holder.isChecked) {
-                    selectedContacts.remove(contact)
+                    selectedContacts[contact] = false
                     holder.isChecked = false
                     listener.onContactDeselected(contact)
                 } else {
-                    selectedContacts.add(contact)
+                    selectedContacts[contact] = true
                     holder.isChecked = true
                     listener.onContactSelected(contact)
                 }
@@ -66,13 +66,15 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
 
     fun setSelectedContacts(newSelection: List<Contact>) {
         selectedContacts.clear()
-        selectedContacts.addAll(newSelection)
+        newSelection.forEach {
+            selectedContacts[it] = true
+        }
     }
 
     fun setContacts(newContacts: List<Contact>) {
         ArrayList(newContacts).apply {
             allContacts.retainAll(this)
-            selectedContacts.retainAll(this)
+            selectedContacts.keys.retainAll(newContacts)
             removeAll(allContacts)
             forEach {
                 allContacts.add(it)
@@ -84,14 +86,14 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
     }
 
     fun selectAllContacts() {
-        allContacts.minus(selectedContacts).forEach {
-            selectedContacts.add(it)
+        allContacts.minus(selectedContacts.keys).forEach {
+            selectedContacts[it] = true
             listener.onContactSelected(it)
         }
     }
 
     fun deselectAllContacts() {
-        selectedContacts.forEach {
+        selectedContacts.keys.forEach {
             listener.onContactDeselected(it)
         }
         selectedContacts.clear()
