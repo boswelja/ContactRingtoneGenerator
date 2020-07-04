@@ -10,6 +10,8 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.databinding.FragmentRingtoneCreatorBinding
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorAvailableItemBinding
+import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomAudio
+import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomText
 import com.boswelja.contactringtonegenerator.ringtonegen.item.FirstName
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
 import com.boswelja.contactringtonegenerator.ringtonegen.item.LastName
@@ -17,8 +19,9 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.MiddleName
 import com.boswelja.contactringtonegenerator.ringtonegen.item.NamePrefix
 import com.boswelja.contactringtonegenerator.ringtonegen.item.NameSuffix
 import com.boswelja.contactringtonegenerator.ringtonegen.item.Nickname
+import com.boswelja.contactringtonegenerator.ringtonegen.item.common.AudioItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomText
+import com.boswelja.contactringtonegenerator.ringtonegen.item.common.TextItem
 import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
 import com.google.android.material.chip.Chip
 
@@ -37,6 +40,7 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
                 ID.PREFIX -> NamePrefix()
                 ID.SUFFIX -> NameSuffix()
                 ID.NICKNAME -> Nickname()
+                ID.CUSTOM_AUDIO -> CustomAudio()
             }
             adapter.addItem(item)
         }
@@ -105,6 +109,20 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
                         ID.PREFIX -> NamePrefix.labelRes
                         ID.SUFFIX -> NameSuffix.labelRes
                         ID.NICKNAME -> Nickname.labelRes
+                        ID.CUSTOM_AUDIO -> CustomAudio.labelRes
+                    }
+                )
+                setChipIconResource(
+                    when (it) {
+                        ID.FIRST_NAME,
+                        ID.CUSTOM_TEXT,
+                        ID.MIDDLE_NAME,
+                        ID.LAST_NAME,
+                        ID.PREFIX,
+                        ID.SUFFIX,
+                        ID.NICKNAME
+                        -> TextItem.iconRes
+                        ID.CUSTOM_AUDIO -> AudioItem.iconRes
                     }
                 )
                 id = it.ordinal

@@ -9,5 +9,9 @@ abstract class AudioItem(id: ID) : StructureItem(id) {
     override val isUserAdjustable: Boolean = true
 
     abstract fun getAudioFile(): File?
-    override fun getIconRes(): Int = R.drawable.structure_ic_text
+    override fun getIconRes(): Int = iconRes
+
+    companion object {
+        const val iconRes: Int = R.drawable.structure_ic_audio
+    }
 }

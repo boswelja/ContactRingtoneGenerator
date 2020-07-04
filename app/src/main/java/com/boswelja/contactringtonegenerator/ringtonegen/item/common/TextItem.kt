@@ -5,5 +5,9 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
 
 abstract class TextItem(id: ID) : StructureItem(id) {
     abstract fun getEngineText(): String
-    override fun getIconRes(): Int = R.drawable.structure_ic_text
+    override fun getIconRes(): Int = iconRes
+
+    companion object {
+        const val iconRes: Int = R.drawable.structure_ic_text
+    }
 }

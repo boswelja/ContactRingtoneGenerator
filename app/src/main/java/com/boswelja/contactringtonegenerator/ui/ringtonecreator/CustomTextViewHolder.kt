@@ -5,8 +5,8 @@ import android.view.View
 import android.widget.LinearLayout
 import androidx.core.widget.doAfterTextChanged
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorItemBinding
-import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomText
+import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
