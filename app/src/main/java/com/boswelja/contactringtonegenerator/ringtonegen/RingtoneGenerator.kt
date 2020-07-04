@@ -6,6 +6,7 @@ import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.mediastore.MediaStoreHelper
 import com.boswelja.contactringtonegenerator.ringtonegen.item.Constants
+import com.boswelja.contactringtonegenerator.ringtonegen.item.common.AudioItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.TextItem
 import com.boswelja.contactringtonegenerator.tts.SynthesisJob
@@ -81,8 +82,11 @@ class RingtoneGenerator(
         withContext(Dispatchers.Default) {
             val messageBuilder = StringJoinerCompat(" ")
             ringtoneStructure.forEach {
-                if (it is TextItem) {
-                    messageBuilder.add(it.getEngineText())
+                when (it) {
+                    is TextItem -> messageBuilder.add(it.getEngineText())
+                    is AudioItem -> {
+                        //TODO Set this up
+                    }
                 }
             }
             val message = messageBuilder.toString()
