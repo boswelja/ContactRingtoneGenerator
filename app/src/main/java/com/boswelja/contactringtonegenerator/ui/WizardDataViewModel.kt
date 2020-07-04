@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
-import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 
 class WizardDataViewModel : ViewModel() {
 

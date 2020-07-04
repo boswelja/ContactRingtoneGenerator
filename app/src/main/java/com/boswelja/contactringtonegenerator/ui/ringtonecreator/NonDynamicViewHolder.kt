@@ -5,7 +5,7 @@ import android.view.ViewGroup
 import androidx.appcompat.widget.AppCompatTextView
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorItemBinding
-import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 
 class NonDynamicViewHolder(binding: RingtoneCreatorItemBinding) : BaseViewHolder(binding) {
 

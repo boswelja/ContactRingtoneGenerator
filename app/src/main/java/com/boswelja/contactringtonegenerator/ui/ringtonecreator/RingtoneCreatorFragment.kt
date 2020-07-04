@@ -17,8 +17,8 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.MiddleName
 import com.boswelja.contactringtonegenerator.ringtonegen.item.NamePrefix
 import com.boswelja.contactringtonegenerator.ringtonegen.item.NameSuffix
 import com.boswelja.contactringtonegenerator.ringtonegen.item.Nickname
-import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomText
 import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
 import com.google.android.material.chip.Chip
 
@@ -31,7 +31,7 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
         if (it is Chip) {
             val item = when (ID.values().first { item -> item.ordinal == it.id }) {
                 ID.FIRST_NAME -> FirstName()
-                ID.TEXT_ITEM -> TextItem()
+                ID.CUSTOM_TEXT -> CustomText()
                 ID.MIDDLE_NAME -> MiddleName()
                 ID.LAST_NAME -> LastName()
                 ID.PREFIX -> NamePrefix()
@@ -99,7 +99,7 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
                 setText(
                     when (it) {
                         ID.FIRST_NAME -> FirstName.labelRes
-                        ID.TEXT_ITEM -> TextItem.labelRes
+                        ID.CUSTOM_TEXT -> CustomText.labelRes
                         ID.MIDDLE_NAME -> MiddleName.labelRes
                         ID.LAST_NAME -> LastName.labelRes
                         ID.PREFIX -> NamePrefix.labelRes

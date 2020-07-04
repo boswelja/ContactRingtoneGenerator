@@ -6,7 +6,7 @@ import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.mediastore.MediaStoreHelper
 import com.boswelja.contactringtonegenerator.ringtonegen.item.Constants
-import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 import com.boswelja.contactringtonegenerator.tts.SynthesisJob
 import com.boswelja.contactringtonegenerator.tts.SynthesisResult
 import com.boswelja.contactringtonegenerator.tts.TtsManager
@@ -17,9 +17,9 @@ import kotlinx.coroutines.withContext
 import java.io.File
 
 class RingtoneGenerator(
-    private val context: Context,
-    private val ringtoneStructure: List<StructureItem>,
-    private val contacts: List<Contact>
+        private val context: Context,
+        private val ringtoneStructure: List<StructureItem>,
+        private val contacts: List<Contact>
 ) :
     TtsManager.JobProgressListener,
     TtsManager.EngineEventListener {
