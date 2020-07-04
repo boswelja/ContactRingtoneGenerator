@@ -5,7 +5,7 @@ abstract class StructureItem(val id: ID) {
     /**
      * Indicates whether this [StructureItem] is a user-adjustable item.
      */
-    abstract val isDynamic: Boolean
+    abstract val isUserAdjustable: Boolean
 
     abstract fun getLabelRes(): Int
     abstract fun getEngineText(): String

@@ -4,7 +4,7 @@ import com.boswelja.contactringtonegenerator.R
 
 class TextItem : StructureItem(ID.TEXT_ITEM) {
 
-    override val isDynamic: Boolean = true
+    override val isUserAdjustable: Boolean = true
 
     var text: String = ""
 

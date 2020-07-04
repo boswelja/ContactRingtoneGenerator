@@ -17,7 +17,7 @@ class RingtoneCreatorAdapter(private val listener: DataEventListener) :
     override fun getItemCount(): Int = items.count()
 
     override fun getItemViewType(position: Int): Int =
-        if (getItem(position).isDynamic) DYNAMIC_ITEM
+        if (getItem(position).isUserAdjustable) DYNAMIC_ITEM
         else NON_DYNAMIC_ITEM
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): BaseViewHolder {
@@ -34,7 +34,7 @@ class RingtoneCreatorAdapter(private val listener: DataEventListener) :
     override fun onBindViewHolder(holder: BaseViewHolder, position: Int) {
         val contact = getItem(position)
         holder.bind(contact)
-        if (!contact.isDynamic) setIsDataValid(position, true)
+        if (!contact.isUserAdjustable) setIsDataValid(position, true)
     }
 
     fun setIsDataValid(position: Int, isValid: Boolean) {
