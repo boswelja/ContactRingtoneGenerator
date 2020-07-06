@@ -9,6 +9,10 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureIt
 
 class NonDynamicViewHolder(binding: RingtoneCreatorItemBinding) : BaseViewHolder(binding) {
 
+    init {
+        initWidgetView()
+    }
+
     override fun createWidgetView(): View {
         return AppCompatTextView(itemView.context).apply {
             layoutParams = ViewGroup.LayoutParams(

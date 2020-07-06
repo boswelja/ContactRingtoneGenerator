@@ -17,6 +17,10 @@ class CustomTextViewHolder(
 ) :
     BaseViewHolder(binding) {
 
+    init {
+        initWidgetView()
+    }
+
     override fun createWidgetView(): View {
         return TextInputLayout(itemView.context).apply {
             layoutParams = LinearLayout.LayoutParams(

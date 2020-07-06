@@ -8,6 +8,7 @@
     <string name="grant">Grant</string>
     <string name="next">Next</string>
     <string name="finish">Finish</string>
+    <string name="browse">Browse</string>
 
     <string name="settings_title">Settings</string>
     <string name="contact_picker_settings_title">Contact Picker</string>
@@ -50,4 +51,6 @@
     <string name="label_nickname">Nickname</string>
     <string name="label_custom_text">Custom Text</string>
     <string name="label_custom_audio">Audio</string>
+
+    <string name="item_audio_no_file">No audio selected</string>
 </resources>

@@ -9,11 +9,7 @@ abstract class BaseViewHolder(val binding: RingtoneCreatorItemBinding) : Recycle
 
     lateinit var widgetView: View
 
-    init {
-        initWidgetView()
-    }
-
-    private fun initWidgetView() {
+    fun initWidgetView() {
         widgetView = createWidgetView()
         binding.widgetContainer.addView(widgetView)
     }
