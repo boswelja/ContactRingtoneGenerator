@@ -5,6 +5,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorItemBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
+import com.boswelja.contactringtonegenerator.ui.ringtonecreator.holder.BaseViewHolder
+import com.boswelja.contactringtonegenerator.ui.ringtonecreator.holder.CustomTextViewHolder
+import com.boswelja.contactringtonegenerator.ui.ringtonecreator.holder.NonDynamicViewHolder
 
 class RingtoneCreatorAdapter(private val listener: DataEventListener) :
     RecyclerView.Adapter<BaseViewHolder>() {

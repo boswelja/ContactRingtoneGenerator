@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ui.ringtonecreator
+package com.boswelja.contactringtonegenerator.ui.ringtonecreator.holder
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView
@@ -9,7 +9,11 @@ abstract class BaseViewHolder(val binding: RingtoneCreatorItemBinding) : Recycle
 
     lateinit var widgetView: View
 
-    fun initWidgetView() {
+    init {
+        initWidgetView()
+    }
+
+    private fun initWidgetView() {
         widgetView = createWidgetView()
         binding.widgetContainer.addView(widgetView)
     }

@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ui.ringtonecreator
+package com.boswelja.contactringtonegenerator.ui.ringtonecreator.holder
 
 import android.view.View
 import android.view.ViewGroup
@@ -8,10 +8,6 @@ import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorItemBind
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 
 class NonDynamicViewHolder(binding: RingtoneCreatorItemBinding) : BaseViewHolder(binding) {
-
-    init {
-        initWidgetView()
-    }
 
     override fun createWidgetView(): View {
         return AppCompatTextView(itemView.context).apply {

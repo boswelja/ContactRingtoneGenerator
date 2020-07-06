@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ui.ringtonecreator
+package com.boswelja.contactringtonegenerator.ui.ringtonecreator.holder
 
 import android.text.InputType
 import android.view.View
@@ -7,18 +7,15 @@ import androidx.core.widget.doAfterTextChanged
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorItemBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomText
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
+import com.boswelja.contactringtonegenerator.ui.ringtonecreator.RingtoneCreatorAdapter
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
 class CustomTextViewHolder(
-    private val adapter: RingtoneCreatorAdapter,
-    binding: RingtoneCreatorItemBinding
+        private val adapter: RingtoneCreatorAdapter,
+        binding: RingtoneCreatorItemBinding
 ) :
     BaseViewHolder(binding) {
-
-    init {
-        initWidgetView()
-    }
 
     override fun createWidgetView(): View {
         return TextInputLayout(itemView.context).apply {
