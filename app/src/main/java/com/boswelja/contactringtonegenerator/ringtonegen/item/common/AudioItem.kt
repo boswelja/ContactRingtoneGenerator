@@ -1,14 +1,14 @@
 package com.boswelja.contactringtonegenerator.ringtonegen.item.common
 
+import android.net.Uri
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
-import java.io.File
 
 abstract class AudioItem(id: ID) : StructureItem(id) {
 
     override val isUserAdjustable: Boolean = true
 
-    abstract fun getAudioFile(): File?
+    abstract fun getAudioContentUri(): Uri?
     override fun getIconRes(): Int = iconRes
 
     companion object {

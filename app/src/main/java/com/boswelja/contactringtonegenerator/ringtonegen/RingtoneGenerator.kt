@@ -1,6 +1,9 @@
 package com.boswelja.contactringtonegenerator.ringtonegen
 
 import android.content.Context
+import android.net.Uri
+import android.provider.OpenableColumns
+import android.webkit.MimeTypeMap
 import com.boswelja.contactringtonegenerator.StringJoinerCompat
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
@@ -17,6 +20,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.FileOutputStream
 
 class RingtoneGenerator(
     private val context: Context,
@@ -29,6 +33,7 @@ class RingtoneGenerator(
     private val coroutineScope = MainScope()
     private val cacheDir: File = context.cacheDir
     private val ttsManager = TtsManager(context)
+    private val customAudioCacheMap: HashMap<Uri, File> by lazy { HashMap() }
 
     private var remainingJobs: HashMap<String, Contact> = HashMap()
     private var jobsQueued: Boolean = false
@@ -49,6 +54,10 @@ class RingtoneGenerator(
             engineEventListener = this@RingtoneGenerator
         }
         coroutineScope.launch(Dispatchers.Default) {
+            ringtoneStructure.filterIsInstance<AudioItem>().forEach {
+                val uri = it.getAudioContentUri()
+                if (uri != null) saveFileToCache(uri)
+            }
             contacts.forEach {
                 queueJobFor(it)
             }
@@ -75,6 +84,24 @@ class RingtoneGenerator(
             remainingJobs.remove(synthesisResult.id)
             progressListener?.onJobCompleted(saveSuccess, synthesisResult)
             if (remainingJobs.count() < 1) state = State.FINISHED
+        }
+    }
+
+    private suspend fun saveFileToCache(uri: Uri) {
+        withContext(Dispatchers.IO) {
+            val destination: File
+            val fileType = MimeTypeMap.getSingleton().getExtensionFromMimeType(context.contentResolver.getType(uri))
+            context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)!!.use {
+                it.moveToFirst()
+                val fileName = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
+                destination = File(cacheDir, "$fileName.$fileType")
+            }
+            context.contentResolver.openInputStream(uri)?.use { inStream ->
+                FileOutputStream(destination).use {
+                    it.write(inStream.read())
+                }
+            }
+            customAudioCacheMap[uri] = destination
         }
     }
 
