@@ -29,7 +29,7 @@ class TtsManager(context: Context) :
     val synthesisJobCount: Int
         get() = synthesisJobs.count()
 
-    var jobProgressListener: JobProgressListener? = null
+    val jobProgressListener: ArrayList<JobProgressListener> = ArrayList()
     var engineEventListener: EngineEventListener? = null
 
     /**
@@ -57,11 +57,11 @@ class TtsManager(context: Context) :
         if (utteranceJob != null) {
             // onStart seems to get called twice per job on API versions 28 and lower, work around this by keeping track of which job IDs have been called
             if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                jobProgressListener?.onJobStarted(utteranceJob)
+                jobProgressListener.forEach { it.onJobStarted(utteranceJob) }
             } else {
                 if (!startedJobIds.contains(utteranceId)) {
                     startedJobIds.add(utteranceId!!)
-                    jobProgressListener?.onJobStarted(utteranceJob)
+                    jobProgressListener.forEach { it.onJobStarted(utteranceJob) }
                 }
             }
         }
@@ -73,7 +73,7 @@ class TtsManager(context: Context) :
         if (synthesisJob != null) synthesisJobs.remove(synthesisJob)
         if (synthesisResult != null) {
             synthesisResults.remove(synthesisResult)
-            jobProgressListener?.onJobCompleted(true, synthesisResult)
+            jobProgressListener.forEach { it.onJobCompleted(true, synthesisResult) }
         }
     }
 
@@ -83,7 +83,7 @@ class TtsManager(context: Context) :
         if (synthesisJob != null) synthesisJobs.remove(synthesisJob)
         if (synthesisResult != null) {
             synthesisResults.remove(synthesisResult)
-            jobProgressListener?.onJobCompleted(false, synthesisResult)
+            jobProgressListener.forEach { it.onJobCompleted(false, synthesisResult) }
         }
     }
 
