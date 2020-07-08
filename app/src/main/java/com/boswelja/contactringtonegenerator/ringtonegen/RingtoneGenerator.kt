@@ -1,9 +1,6 @@
 package com.boswelja.contactringtonegenerator.ringtonegen
 
 import android.content.Context
-import android.net.Uri
-import android.provider.OpenableColumns
-import android.webkit.MimeTypeMap
 import com.arthenica.mobileffmpeg.Config
 import com.arthenica.mobileffmpeg.FFmpeg
 import com.boswelja.contactringtonegenerator.contacts.Contact
@@ -21,7 +18,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
-import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicInteger
 
 class RingtoneGenerator(
@@ -33,13 +29,11 @@ class RingtoneGenerator(
     private val coroutineScope = MainScope()
     private val cacheDir: File = context.cacheDir
     private val ttsManager = TtsManager(context)
-    private val customAudioCacheMap: HashMap<Uri, File> by lazy { HashMap() }
     private val counter = AtomicInteger()
 
     private var initialSetupComplete: Boolean = false
 
-    val totalJobCount: Int get() =
-        customAudioCacheMap.count() + contacts.count() + ringtoneStructure.count()
+    val totalJobCount: Int get() =contacts.count()
 
     var progressListener: ProgressListener? = null
     var stateListener: StateListener? = null
@@ -54,7 +48,6 @@ class RingtoneGenerator(
             engineEventListener = this@RingtoneGenerator
         }
         coroutineScope.launch(Dispatchers.Default) {
-            getAndSaveCustomAudioFiles()
             initialSetupComplete = true
             if (ttsManager.isEngineReady) state = State.READY
         }
@@ -63,34 +56,6 @@ class RingtoneGenerator(
     override fun onInitialised(success: Boolean) {
         if (!success) throw IllegalStateException("TTS failed to initialise")
         if (initialSetupComplete) state = State.READY
-    }
-
-    private suspend fun saveFileToCache(uri: Uri) {
-        withContext(Dispatchers.IO) {
-            val destination: File
-            val fileName: String
-            val fileType = MimeTypeMap.getSingleton().getExtensionFromMimeType(context.contentResolver.getType(uri))
-            val cursor = context.contentResolver.query(uri, arrayOf(OpenableColumns.DISPLAY_NAME), null, null, null)!!
-            cursor.also {
-                it.moveToFirst()
-                fileName = it.getString(it.getColumnIndex(OpenableColumns.DISPLAY_NAME))
-            }
-            cursor.close()
-            destination = File(cacheDir, "$fileName.$fileType")
-            context.contentResolver.openInputStream(uri)?.use { inStream ->
-                FileOutputStream(destination).use {
-                    it.write(inStream.read())
-                }
-            }
-            customAudioCacheMap[uri] = destination
-        }
-    }
-
-    private suspend fun getAndSaveCustomAudioFiles() {
-        ringtoneStructure.filterIsInstance<AudioItem>().forEach {
-            val uri = it.getAudioContentUri()
-            if (uri != null) saveFileToCache(uri)
-        }
     }
 
     private suspend fun handleGenerateCompleted(contact: Contact, ringtone: File): Boolean {
@@ -107,19 +72,25 @@ class RingtoneGenerator(
     private fun createJobFor(contact: Contact): Job {
         Timber.d("createJobFor($contact)")
         return coroutineScope.launch(Dispatchers.Default) {
-            val files = ArrayList<File>()
             var workingString = ""
-            var fileIndex = 0
+            var commandInputs = ""
+            var filterInputs = ""
+            var filesCount = 0
             ringtoneStructure.forEach {
                 if (it !is TextItem && workingString.isNotEmpty()) {
                     val id = counter.incrementAndGet().toString()
                     val result = ttsManager.synthesizeToFile(SynthesisJob(id, workingString))
-                    files.add(fileIndex, result.result)
+                    commandInputs += " -i ${result.result.absolutePath}"
+                    filesCount += 1
+                    filterInputs += "[$filesCount:0]"
                 }
                 when (it) {
                     is AudioItem -> {
-                        files.add(fileIndex, customAudioCacheMap[it.getAudioContentUri()]!!)
-                        fileIndex += 1
+                        val parcelFileDescriptor = context.contentResolver.openFileDescriptor(it.getAudioContentUri()!!, "r")
+                        val path = String.format("pipe:%d", parcelFileDescriptor?.fd)
+                        commandInputs += " -i $path"
+                        filesCount += 1
+                        filterInputs += "[$filesCount:0]"
                     }
                     is TextItem -> {
                         workingString += it.getEngineText()
@@ -129,17 +100,12 @@ class RingtoneGenerator(
             if (workingString.isNotEmpty()) {
                 val id = counter.incrementAndGet().toString()
                 val result = ttsManager.synthesizeToFile(SynthesisJob(id, workingString))
-                files.add(fileIndex, result.result)
+                commandInputs += " -i ${result.result.absolutePath}"
             }
 
+            Timber.d("Got $filesCount files")
             val output = File(cacheDir, "${contact.displayName.replace(" ", "-")}.ogg")
-            var commandInputs = ""
-            var filterInputs = ""
-            files.forEachIndexed { index, file ->
-                commandInputs += " -i ${file.absolutePath}"
-                filterInputs += "[$index:0]"
-            }
-            val command = "$commandInputs -filter_complex '${filterInputs}concat=n=${files.count()}:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
+            val command = "$commandInputs -filter_complex '${filterInputs}concat=n=${filesCount}:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
             Timber.i("ffmpeg $command")
             val result = FFmpeg.execute(command)
             val success = result == Config.RETURN_CODE_SUCCESS
