@@ -12,7 +12,6 @@ import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.FragmentProgressBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
-import com.boswelja.contactringtonegenerator.tts.SynthesisResult
 import timber.log.Timber
 
 class ProgressFragment :
@@ -59,8 +58,8 @@ class ProgressFragment :
         binding.loadingStatus.text = getString(R.string.progress_status_generating, contact.nickname ?: contact.displayName)
     }
 
-    override fun onJobCompleted(success: Boolean, synthesisResult: SynthesisResult) {
-        Timber.d("onJobCompleted($success, $synthesisResult)")
+    override fun onJobCompleted(success: Boolean, contact: Contact) {
+        Timber.d("onJobCompleted($success, $contact)")
         binding.progressBar.apply {
             if (success) {
                 incrementProgress()
