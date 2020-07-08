@@ -1,5 +1,6 @@
 package com.boswelja.contactringtonegenerator.ui.ringtonecreator
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -28,7 +29,7 @@ import com.google.android.material.chip.Chip
 class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventListener {
 
     private val dataModel: WizardDataViewModel by activityViewModels()
-    private val adapter = RingtoneCreatorAdapter(this)
+    private val adapter = RingtoneCreatorAdapter(this, this)
 
     private val onAvailableItemClickListener = View.OnClickListener {
         if (it is Chip) {
@@ -86,6 +87,11 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
         binding.nextButton.setOnClickListener {
             findNavController().navigate(RingtoneCreatorFragmentDirections.toLoadingFragment())
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (requestCode == RingtoneCreatorAdapter.CHOOSER_REQUEST_CODE) adapter.handleChooserResponse(data)
+        else super.onActivityResult(requestCode, resultCode, data)
     }
 
     private fun setupMessageCreatorView() {
