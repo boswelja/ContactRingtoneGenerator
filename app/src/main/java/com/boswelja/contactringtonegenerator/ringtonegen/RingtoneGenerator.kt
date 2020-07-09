@@ -93,7 +93,9 @@ class RingtoneGenerator(
     private fun createJobFor(contact: Contact): Job {
         Timber.d("createJobFor($contact)")
         return coroutineScope.launch(Dispatchers.Default) {
-            progressListener?.onJobStarted(contact)
+            withContext(Dispatchers.Main) {
+                progressListener?.onJobStarted(contact)
+            }
             var workingString = ""
             var commandInputs = ""
             var filterInputs = ""
@@ -142,8 +144,10 @@ class RingtoneGenerator(
             val result = FFmpeg.execute(command)
             val generateSuccess = result == Config.RETURN_CODE_SUCCESS
             val success = if (generateSuccess) handleGenerateCompleted(contact, output) else false
+            withContext(Dispatchers.Main) {
+                progressListener?.onJobCompleted(success, contact)
+            }
             cacheFiles.forEach { it.delete() }
-            progressListener?.onJobCompleted(success, contact)
             handleJobCompleted()
         }
     }
