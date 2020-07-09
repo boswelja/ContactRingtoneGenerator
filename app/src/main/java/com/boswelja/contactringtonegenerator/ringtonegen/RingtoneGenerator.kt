@@ -36,6 +36,7 @@ class RingtoneGenerator(
     private var initialSetupComplete: Boolean = false
 
     val totalJobCount: Int get() = contacts.count()
+    var jobsCompleted: Int = 0
 
     var progressListener: ProgressListener? = null
     var stateListener: StateListener? = null
@@ -82,6 +83,11 @@ class RingtoneGenerator(
                     .replace(Constants.NICKNAME_PLACEHOLDER, contact.nickname ?: "")
             return@withContext ttsManager.synthesizeToFile(SynthesisJob(id, message))
         }
+    }
+
+    private fun handleJobCompleted() {
+        jobsCompleted += 1
+        if (jobsCompleted >= totalJobCount) state = State.FINISHED
     }
 
     private fun createJobFor(contact: Contact): Job {
@@ -137,6 +143,7 @@ class RingtoneGenerator(
             val success = if (generateSuccess) handleGenerateCompleted(contact, output) else false
             cacheFiles.forEach { it.delete() }
             progressListener?.onJobCompleted(success, contact)
+            handleJobCompleted()
         }
     }
 
