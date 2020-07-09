@@ -6,10 +6,12 @@ import com.arthenica.mobileffmpeg.FFmpeg
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.mediastore.MediaStoreHelper
+import com.boswelja.contactringtonegenerator.ringtonegen.item.Constants
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.AudioItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.TextItem
 import com.boswelja.contactringtonegenerator.tts.SynthesisJob
+import com.boswelja.contactringtonegenerator.tts.SynthesisResult
 import com.boswelja.contactringtonegenerator.tts.TtsManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -62,10 +64,23 @@ class RingtoneGenerator(
         return withContext(Dispatchers.IO) {
             val uri = MediaStoreHelper.scanNewFile(context, ringtone)
             return@withContext if (uri != null) {
-                ringtone.delete()
                 ContactsHelper.setContactRingtone(context, contact, uri)
                 true
             } else false
+        }
+    }
+
+    private suspend fun synthesizeString(workingString: String, contact: Contact): SynthesisResult {
+        return withContext(Dispatchers.IO) {
+            val id = counter.incrementAndGet().toString()
+            val message = workingString
+                    .replace(Constants.FIRST_NAME_PLACEHOLDER, contact.firstName)
+                    .replace(Constants.MIDDLE_NAME_PLACEHOLDER, contact.middleName ?: "")
+                    .replace(Constants.LAST_NAME_PLACEHOLDER, contact.lastName ?: "")
+                    .replace(Constants.NAME_PREFIX_PLACEHOLDER, contact.prefix ?: "")
+                    .replace(Constants.NAME_SUFFIX_PLACEHOLDER, contact.suffix ?: "")
+                    .replace(Constants.NICKNAME_PLACEHOLDER, contact.nickname ?: "")
+            return@withContext ttsManager.synthesizeToFile(SynthesisJob(id, message))
         }
     }
 
@@ -75,43 +90,52 @@ class RingtoneGenerator(
             var workingString = ""
             var commandInputs = ""
             var filterInputs = ""
-            var filesCount = 0
+            val cacheFiles = ArrayList<File>()
+            var trueFileCount = 0
             ringtoneStructure.forEach {
                 if (it !is TextItem && workingString.isNotEmpty()) {
-                    val id = counter.incrementAndGet().toString()
-                    val result = ttsManager.synthesizeToFile(SynthesisJob(id, workingString))
+                    Timber.i("End of TTS block, synthesizing")
+                    val result = synthesizeString(workingString, contact)
+                    cacheFiles.add(result.result)
+                    filterInputs += "[$trueFileCount:0]"
+                    trueFileCount += 1
                     commandInputs += " -i ${result.result.absolutePath}"
-                    filesCount += 1
-                    filterInputs += "[$filesCount:0]"
+                    workingString = ""
                 }
                 when (it) {
                     is AudioItem -> {
+                        Timber.i("Got AudioItem")
                         val parcelFileDescriptor = context.contentResolver.openFileDescriptor(it.getAudioContentUri()!!, "r")
                         val path = String.format("pipe:%d", parcelFileDescriptor?.fd)
+                        filterInputs += "[$trueFileCount:0]"
+                        trueFileCount += 1
                         commandInputs += " -i $path"
-                        filesCount += 1
-                        filterInputs += "[$filesCount:0]"
                     }
                     is TextItem -> {
+                        Timber.i("Got TextItem")
                         workingString += it.getEngineText()
                     }
                 }
             }
             if (workingString.isNotEmpty()) {
-                val id = counter.incrementAndGet().toString()
-                val result = ttsManager.synthesizeToFile(SynthesisJob(id, workingString))
+                Timber.i("TTS working string not empty, synthesizing")
+                val result = synthesizeString(workingString, contact)
+                cacheFiles.add(result.result)
+                filterInputs += "[$trueFileCount:0]"
+                trueFileCount += 1
                 commandInputs += " -i ${result.result.absolutePath}"
-                filesCount += 1
-                filterInputs += "[$filesCount:0]"
+                workingString = ""
             }
 
-            Timber.d("Got $filesCount files")
+            Timber.d("Got $trueFileCount files")
             val output = File(cacheDir, "${contact.displayName.replace(" ", "-")}.ogg")
-            val command = "$commandInputs -filter_complex '${filterInputs}concat=n=$filesCount:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
+            cacheFiles.add(output)
+            val command = "$commandInputs -filter_complex '${filterInputs}concat=n=$trueFileCount:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
             Timber.i("ffmpeg $command")
             val result = FFmpeg.execute(command)
             val generateSuccess = result == Config.RETURN_CODE_SUCCESS
             val success = if (generateSuccess) handleGenerateCompleted(contact, output) else false
+            cacheFiles.forEach { it.delete() }
             progressListener?.onJobCompleted(success, contact)
         }
     }
