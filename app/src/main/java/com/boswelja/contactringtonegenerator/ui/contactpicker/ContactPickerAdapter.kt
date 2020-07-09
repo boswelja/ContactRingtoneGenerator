@@ -11,8 +11,8 @@ import kotlinx.coroutines.withContext
 import java.util.Locale
 
 class ContactPickerAdapter(
-        private val useNicknames: Boolean,
-        private val listener: ContactSelectionListener
+    private val useNicknames: Boolean,
+    private val listener: ContactSelectionListener
 ) : RecyclerView.Adapter<ContactPickerAdapter.ContactViewHolder>() {
 
     private var layoutInflater: LayoutInflater? = null
@@ -101,7 +101,7 @@ class ContactPickerAdapter(
             val search = constraint.toString().toLowerCase(Locale.ROOT)
             val filteredData = allContacts.filter {
                 it.displayName.toLowerCase(Locale.ROOT).contains(search) ||
-                        it.nickname?.toLowerCase(Locale.ROOT)?.contains(search) ?: false
+                    it.nickname?.toLowerCase(Locale.ROOT)?.contains(search) ?: false
             }
             filteredContacts.apply {
                 clear()
