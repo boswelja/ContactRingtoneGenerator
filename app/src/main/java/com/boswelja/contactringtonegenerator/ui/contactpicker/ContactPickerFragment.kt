@@ -14,11 +14,16 @@ import com.boswelja.contactringtonegenerator.databinding.ContactPickerWidgetBind
 import com.boswelja.contactringtonegenerator.ui.MainActivity
 import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
 import com.boswelja.contactringtonegenerator.ui.common.ListFragment
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class ContactPickerFragment : ListFragment(), ContactSelectionListener {
 
     private val dataModel: WizardDataViewModel by activityViewModels()
     private val contactsModel: ContactsViewModel by activityViewModels()
+    private val coroutineScope = MainScope()
 
     private val adapter: ContactPickerAdapter by lazy {
         ContactPickerAdapter(
@@ -53,8 +58,12 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
             }
             searchView.doAfterTextChanged {
                 setLoading(true)
-                adapter.filter.filter(it.toString())
-                setLoading(false)
+                coroutineScope.launch(Dispatchers.Default) {
+                    adapter.filter(it.toString())
+                    withContext(Dispatchers.Main) {
+                        setLoading(false)
+                    }
+                }
             }
         }
         return widgetBinding.root
