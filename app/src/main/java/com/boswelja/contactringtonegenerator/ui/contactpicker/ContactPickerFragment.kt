@@ -1,6 +1,8 @@
 package com.boswelja.contactringtonegenerator.ui.contactpicker
 
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.View
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.activityViewModels
@@ -24,6 +26,15 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     private val dataModel: WizardDataViewModel by activityViewModels()
     private val contactsModel: ContactsViewModel by activityViewModels()
     private val coroutineScope = MainScope()
+    private val searchHandler = Handler(Looper.myLooper()!!)
+    private val searchRunnable = Runnable {
+        coroutineScope.launch(Dispatchers.Default) {
+            if (searchQuery != null) adapter.filter(searchQuery!!)
+            withContext(Dispatchers.Main) {
+                setLoading(false)
+            }
+        }
+    }
 
     private val adapter: ContactPickerAdapter by lazy {
         ContactPickerAdapter(
@@ -34,6 +45,8 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     }
 
     private lateinit var widgetBinding: ContactPickerWidgetBinding
+
+    private var searchQuery: CharSequence? = null
 
     override fun onContactDeselected(contact: Contact) {
         dataModel.selectedContacts.remove(contact)
@@ -58,12 +71,8 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
             }
             searchView.doAfterTextChanged {
                 setLoading(true)
-                coroutineScope.launch(Dispatchers.Default) {
-                    adapter.filter(it.toString())
-                    withContext(Dispatchers.Main) {
-                        setLoading(false)
-                    }
-                }
+                searchQuery = it.toString()
+                startContactSearchTimer()
             }
         }
         return widgetBinding.root
@@ -97,14 +106,21 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
         super.setLoading(loading)
         widgetBinding.apply {
             checkBox.isEnabled = !loading
-            searchView.isEnabled = !loading
         }
+    }
+
+    private fun startContactSearchTimer() {
+        searchHandler.removeCallbacks(searchRunnable)
+        searchHandler.postDelayed(searchRunnable, SEARCH_TIMER_MILLIS)
     }
 
     private fun updateContacts(contacts: List<Contact>) {
         adapter.setContacts(contacts)
         setLoading(false)
-        widgetBinding.checkBox.isChecked = !adapter.canSelectAllContacts
+        widgetBinding.apply {
+            checkBox.isChecked = !adapter.canSelectAllContacts
+            searchView.isEnabled = true
+        }
         adapter.notifyDataSetChanged()
     }
 
@@ -129,5 +145,9 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
             if (isEnabled) extend()
             else shrink()
         }
+    }
+
+    companion object {
+        private const val SEARCH_TIMER_MILLIS: Long = 500
     }
 }

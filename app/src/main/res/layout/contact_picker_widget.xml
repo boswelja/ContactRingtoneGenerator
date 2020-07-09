@@ -28,6 +28,7 @@
         android:drawablePadding="8dp"
         android:elevation="@dimen/list_widget_elevation"
         android:hint="@string/search_hint"
+        android:enabled="false"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/check_box"
         app:layout_constraintTop_toTopOf="parent"
