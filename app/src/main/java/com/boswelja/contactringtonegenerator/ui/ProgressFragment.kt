@@ -1,6 +1,5 @@
 package com.boswelja.contactringtonegenerator.ui
 
-import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -89,11 +88,7 @@ class ProgressFragment :
 
     private fun incrementProgress() {
         binding.progressBar.apply {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                setProgress(progress + 1, true)
-            } else {
-                progress += 1
-            }
+            progress += 1
             secondaryProgress += 1
         }
     }
