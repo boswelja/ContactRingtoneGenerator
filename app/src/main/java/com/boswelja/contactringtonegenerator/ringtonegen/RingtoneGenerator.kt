@@ -93,6 +93,7 @@ class RingtoneGenerator(
     private fun createJobFor(contact: Contact): Job {
         Timber.d("createJobFor($contact)")
         return coroutineScope.launch(Dispatchers.Default) {
+            progressListener?.onJobStarted(contact)
             var workingString = ""
             var commandInputs = ""
             var filterInputs = ""
