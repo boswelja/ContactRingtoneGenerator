@@ -34,6 +34,7 @@
         android:layout_height="wrap_content"
         android:progressTint="@color/successColor"
         android:secondaryProgressTint="@color/failColor"
+        android:secondaryProgressTintMode="src_over"
         android:indeterminate="true"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

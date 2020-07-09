@@ -30,13 +30,15 @@ class ProgressFragment :
                 ringtoneGenerator.start()
             }
             RingtoneGenerator.State.GENERATING -> {
-                binding.progressBar.apply {
-                    isIndeterminate = false
-                    progress = 0
-                    secondaryProgress = 0
-                    max = ringtoneGenerator.totalJobCount
+                binding.apply {
+                    progressBar.apply {
+                        progress = 0
+                        secondaryProgress = 0
+                        max = ringtoneGenerator.totalJobCount
+                    }
+                    loadingTitle.text = getString(R.string.progress_title_generating)
+                    loadingStatus.text = getString(R.string.progress_status_generating)
                 }
-                binding.loadingTitle.text = getString(R.string.progress_title_generating)
             }
             RingtoneGenerator.State.FINISHED -> {
                 binding.apply {
@@ -44,7 +46,6 @@ class ProgressFragment :
                     val failures = progressBar.secondaryProgress - progressBar.progress
                     findNavController().navigate(ProgressFragmentDirections.toFinishedFragment(successes, failures))
                 }
-                ringtoneGenerator.destroy()
             }
             else -> {
                 // Do nothing
@@ -54,12 +55,12 @@ class ProgressFragment :
 
     override fun onJobStarted(contact: Contact) {
         Timber.d("onJobStarted($contact)")
-        binding.loadingStatus.text = getString(R.string.progress_status_generating, contact.nickname ?: contact.displayName)
     }
 
     override fun onJobCompleted(success: Boolean, contact: Contact) {
         Timber.d("onJobCompleted($success, $contact)")
         binding.progressBar.apply {
+            isIndeterminate = false
             if (success) {
                 incrementProgress()
             } else {
