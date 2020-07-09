@@ -9,9 +9,9 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureIt
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.RingtoneCreatorAdapter
 
 class CustomAudioViewHolder(
-        private val adapter: RingtoneCreatorAdapter,
-        private val widgetBinding: RingtoneCreatorCustomAudioWidgetBinding,
-        binding: RingtoneCreatorItemBinding
+    private val adapter: RingtoneCreatorAdapter,
+    private val widgetBinding: RingtoneCreatorCustomAudioWidgetBinding,
+    binding: RingtoneCreatorItemBinding
 ) : BaseViewHolder(binding) {
 
     private val noFileText: String = itemView.context.getString(R.string.item_audio_no_file)

@@ -15,17 +15,20 @@ import com.boswelja.contactringtonegenerator.ui.ringtonecreator.holder.CustomTex
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.holder.NonDynamicViewHolder
 
 class RingtoneCreatorAdapter(
-        private val fragment: RingtoneCreatorFragment,
-        private val listener: DataEventListener
+    private val fragment: RingtoneCreatorFragment,
+    private val listener: DataEventListener
 ) : RecyclerView.Adapter<BaseViewHolder>() {
 
     private val items: ArrayList<StructureItem> = ArrayList()
     private val isDataValid: ArrayList<Boolean> = ArrayList()
     private val fileChooserIntent by lazy {
-        Intent.createChooser(Intent(Intent.ACTION_GET_CONTENT).apply {
-            type = "audio/*"
-            addCategory(Intent.CATEGORY_OPENABLE)
-        }, "Pick an audio file")
+        Intent.createChooser(
+            Intent(Intent.ACTION_GET_CONTENT).apply {
+                type = "audio/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+            },
+            "Pick an audio file"
+        )
     }
 
     private var layoutInflater: LayoutInflater? = null
@@ -51,9 +54,10 @@ class RingtoneCreatorAdapter(
             NON_DYNAMIC_ITEM -> NonDynamicViewHolder(itemBinding)
             CUSTOM_AUDIO_ITEM ->
                 CustomAudioViewHolder(
-                        this,
-                        RingtoneCreatorCustomAudioWidgetBinding.inflate(layoutInflater!!, parent, false),
-                        itemBinding)
+                    this,
+                    RingtoneCreatorCustomAudioWidgetBinding.inflate(layoutInflater!!, parent, false),
+                    itemBinding
+                )
             CUSTOM_TEXT_ITEM -> CustomTextViewHolder(this, itemBinding)
             else -> throw IllegalArgumentException("Unsupported view type, does the adapter support the item type?")
         }

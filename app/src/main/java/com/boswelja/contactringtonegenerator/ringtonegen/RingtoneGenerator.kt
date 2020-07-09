@@ -33,7 +33,7 @@ class RingtoneGenerator(
 
     private var initialSetupComplete: Boolean = false
 
-    val totalJobCount: Int get() =contacts.count()
+    val totalJobCount: Int get() = contacts.count()
 
     var progressListener: ProgressListener? = null
     var stateListener: StateListener? = null
@@ -105,12 +105,12 @@ class RingtoneGenerator(
 
             Timber.d("Got $filesCount files")
             val output = File(cacheDir, "${contact.displayName.replace(" ", "-")}.ogg")
-            val command = "$commandInputs -filter_complex '${filterInputs}concat=n=${filesCount}:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
+            val command = "$commandInputs -filter_complex '${filterInputs}concat=n=$filesCount:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
             Timber.i("ffmpeg $command")
             val result = FFmpeg.execute(command)
             val success = result == Config.RETURN_CODE_SUCCESS
-            progressListener?.onJobCompleted(success, contact)
             if (success) handleGenerateCompleted(contact, output)
+            progressListener?.onJobCompleted(success, contact)
         }
     }
 
