@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.preference.PreferenceScreen
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<androidx.preference.PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <androidx.preference.PreferenceCategory
         android:title="@string/tts_settings_title">
@@ -18,6 +18,18 @@
             android:key="use_nicknames"
             android:title="@string/use_nicknames"
             android:defaultValue="true" />
+
+    </androidx.preference.PreferenceCategory>
+
+    <androidx.preference.PreferenceCategory
+        android:title="@string/generator_settings_title">
+
+        <androidx.preference.SeekBarPreference
+            android:key="volume_boost"
+            android:title="@string/volume_boost_title"
+            android:summary="@string/volume_boost_summary"
+            android:max="40"
+            android:defaultValue="0" />
 
     </androidx.preference.PreferenceCategory>
 

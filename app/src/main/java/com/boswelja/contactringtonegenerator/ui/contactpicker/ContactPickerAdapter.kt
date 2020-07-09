@@ -2,23 +2,24 @@ package com.boswelja.contactringtonegenerator.ui.contactpicker
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import android.widget.Filter
-import android.widget.Filterable
 import androidx.recyclerview.widget.RecyclerView
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ContactPickerRecyclerviewItemBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import java.util.Locale
 
-class ContactPickerAdapter(private val useNicknames: Boolean, private val listener: ContactSelectionListener) :
-    RecyclerView.Adapter<ContactPickerAdapter.ContactViewHolder>(), Filterable {
+class ContactPickerAdapter(
+    private val useNicknames: Boolean,
+    private val listener: ContactSelectionListener
+) : RecyclerView.Adapter<ContactPickerAdapter.ContactViewHolder>() {
 
     private var layoutInflater: LayoutInflater? = null
 
     private val allContacts = ArrayList<Contact>()
     private val filteredContacts = ArrayList<Contact>(allContacts)
     private val selectedContacts = HashMap<Contact, Boolean>()
-    private val filter = ItemFilter()
 
     val canSelectAllContacts: Boolean get() = selectedContacts.count() < allContacts.count()
 
@@ -62,8 +63,6 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
         }
     }
 
-    override fun getFilter(): Filter = filter
-
     fun setSelectedContacts(newSelection: List<Contact>) {
         selectedContacts.clear()
         newSelection.forEach {
@@ -99,6 +98,23 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
         selectedContacts.clear()
     }
 
+    suspend fun filter(constraint: CharSequence) {
+        withContext(Dispatchers.IO) {
+            val search = constraint.toString().toLowerCase(Locale.ROOT)
+            val filteredData = allContacts.filter {
+                it.displayName.toLowerCase(Locale.ROOT).contains(search) ||
+                    it.nickname?.toLowerCase(Locale.ROOT)?.contains(search) ?: false
+            }
+            filteredContacts.apply {
+                clear()
+                addAll(filteredData)
+            }
+        }
+        withContext(Dispatchers.Main) {
+            notifyDataSetChanged()
+        }
+    }
+
     class ContactViewHolder(
         private val binding: ContactPickerRecyclerviewItemBinding,
         private val useNicknames: Boolean
@@ -119,36 +135,6 @@ class ContactPickerAdapter(private val useNicknames: Boolean, private val listen
                 binding.contactIcon.setImageURI(contact.photoUri)
             } else {
                 binding.contactIcon.setImageResource(R.drawable.ic_default_contact)
-            }
-        }
-    }
-
-    inner class ItemFilter : Filter() {
-        override fun performFiltering(constraint: CharSequence?): FilterResults {
-            val defaultData = allContacts
-            val results = FilterResults()
-            if (constraint != null) {
-                val search = constraint.toString().toLowerCase(Locale.ROOT)
-                val filteredData = defaultData.filter {
-                    it.displayName.toLowerCase(Locale.ROOT).contains(search) ||
-                        it.nickname?.toLowerCase(Locale.ROOT)?.contains(search) ?: false
-                }
-                results.values = filteredData
-            } else {
-                results.values = defaultData
-            }
-            return results
-        }
-
-        override fun publishResults(constraint: CharSequence?, results: FilterResults?) {
-            if (results != null) {
-                val list = results.values
-                if (list is List<*>) {
-                    val values = list.filterIsInstance<Contact>()
-                    filteredContacts.clear()
-                    filteredContacts.addAll(values)
-                    notifyDataSetChanged()
-                }
             }
         }
     }

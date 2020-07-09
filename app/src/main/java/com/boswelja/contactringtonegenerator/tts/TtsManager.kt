@@ -1,12 +1,14 @@
 package com.boswelja.contactringtonegenerator.tts
 
 import android.content.Context
-import android.os.Build
 import android.speech.tts.TextToSpeech
 import android.speech.tts.TextToSpeech.SUCCESS
 import android.speech.tts.UtteranceProgressListener
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
+import java.util.concurrent.TimeUnit
 import kotlin.collections.ArrayList
 
 /**
@@ -18,18 +20,15 @@ class TtsManager(context: Context) :
     UtteranceProgressListener() {
 
     private val cacheDirectory = context.cacheDir
-    private val synthesisJobs = ArrayList<SynthesisJob>()
-    private val synthesisResults = ArrayList<SynthesisResult>()
-    private val startedJobIds by lazy { ArrayList<String>() }
+    private val completedJobIds = ArrayList<String?>()
     private val tts: TextToSpeech = TextToSpeech(context, this)
 
     /**
      * The number of [SynthesisJob] that are still enqueued.
      */
-    val synthesisJobCount: Int
-        get() = synthesisJobs.count()
+    var synthesisJobCount: Int = 0
+        private set
 
-    var jobProgressListener: JobProgressListener? = null
     var engineEventListener: EngineEventListener? = null
 
     /**
@@ -53,76 +52,49 @@ class TtsManager(context: Context) :
 
     override fun onStart(utteranceId: String?) {
         Timber.d("onStart($utteranceId) called")
-        val utteranceJob = getSynthesisJob(utteranceId)
-        if (utteranceJob != null) {
-            // onStart seems to get called twice per job on API versions 28 and lower, work around this by keeping track of which job IDs have been called
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
-                jobProgressListener?.onJobStarted(utteranceJob)
-            } else {
-                if (!startedJobIds.contains(utteranceId)) {
-                    startedJobIds.add(utteranceId!!)
-                    jobProgressListener?.onJobStarted(utteranceJob)
-                }
-            }
-        }
     }
 
     override fun onDone(utteranceId: String?) {
-        val synthesisJob = getSynthesisJob(utteranceId)
-        val synthesisResult = synthesisResults.firstOrNull { it.id == utteranceId }
-        if (synthesisJob != null) synthesisJobs.remove(synthesisJob)
-        if (synthesisResult != null) {
-            synthesisResults.remove(synthesisResult)
-            jobProgressListener?.onJobCompleted(true, synthesisResult)
-        }
+        handleJobCompleted(utteranceId, true)
     }
 
     override fun onError(utteranceId: String?) {
-        val synthesisJob = getSynthesisJob(utteranceId)
-        val synthesisResult = synthesisResults.firstOrNull { it.id == utteranceId }
-        if (synthesisJob != null) synthesisJobs.remove(synthesisJob)
-        if (synthesisResult != null) {
-            synthesisResults.remove(synthesisResult)
-            jobProgressListener?.onJobCompleted(false, synthesisResult)
-        }
+        handleJobCompleted(utteranceId, false)
+    }
+
+    private fun handleJobCompleted(utteranceId: String?, success: Boolean) {
+        synthesisJobCount -= 1
+        completedJobIds.add(utteranceId)
     }
 
     /**
-     * Gets an existing [SynthesisJob] with a given ID, or null if none exist.
-     * @param utteranceId The ID of the [SynthesisJob] to get.
-     * @return The existing [SynthesisJob], or null if none were found.
+     * Requests a [SynthesisJob] to be synthesized to a file as soon as possible.
+     * @param synthesisJob The [SynthesisJob] to synthesise.
      */
-    private fun getSynthesisJob(utteranceId: String?): SynthesisJob? {
-        return synthesisJobs.firstOrNull { it.id == utteranceId }
-    }
+    suspend fun synthesizeToFile(synthesisJob: SynthesisJob): SynthesisResult {
+        return withContext(Dispatchers.Default) {
+            synthesisJobCount += 1
+            val id = synthesisJob.id
 
-    /**
-     * Schedules all [SynthesisJob]s in the queue for synthesis.
-     * Does nothing if [isEngineReady] is false.
-     */
-    fun startSynthesis() {
-        if (isEngineReady) {
-            for (synthesisJob in synthesisJobs) {
-                val synthesisId = synthesisJob.id
-                val file = File(cacheDirectory, "$synthesisId.ogg")
-                if (!file.exists()) file.createNewFile()
-                tts.synthesizeToFile(synthesisJob.text, null, file, synthesisId)
-                synthesisResults.add(SynthesisResult(synthesisId, file))
+            val file = File(cacheDirectory, "${id.replace(" ", "-")}.ogg")
+            if (!file.exists()) file.createNewFile()
+
+            val result = SynthesisResult(id, file)
+            tts.synthesizeToFile(synthesisJob.text, null, file, id)
+            val startTime = System.currentTimeMillis()
+
+            // Wait for synthesis completion
+            while (!completedJobIds.contains(id)) {
+                val elapsed = System.currentTimeMillis() - startTime
+                if (elapsed > TimeUnit.SECONDS.toMillis(MAX_TASK_TIMEOUT_SECONDS)) {
+                    throw Exception("TTS timed out waiting for $id to complete")
+                }
+                continue
             }
-        }
-    }
+            completedJobIds.remove(id)
 
-    /**
-     * Add a [SynthesisJob] to the queue.
-     * @param synthesisJob The [SynthesisJob] to enqueue.
-     * @return true if successfully queued, false otherwise.
-     */
-    fun enqueueJob(synthesisJob: SynthesisJob): Boolean {
-        if (!synthesisJobs.contains(synthesisJob)) {
-            synthesisJobs.add(synthesisJob)
-            return true
+            return@withContext result
         }
-        return false
     }
 
     /**
@@ -136,9 +108,9 @@ class TtsManager(context: Context) :
 
         /**
          * Called when a [SynthesisJob] is started.\
-         * @param synthesisJob The job that has been started.
+         * @param utteranceId The ID of the job that has been started.
          */
-        fun onJobStarted(synthesisJob: SynthesisJob)
+        fun onJobStarted(utteranceId: String?)
 
         /**
          * Called when a [SynthesisJob] has been completed.
@@ -155,5 +127,9 @@ class TtsManager(context: Context) :
          * @param success true if [TtsManager] was successfully initialised, false otherwise.
          */
         fun onInitialised(success: Boolean)
+    }
+
+    companion object {
+        private const val MAX_TASK_TIMEOUT_SECONDS: Long = 30
     }
 }

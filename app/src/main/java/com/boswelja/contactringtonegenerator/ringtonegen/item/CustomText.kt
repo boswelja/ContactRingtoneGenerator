@@ -1,10 +1,11 @@
 package com.boswelja.contactringtonegenerator.ringtonegen.item
 
 import com.boswelja.contactringtonegenerator.R
+import com.boswelja.contactringtonegenerator.ringtonegen.item.common.TextItem
 
-class TextItem : StructureItem(ID.TEXT_ITEM) {
+class CustomText : TextItem(ID.CUSTOM_TEXT) {
 
-    override val isDynamic: Boolean = true
+    override val isUserAdjustable: Boolean = true
 
     var text: String = ""
 

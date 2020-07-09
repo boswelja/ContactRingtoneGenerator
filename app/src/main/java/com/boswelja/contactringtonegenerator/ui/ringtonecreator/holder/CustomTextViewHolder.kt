@@ -1,12 +1,13 @@
-package com.boswelja.contactringtonegenerator.ui.ringtonecreator
+package com.boswelja.contactringtonegenerator.ui.ringtonecreator.holder
 
 import android.text.InputType
 import android.view.View
 import android.widget.LinearLayout
 import androidx.core.widget.doAfterTextChanged
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorItemBinding
-import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomText
+import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
+import com.boswelja.contactringtonegenerator.ui.ringtonecreator.RingtoneCreatorAdapter
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
@@ -35,7 +36,7 @@ class CustomTextViewHolder(
                     InputType.TYPE_TEXT_FLAG_NO_SUGGESTIONS
                 doAfterTextChanged {
                     val item = adapter.getItem(adapterPosition)
-                    if (item is TextItem) {
+                    if (item is CustomText) {
                         item.text = it.toString()
                         adapter.setIsDataValid(adapterPosition, item.text.isNotBlank())
                     }
@@ -47,7 +48,7 @@ class CustomTextViewHolder(
     }
 
     override fun bind(item: StructureItem) {
-        if (item is TextItem) {
+        if (item is CustomText) {
             (widgetView as TextInputLayout).editText?.apply {
                 setText(item.text)
                 setHint(item.getLabelRes())
