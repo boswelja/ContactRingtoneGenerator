@@ -82,6 +82,11 @@ class ProgressFragment :
         }
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        ringtoneGenerator.destroy()
+    }
+
     private fun incrementProgress() {
         binding.progressBar.apply {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
