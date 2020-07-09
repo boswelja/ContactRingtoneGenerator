@@ -28,7 +28,7 @@
             android:key="volume_boost"
             android:title="@string/volume_boost_title"
             android:summary="@string/volume_boost_summary"
-            android:max="20"
+            android:max="40"
             android:defaultValue="0" />
 
     </androidx.preference.PreferenceCategory>
