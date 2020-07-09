@@ -110,8 +110,8 @@ class RingtoneGenerator(
             val command = "$commandInputs -filter_complex '${filterInputs}concat=n=$filesCount:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
             Timber.i("ffmpeg $command")
             val result = FFmpeg.execute(command)
-            val success = result == Config.RETURN_CODE_SUCCESS
-            if (success) handleGenerateCompleted(contact, output)
+            val generateSuccess = result == Config.RETURN_CODE_SUCCESS
+            val success = if (generateSuccess) handleGenerateCompleted(contact, output) else false
             progressListener?.onJobCompleted(success, contact)
         }
     }
