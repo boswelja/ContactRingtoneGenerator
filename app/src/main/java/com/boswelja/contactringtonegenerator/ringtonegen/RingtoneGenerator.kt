@@ -77,12 +77,12 @@ class RingtoneGenerator(
         return withContext(Dispatchers.IO) {
             val id = counter.incrementAndGet().toString()
             val message = workingString
-                    .replace(Constants.FIRST_NAME_PLACEHOLDER, contact.firstName)
-                    .replace(Constants.MIDDLE_NAME_PLACEHOLDER, contact.middleName ?: "")
-                    .replace(Constants.LAST_NAME_PLACEHOLDER, contact.lastName ?: "")
-                    .replace(Constants.NAME_PREFIX_PLACEHOLDER, contact.prefix ?: "")
-                    .replace(Constants.NAME_SUFFIX_PLACEHOLDER, contact.suffix ?: "")
-                    .replace(Constants.NICKNAME_PLACEHOLDER, contact.nickname ?: "")
+                .replace(Constants.FIRST_NAME_PLACEHOLDER, contact.firstName)
+                .replace(Constants.MIDDLE_NAME_PLACEHOLDER, contact.middleName ?: "")
+                .replace(Constants.LAST_NAME_PLACEHOLDER, contact.lastName ?: "")
+                .replace(Constants.NAME_PREFIX_PLACEHOLDER, contact.prefix ?: "")
+                .replace(Constants.NAME_SUFFIX_PLACEHOLDER, contact.suffix ?: "")
+                .replace(Constants.NICKNAME_PLACEHOLDER, contact.nickname ?: "")
             return@withContext ttsManager.synthesizeToFile(SynthesisJob(id, message))
         }
     }
