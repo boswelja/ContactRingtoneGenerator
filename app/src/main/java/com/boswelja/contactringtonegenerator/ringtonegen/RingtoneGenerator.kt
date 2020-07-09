@@ -101,6 +101,8 @@ class RingtoneGenerator(
                 val id = counter.incrementAndGet().toString()
                 val result = ttsManager.synthesizeToFile(SynthesisJob(id, workingString))
                 commandInputs += " -i ${result.result.absolutePath}"
+                filesCount += 1
+                filterInputs += "[$filesCount:0]"
             }
 
             Timber.d("Got $filesCount files")
