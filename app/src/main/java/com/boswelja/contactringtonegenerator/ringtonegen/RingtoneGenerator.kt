@@ -107,6 +107,7 @@ class RingtoneGenerator(
             var workingString = ""
             var commandInputs = ""
             var filterInputs = ""
+            var filters = ""
             val cacheFiles = ArrayList<File>()
             var trueFileCount = 0
             ringtoneStructure.forEach {
@@ -114,7 +115,9 @@ class RingtoneGenerator(
                     Timber.i("End of TTS block, synthesizing")
                     val result = synthesizeString(workingString, contact)
                     cacheFiles.add(result.result)
-                    filterInputs += "[$trueFileCount:0]"
+                    val filter = "[a$trueFileCount]"
+                    filterInputs += "[$trueFileCount:0]volume=$volumeMultiplier$filter;"
+                    filters += filter
                     trueFileCount += 1
                     commandInputs += " -i ${result.result.absolutePath}"
                     workingString = ""
@@ -124,7 +127,9 @@ class RingtoneGenerator(
                         Timber.i("Got AudioItem")
                         val parcelFileDescriptor = context.contentResolver.openFileDescriptor(it.getAudioContentUri()!!, "r")
                         val path = String.format("pipe:%d", parcelFileDescriptor?.fd)
-                        filterInputs += "[$trueFileCount:0]"
+                        val filter = "[a$trueFileCount]"
+                        filterInputs += "[$trueFileCount:0]volume=$volumeMultiplier$filter;"
+                        filters += filter
                         trueFileCount += 1
                         commandInputs += " -i $path"
                     }
@@ -138,7 +143,9 @@ class RingtoneGenerator(
                 Timber.i("TTS working string not empty, synthesizing")
                 val result = synthesizeString(workingString, contact)
                 cacheFiles.add(result.result)
-                filterInputs += "[$trueFileCount:0]"
+                val filter = "[a$trueFileCount]"
+                filterInputs += "[$trueFileCount:0]volume=$volumeMultiplier$filter;"
+                filters += filter
                 trueFileCount += 1
                 commandInputs += " -i ${result.result.absolutePath}"
                 workingString = ""
@@ -147,18 +154,11 @@ class RingtoneGenerator(
             Timber.d("Got $trueFileCount files")
             val output = File(cacheDir, "${contact.displayName.replace(" ", "-")}.ogg")
             cacheFiles.add(output)
-            val command = "$commandInputs -filter_complex '${filterInputs}concat=n=$trueFileCount:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
+            val command = "$commandInputs -filter_complex '${filterInputs}${filters}concat=n=$trueFileCount:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
             Timber.i("ffmpeg $command")
             val result = FFmpeg.execute(command)
             val generateSuccess = result == Config.RETURN_CODE_SUCCESS
-            val success = if (generateSuccess && volumeMultiplier > 1) {
-                //TODO There must be a way to add a volume filter to the concat command
-                val boostedOutput = File(cacheDir, "${contact.displayName.replace(" ", "-")}_$volumeMultiplier.ogg")
-                val boostSuccess = FFmpeg.execute("-i ${output.absolutePath} -filter:a 'volume=$volumeMultiplier' ${boostedOutput.absolutePath}") == Config.RETURN_CODE_SUCCESS
-                if (boostSuccess) handleGenerateCompleted(contact, boostedOutput) else false
-            } else {
-                handleGenerateCompleted(contact, output)
-            }
+            val success = if (generateSuccess) handleGenerateCompleted(contact, output) else false
             withContext(Dispatchers.Main) {
                 progressListener?.onJobCompleted(success, contact)
             }
