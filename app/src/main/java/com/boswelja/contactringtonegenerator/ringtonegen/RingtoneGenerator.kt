@@ -1,6 +1,7 @@
 package com.boswelja.contactringtonegenerator.ringtonegen
 
 import android.content.Context
+import androidx.preference.PreferenceManager
 import com.arthenica.mobileffmpeg.Config
 import com.arthenica.mobileffmpeg.FFmpeg
 import com.boswelja.contactringtonegenerator.contacts.Contact
@@ -32,6 +33,7 @@ class RingtoneGenerator(
     private val cacheDir: File = context.cacheDir
     private val ttsManager = TtsManager(context)
     private val counter = AtomicInteger()
+    private val volumeMultiplier = calculateVolumeMultiplier()
 
     private var initialSetupComplete: Boolean = false
 
@@ -90,6 +92,12 @@ class RingtoneGenerator(
         if (jobsCompleted >= totalJobCount) state = State.FINISHED
     }
 
+    private fun calculateVolumeMultiplier(): Float {
+        val userBoost = PreferenceManager.getDefaultSharedPreferences(context).getInt("volume_boost", 0)
+        val baseVolume = 10
+        return (baseVolume + userBoost) / 10f
+    }
+
     private fun createJobFor(contact: Contact): Job {
         Timber.d("createJobFor($contact)")
         return coroutineScope.launch(Dispatchers.Default) {
@@ -143,7 +151,14 @@ class RingtoneGenerator(
             Timber.i("ffmpeg $command")
             val result = FFmpeg.execute(command)
             val generateSuccess = result == Config.RETURN_CODE_SUCCESS
-            val success = if (generateSuccess) handleGenerateCompleted(contact, output) else false
+            val success = if (generateSuccess && volumeMultiplier > 1) {
+                //TODO There must be a way to add a volume filter to the concat command
+                val boostedOutput = File(cacheDir, "${contact.displayName.replace(" ", "-")}_$volumeMultiplier.ogg")
+                val boostSuccess = FFmpeg.execute("-i ${output.absolutePath} -filter:a 'volume=$volumeMultiplier' ${boostedOutput.absolutePath}") == Config.RETURN_CODE_SUCCESS
+                if (boostSuccess) handleGenerateCompleted(contact, boostedOutput) else false
+            } else {
+                handleGenerateCompleted(contact, output)
+            }
             withContext(Dispatchers.Main) {
                 progressListener?.onJobCompleted(success, contact)
             }
