@@ -2,6 +2,7 @@ package com.boswelja.contactringtonegenerator.ui.contactpicker
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
@@ -100,18 +101,29 @@ class ContactPickerAdapter(
 
     suspend fun filter(constraint: CharSequence) {
         withContext(Dispatchers.IO) {
-            val search = constraint.toString().toLowerCase(Locale.ROOT)
-            val filteredData = allContacts.filter {
-                it.displayName.toLowerCase(Locale.ROOT).contains(search) ||
-                    it.nickname?.toLowerCase(Locale.ROOT)?.contains(search) ?: false
+            val newSearch = constraint.toString().toLowerCase(Locale.ROOT)
+            val newData = allContacts.filter {
+                it.displayName.toLowerCase(Locale.ROOT).contains(newSearch) ||
+                    it.nickname?.toLowerCase(Locale.ROOT)?.contains(newSearch) ?: false
             }
+            val oldData = filteredContacts.toList()
             filteredContacts.apply {
                 clear()
-                addAll(filteredData)
+                addAll(newData)
             }
-        }
-        withContext(Dispatchers.Main) {
-            notifyDataSetChanged()
+            val diffResult = DiffUtil.calculateDiff(object : DiffUtil.Callback() {
+                override fun getOldListSize(): Int = oldData.count()
+                override fun getNewListSize(): Int = newData.count()
+
+                override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+                        oldData[oldItemPosition] == newData[newItemPosition]
+
+                override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
+                        oldData[oldItemPosition] == newData[newItemPosition]
+            })
+            withContext(Dispatchers.Main) {
+                diffResult.dispatchUpdatesTo(this@ContactPickerAdapter)
+            }
         }
     }
 
