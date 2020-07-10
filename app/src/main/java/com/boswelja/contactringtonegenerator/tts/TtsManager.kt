@@ -23,12 +23,6 @@ class TtsManager(context: Context) :
     private val completedJobIds = ArrayList<String?>()
     private val tts: TextToSpeech = TextToSpeech(context, this)
 
-    /**
-     * The number of [SynthesisJob] that are still enqueued.
-     */
-    var synthesisJobCount: Int = 0
-        private set
-
     var engineEventListener: EngineEventListener? = null
 
     /**
@@ -55,15 +49,10 @@ class TtsManager(context: Context) :
     }
 
     override fun onDone(utteranceId: String?) {
-        handleJobCompleted(utteranceId, true)
+        completedJobIds.add(utteranceId)
     }
 
     override fun onError(utteranceId: String?) {
-        handleJobCompleted(utteranceId, false)
-    }
-
-    private fun handleJobCompleted(utteranceId: String?, success: Boolean) {
-        synthesisJobCount -= 1
         completedJobIds.add(utteranceId)
     }
 
@@ -73,7 +62,6 @@ class TtsManager(context: Context) :
      */
     suspend fun synthesizeToFile(synthesisJob: SynthesisJob): SynthesisResult {
         return withContext(Dispatchers.Default) {
-            synthesisJobCount += 1
             val id = synthesisJob.id
 
             val file = File(cacheDirectory, "${id.replace(" ", "-")}.ogg")
@@ -98,26 +86,10 @@ class TtsManager(context: Context) :
     }
 
     /**
-     * Destroy the TtsManager.
+     * Destroy the [TtsManager].
      */
     fun destroy() {
         tts.shutdown()
-    }
-
-    interface JobProgressListener {
-
-        /**
-         * Called when a [SynthesisJob] is started.\
-         * @param utteranceId The ID of the job that has been started.
-         */
-        fun onJobStarted(utteranceId: String?)
-
-        /**
-         * Called when a [SynthesisJob] has been completed.
-         * @param success true if the synthesis was successful, false otherwise.
-         * @param synthesisResult The [SynthesisResult] for the job.
-         */
-        fun onJobCompleted(success: Boolean, synthesisResult: SynthesisResult)
     }
 
     interface EngineEventListener {
