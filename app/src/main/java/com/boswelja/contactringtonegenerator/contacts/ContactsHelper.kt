@@ -5,13 +5,16 @@ import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
 import android.provider.ContactsContract
+import androidx.annotation.VisibleForTesting
+import androidx.annotation.VisibleForTesting.PRIVATE
 import androidx.core.database.getStringOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 
 object ContactsHelper {
 
-    private val CONTACTS_PROJECTION = arrayOf(
+    @VisibleForTesting(otherwise = PRIVATE)
+    val CONTACTS_PROJECTION = arrayOf(
         ContactsContract.Contacts._ID,
         ContactsContract.Contacts.LOOKUP_KEY
     )
