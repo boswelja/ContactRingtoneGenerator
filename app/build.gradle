@@ -70,7 +70,7 @@ dependencies {
 
     implementation 'com.jakewharton.timber:timber:4.7.1'
 
-    implementation 'com.arthenica:mobile-ffmpeg-full:4.3.1.LTS'
+    implementation 'com.arthenica:mobile-ffmpeg-audio:4.3.1.LTS'
 
     debugImplementation "androidx.fragment:fragment-testing:$fragment_version"
 
