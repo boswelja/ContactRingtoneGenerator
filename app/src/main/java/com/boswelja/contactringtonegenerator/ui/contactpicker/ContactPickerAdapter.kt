@@ -2,6 +2,9 @@ package com.boswelja.contactringtonegenerator.ui.contactpicker
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.boswelja.contactringtonegenerator.R
@@ -21,6 +24,7 @@ class ContactPickerAdapter(
     private val allContacts = ArrayList<Contact>()
     private val filteredContacts = ArrayList<Contact>(allContacts)
     private val selectedContacts = HashMap<Contact, Boolean>()
+    private val allContactsSelected: MutableLiveData<Boolean> = MutableLiveData(canSelectAllContacts)
 
     val canSelectAllContacts: Boolean get() = selectedContacts.count() < allContacts.count()
 
@@ -38,7 +42,7 @@ class ContactPickerAdapter(
         val contact = filteredContacts[position]
         val selected = selectedContacts[contact] ?: false
         holder.apply {
-            bind(contact)
+            bind(contact, allContactsSelected)
             checkbox.isChecked = selected
             itemView.setOnClickListener {
                 if (holder.isChecked) {
@@ -90,6 +94,7 @@ class ContactPickerAdapter(
             selectedContacts[it] = true
             listener.onContactSelected(it)
         }
+        allContactsSelected.postValue(true)
     }
 
     fun deselectAllContacts() {
@@ -97,6 +102,7 @@ class ContactPickerAdapter(
             listener.onContactDeselected(it)
         }
         selectedContacts.clear()
+        allContactsSelected.postValue(false)
     }
 
     suspend fun filter(constraint: CharSequence) {
@@ -137,7 +143,7 @@ class ContactPickerAdapter(
         var isChecked: Boolean get() = binding.checkbox.isChecked
             set(value) { binding.checkbox.isChecked = value }
 
-        fun bind(contact: Contact) {
+        fun bind(contact: Contact, allSelectedLiveData: LiveData<Boolean>) {
             binding.contactName.text = if (useNicknames) {
                 contact.nickname ?: contact.displayName
             } else {
@@ -147,6 +153,9 @@ class ContactPickerAdapter(
                 binding.contactIcon.setImageURI(contact.photoUri)
             } else {
                 binding.contactIcon.setImageResource(R.drawable.ic_default_contact)
+            }
+            allSelectedLiveData.observe(checkbox.context as LifecycleOwner) {
+                checkbox.isChecked = it
             }
         }
     }

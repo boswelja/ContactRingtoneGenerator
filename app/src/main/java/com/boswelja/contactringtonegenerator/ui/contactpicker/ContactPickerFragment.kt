@@ -67,7 +67,6 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
             checkBox.setOnCheckedChangeListener { _, checked ->
                 if (checked) adapter.selectAllContacts()
                 else adapter.deselectAllContacts()
-                adapter.notifyDataSetChanged()
             }
             searchView.doAfterTextChanged {
                 setLoading(true)
