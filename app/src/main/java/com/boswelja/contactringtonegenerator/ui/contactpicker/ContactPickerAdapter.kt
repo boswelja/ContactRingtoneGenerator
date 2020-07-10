@@ -122,10 +122,10 @@ class ContactPickerAdapter(
                 override fun getNewListSize(): Int = newData.count()
 
                 override fun areContentsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
-                        oldData[oldItemPosition] == newData[newItemPosition]
+                    oldData[oldItemPosition] == newData[newItemPosition]
 
                 override fun areItemsTheSame(oldItemPosition: Int, newItemPosition: Int): Boolean =
-                        oldData[oldItemPosition] == newData[newItemPosition]
+                    oldData[oldItemPosition] == newData[newItemPosition]
             })
             withContext(Dispatchers.Main) {
                 diffResult.dispatchUpdatesTo(this@ContactPickerAdapter)

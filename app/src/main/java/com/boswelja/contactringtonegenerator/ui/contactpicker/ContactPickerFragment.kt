@@ -147,6 +147,6 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     }
 
     companion object {
-        private const val SEARCH_TIMER_MILLIS: Long = 500
+        private const val SEARCH_TIMER_MILLIS: Long = 300
     }
 }
