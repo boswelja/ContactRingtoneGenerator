@@ -69,7 +69,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setLoading(true)
-        adapter.setSelectedContacts(dataModel.selectedContacts)
+        adapter.setSelectedContacts(dataModel.selectedContacts.toList())
         updateSelectedContactsView()
         updateNextEnabled()
         binding.recyclerView.adapter = this@ContactPickerFragment.adapter
