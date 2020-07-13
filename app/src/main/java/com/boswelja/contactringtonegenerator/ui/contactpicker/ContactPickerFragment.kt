@@ -8,7 +8,6 @@ import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ContactPickerWidgetBinding
@@ -17,32 +16,14 @@ import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
 import com.boswelja.contactringtonegenerator.ui.common.ListFragment
 import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactPickerAdapter
 import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactSelectionListener
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
-import java.util.Locale
 
 class ContactPickerFragment : ListFragment(), ContactSelectionListener {
 
     private val dataModel: WizardDataViewModel by activityViewModels()
-    private val contactsModel: ContactsViewModel by activityViewModels()
-    private val coroutineScope = MainScope()
+    private val viewModel: ContactsViewModel by activityViewModels()
     private val searchHandler = Handler(Looper.myLooper()!!)
     private val searchRunnable = Runnable {
-        coroutineScope.launch(Dispatchers.Default) {
-            searchQuery?.let { searchQuery ->
-                val query = searchQuery.toString().toLowerCase(Locale.ROOT)
-                val filteredList = contactsModel.contacts.value?.filter {
-                    it.displayName.toLowerCase(Locale.ROOT).contains(query) ||
-                        it.displayName.toLowerCase(Locale.ROOT).contains(query)
-                }
-                adapter.submitList(filteredList)
-            }
-            withContext(Dispatchers.Main) {
-                setLoading(false)
-            }
-        }
+        viewModel.filterContacts(searchQuery)
     }
 
     private val adapter: ContactPickerAdapter by lazy {
@@ -74,7 +55,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
         widgetBinding = ContactPickerWidgetBinding.inflate(layoutInflater)
         widgetBinding.apply {
             checkBox.setOnCheckedChangeListener { _, checked ->
-                if (checked) adapter.setSelectedContacts(contactsModel.contacts.value!!)
+                if (checked) adapter.setSelectedContacts(viewModel.allContacts)
                 else adapter.deselectAllContacts()
             }
             searchView.doAfterTextChanged {
@@ -91,16 +72,12 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
         adapter.setSelectedContacts(dataModel.selectedContacts)
         updateSelectedContactsView()
         updateNextEnabled()
-        binding.apply {
-            nextButton.setOnClickListener {
-                findNavController().navigate(ContactPickerFragmentDirections.toRingtoneCreatorFragment())
-            }
-            recyclerView.apply {
-                layoutManager = LinearLayoutManager(context, LinearLayoutManager.VERTICAL, false)
-                adapter = this@ContactPickerFragment.adapter
-            }
+        binding.recyclerView.adapter = this@ContactPickerFragment.adapter
+        binding.nextButton.setOnClickListener {
+            findNavController().navigate(ContactPickerFragmentDirections.toRingtoneCreatorFragment())
         }
-        contactsModel.contacts.observe(viewLifecycleOwner) {
+
+        viewModel.adapterContacts.observe(viewLifecycleOwner) {
             updateContacts(it)
         }
     }
