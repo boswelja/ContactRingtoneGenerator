@@ -6,8 +6,8 @@ import androidx.recyclerview.widget.ListAdapter
 import com.boswelja.contactringtonegenerator.contacts.Contact
 
 class ContactPickerAdapter(
-        private val useNicknames: Boolean,
-        private val selectionListener: ContactSelectionListener
+    private val useNicknames: Boolean,
+    private val selectionListener: ContactSelectionListener
 ) : ListAdapter<Contact, ContactViewHolder>(ContactDiffCallback()) {
 
     private val selectedContacts = HashMap<Contact, Boolean>()
@@ -52,4 +52,3 @@ class ContactPickerAdapter(
         allContactsSelected.value = false
     }
 }
-

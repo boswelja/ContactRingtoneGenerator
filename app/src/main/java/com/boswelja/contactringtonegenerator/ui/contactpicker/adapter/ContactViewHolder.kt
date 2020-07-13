@@ -9,8 +9,8 @@ import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ContactPickerRecyclerviewItemBinding
 
 class ContactViewHolder(
-        private val binding: ContactPickerRecyclerviewItemBinding,
-        private val useNicknames: Boolean
+    private val binding: ContactPickerRecyclerviewItemBinding,
+    private val useNicknames: Boolean
 ) : RecyclerView.ViewHolder(binding.root) {
 
     val checkbox = binding.checkbox
@@ -38,4 +38,3 @@ class ContactViewHolder(
         }
     }
 }
-
