@@ -1,6 +1,8 @@
 package com.boswelja.contactringtonegenerator.ui.contactpicker
 
 import com.boswelja.contactringtonegenerator.contacts.Contact
+import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactPickerAdapter
+import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactSelectionListener
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
 import io.mockk.every

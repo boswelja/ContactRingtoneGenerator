@@ -11,11 +11,13 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
-import com.boswelja.contactringtonegenerator.contacts.ContactsViewModel
 import com.boswelja.contactringtonegenerator.databinding.ContactPickerWidgetBinding
 import com.boswelja.contactringtonegenerator.ui.MainActivity
 import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
 import com.boswelja.contactringtonegenerator.ui.common.ListFragment
+import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactClickListener
+import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactPickerAdapter
+import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactSelectionListener
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -48,7 +50,10 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
         ContactPickerAdapter(
             PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .getBoolean("use_nicknames", true),
-            this
+            this,
+                ContactClickListener {
+                    adapter.toggleSelected(it)
+                }
         )
     }
 
