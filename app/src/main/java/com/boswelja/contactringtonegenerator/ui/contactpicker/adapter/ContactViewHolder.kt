@@ -39,6 +39,3 @@ class ContactViewHolder(
     }
 }
 
-interface SelectionCallback {
-    fun onSelected(contact: Contact, isSelected: Boolean)
-}
