@@ -106,7 +106,6 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
             checkBox.isChecked = adapter.allContactsSelected.value ?: false
             searchView.isEnabled = true
         }
-        adapter.notifyDataSetChanged()
     }
 
     private fun updateSelectedContactsView() {
