@@ -1,6 +1,7 @@
 package com.boswelja.contactringtonegenerator.ui.contactpicker.adapter
 
 import android.view.ViewGroup
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.ListAdapter
 import com.boswelja.contactringtonegenerator.contacts.Contact
@@ -11,7 +12,7 @@ class ContactPickerAdapter(
 ) : ListAdapter<Contact, ContactViewHolder>(ContactDiffCallback()) {
 
     private val selectedContacts = HashMap<Long, Boolean>()
-    private val allContactsSelected: MutableLiveData<Boolean> = MutableLiveData(canSelectAllContacts)
+
     private val selectionCallback = object : SelectionCallback {
         override fun onSelected(contact: Contact, isSelected: Boolean) {
             selectedContacts[contact.id] = isSelected
@@ -20,7 +21,10 @@ class ContactPickerAdapter(
         }
     }
 
-    val canSelectAllContacts: Boolean get() = selectedContacts.count() < itemCount
+    private val _allContactsSelected = MutableLiveData(selectedContacts.count { it.value } >= itemCount)
+    val allContactsSelected: LiveData<Boolean>
+        get() = _allContactsSelected
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         return ContactViewHolder.from(parent, useNicknames)
@@ -41,7 +45,7 @@ class ContactPickerAdapter(
             selectedContacts[it.id] = true
             selectionListener.onContactSelected(it.id)
         }
-        allContactsSelected.value = selectedContacts.count() >= itemCount
+        _allContactsSelected.value = selectedContacts.count() >= itemCount
     }
 
     fun deselectAllContacts() {
@@ -49,6 +53,6 @@ class ContactPickerAdapter(
             selectionListener.onContactDeselected(it)
         }
         selectedContacts.clear()
-        allContactsSelected.value = false
+        _allContactsSelected.value = false
     }
 }

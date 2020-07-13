@@ -103,7 +103,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
         adapter.submitList(contacts)
         setLoading(false)
         widgetBinding.apply {
-            checkBox.isChecked = !adapter.canSelectAllContacts
+            checkBox.isChecked = adapter.allContactsSelected.value ?: false
             searchView.isEnabled = true
         }
         adapter.notifyDataSetChanged()
