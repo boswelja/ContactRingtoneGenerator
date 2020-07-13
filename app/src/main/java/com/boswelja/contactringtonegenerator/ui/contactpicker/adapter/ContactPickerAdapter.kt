@@ -7,12 +7,18 @@ import com.boswelja.contactringtonegenerator.contacts.Contact
 
 class ContactPickerAdapter(
         private val useNicknames: Boolean,
-        private val selectionListener: ContactSelectionListener,
-        private val clickListener: ContactClickListener
+        private val selectionListener: ContactSelectionListener
 ) : ListAdapter<Contact, ContactViewHolder>(ContactDiffCallback()) {
 
     private val selectedContacts = HashMap<Contact, Boolean>()
     private val allContactsSelected: MutableLiveData<Boolean> = MutableLiveData(canSelectAllContacts)
+    private val selectionCallback = object : SelectionCallback {
+        override fun onSelected(contact: Contact, isSelected: Boolean) {
+            selectedContacts[contact] = isSelected
+            if (isSelected) selectionListener.onContactSelected(contact)
+            else selectionListener.onContactDeselected(contact)
+        }
+    }
 
     val canSelectAllContacts: Boolean get() = selectedContacts.count() < itemCount
 
@@ -24,22 +30,9 @@ class ContactPickerAdapter(
         val contact = getItem(position)
         val selected = selectedContacts[contact] ?: false
         holder.apply {
-            bind(contact, clickListener, allContactsSelected)
+            bind(contact, allContactsSelected, selectionCallback)
             checkbox.isChecked = selected
         }
-    }
-
-    fun toggleSelected(position: Int) {
-        val item = getItem(position)
-        val selected: Boolean = selectedContacts[item] ?: false
-        if (selected) {
-            selectedContacts[item] = false
-            selectionListener.onContactDeselected(item)
-        } else {
-            selectedContacts[item] = true
-            selectionListener.onContactSelected(item)
-        }
-        notifyItemChanged(position)
     }
 
     fun setSelectedContacts(newSelection: List<Contact>) {

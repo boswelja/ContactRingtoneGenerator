@@ -15,13 +15,16 @@ class ContactViewHolder(
 
     val checkbox = binding.checkbox
 
-    fun bind(contact: Contact, clickListener: ContactClickListener, allSelectedLiveData: LiveData<Boolean>) {
+    fun bind(contact: Contact, allSelectedLiveData: LiveData<Boolean>, selectionCallback: SelectionCallback) {
         binding.showNickname = useNicknames
         binding.contact = contact
-        binding.clickListener = clickListener
         binding.position = adapterPosition
         binding.executePendingBindings()
 
+        itemView.setOnClickListener {
+            checkbox.isChecked = !checkbox.isChecked
+            selectionCallback.onSelected(contact, checkbox.isChecked)
+        }
         allSelectedLiveData.observe(checkbox.context as LifecycleOwner) {
             checkbox.isChecked = it
         }
@@ -34,4 +37,8 @@ class ContactViewHolder(
             return ContactViewHolder(binding, useNicknames)
         }
     }
+}
+
+interface SelectionCallback {
+    fun onSelected(contact: Contact, isSelected: Boolean)
 }

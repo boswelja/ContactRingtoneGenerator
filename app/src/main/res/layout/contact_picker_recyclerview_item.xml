@@ -13,16 +13,12 @@
         <variable
             name="contact"
             type="com.boswelja.contactringtonegenerator.contacts.Contact" />
-        <variable
-            name="clickListener"
-            type="com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactClickListener" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="56dp"
-        android:background="?selectableItemBackground"
-        android:onClick="@{() -> clickListener.onClick(position)}">
+        android:background="?selectableItemBackground">
 
         <com.google.android.material.imageview.ShapeableImageView
             android:id="@+id/contact_icon"

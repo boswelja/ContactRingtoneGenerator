@@ -15,7 +15,6 @@ import com.boswelja.contactringtonegenerator.databinding.ContactPickerWidgetBind
 import com.boswelja.contactringtonegenerator.ui.MainActivity
 import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
 import com.boswelja.contactringtonegenerator.ui.common.ListFragment
-import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactClickListener
 import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactPickerAdapter
 import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactSelectionListener
 import kotlinx.coroutines.Dispatchers
@@ -50,10 +49,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
         ContactPickerAdapter(
             PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .getBoolean("use_nicknames", true),
-            this,
-                ContactClickListener {
-                    adapter.toggleSelected(it)
-                }
+            this
         )
     }
 
