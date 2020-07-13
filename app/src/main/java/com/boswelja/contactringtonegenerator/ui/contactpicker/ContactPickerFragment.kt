@@ -34,7 +34,8 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
                 val query = searchQuery.toString().toLowerCase(Locale.ROOT)
                 val filteredList = contactsModel.contacts.value?.filter {
                     it.displayName.toLowerCase(Locale.ROOT).contains(query) ||
-                            it.displayName.toLowerCase(Locale.ROOT).contains(query) }
+                        it.displayName.toLowerCase(Locale.ROOT).contains(query)
+                }
                 adapter.submitList(filteredList)
             }
             withContext(Dispatchers.Main) {
