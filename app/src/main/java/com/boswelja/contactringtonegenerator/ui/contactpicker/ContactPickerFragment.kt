@@ -38,15 +38,15 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
 
     private var searchQuery: CharSequence? = null
 
-    override fun onContactDeselected(contact: Contact) {
-        dataModel.selectedContacts.remove(contact)
+    override fun onContactDeselected(contactId: Long) {
+        dataModel.selectedContacts.removeAll { it.id == contactId }
         widgetBinding.checkBox.isChecked = false
         updateSelectedContactsView()
         updateNextEnabled()
     }
 
-    override fun onContactSelected(contact: Contact) {
-        dataModel.selectedContacts.add(contact)
+    override fun onContactSelected(contactId: Long) {
+        dataModel.selectedContacts.add(viewModel.allContacts.first { it.id == contactId })
         updateSelectedContactsView()
         updateNextEnabled()
     }

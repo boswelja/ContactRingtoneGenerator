@@ -4,6 +4,6 @@ import com.boswelja.contactringtonegenerator.contacts.Contact
 
 interface ContactSelectionListener {
 
-    fun onContactSelected(contact: Contact)
-    fun onContactDeselected(contact: Contact)
+    fun onContactSelected(contactId: Long)
+    fun onContactDeselected(contactId: Long)
 }

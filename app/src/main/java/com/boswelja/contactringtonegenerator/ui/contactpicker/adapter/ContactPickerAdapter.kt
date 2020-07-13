@@ -10,13 +10,13 @@ class ContactPickerAdapter(
     private val selectionListener: ContactSelectionListener
 ) : ListAdapter<Contact, ContactViewHolder>(ContactDiffCallback()) {
 
-    private val selectedContacts = HashMap<Contact, Boolean>()
+    private val selectedContacts = HashMap<Long, Boolean>()
     private val allContactsSelected: MutableLiveData<Boolean> = MutableLiveData(canSelectAllContacts)
     private val selectionCallback = object : SelectionCallback {
         override fun onSelected(contact: Contact, isSelected: Boolean) {
-            selectedContacts[contact] = isSelected
-            if (isSelected) selectionListener.onContactSelected(contact)
-            else selectionListener.onContactDeselected(contact)
+            selectedContacts[contact.id] = isSelected
+            if (isSelected) selectionListener.onContactSelected(contact.id)
+            else selectionListener.onContactDeselected(contact.id)
         }
     }
 
@@ -28,7 +28,7 @@ class ContactPickerAdapter(
 
     override fun onBindViewHolder(holder: ContactViewHolder, position: Int) {
         val contact = getItem(position)
-        val selected = selectedContacts[contact] ?: false
+        val selected = selectedContacts[contact.id] ?: false
         holder.apply {
             bind(contact, allContactsSelected, selectionCallback)
             checkbox.isChecked = selected
@@ -38,8 +38,8 @@ class ContactPickerAdapter(
     fun setSelectedContacts(newSelection: List<Contact>) {
         deselectAllContacts()
         newSelection.forEach {
-            selectedContacts[it] = true
-            selectionListener.onContactSelected(it)
+            selectedContacts[it.id] = true
+            selectionListener.onContactSelected(it.id)
         }
         allContactsSelected.value = selectedContacts.count() >= itemCount
     }
