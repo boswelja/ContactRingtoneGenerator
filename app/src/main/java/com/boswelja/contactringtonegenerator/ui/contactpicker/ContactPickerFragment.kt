@@ -54,8 +54,9 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     override fun onCreateWidgetView(): View? {
         widgetBinding = ContactPickerWidgetBinding.inflate(layoutInflater)
         widgetBinding.apply {
-            checkBox.setOnCheckedChangeListener { _, checked ->
-                if (checked) adapter.setSelectedContacts(viewModel.allContacts)
+            checkBox.setOnClickListener {
+                val contactsSelected = adapter.allContactsSelected.value == true
+                if (!contactsSelected) adapter.setSelectedContacts(viewModel.allContacts)
                 else adapter.deselectAllContacts()
             }
             searchView.doAfterTextChanged {
@@ -77,6 +78,9 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
             findNavController().navigate(ContactPickerFragmentDirections.toRingtoneCreatorFragment())
         }
 
+        adapter.allContactsSelected.observe(viewLifecycleOwner) {
+            widgetBinding.checkBox.isChecked = it
+        }
         viewModel.adapterContacts.observe(viewLifecycleOwner) {
             updateContacts(it)
         }
@@ -103,7 +107,6 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
         adapter.submitList(contacts)
         setLoading(false)
         widgetBinding.apply {
-            checkBox.isChecked = adapter.allContactsSelected.value ?: false
             searchView.isEnabled = true
         }
     }

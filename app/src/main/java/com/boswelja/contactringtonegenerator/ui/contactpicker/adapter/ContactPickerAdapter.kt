@@ -21,7 +21,7 @@ class ContactPickerAdapter(
         }
     }
 
-    private val _allContactsSelected = MutableLiveData(selectedContacts.count { it.value } >= itemCount)
+    private val _allContactsSelected = MutableLiveData(false)
     val allContactsSelected: LiveData<Boolean>
         get() = _allContactsSelected
 
@@ -39,13 +39,24 @@ class ContactPickerAdapter(
         }
     }
 
+    override fun submitList(list: List<Contact>?) {
+        super.submitList(list)
+        updateAllContactsSelected()
+    }
+
+    private fun updateAllContactsSelected() {
+        _allContactsSelected.value =
+                if (itemCount == 0) false
+                else selectedContacts.count { it.value } >= itemCount
+    }
+
     fun setSelectedContacts(newSelection: List<Contact>) {
         deselectAllContacts()
         newSelection.forEach {
             selectedContacts[it.id] = true
             selectionListener.onContactSelected(it.id)
         }
-        _allContactsSelected.value = selectedContacts.count() >= itemCount
+        updateAllContactsSelected()
     }
 
     fun deselectAllContacts() {
