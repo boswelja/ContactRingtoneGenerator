@@ -20,6 +20,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.Locale
 
 class ContactPickerFragment : ListFragment(), ContactSelectionListener {
 
@@ -29,7 +30,13 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     private val searchHandler = Handler(Looper.myLooper()!!)
     private val searchRunnable = Runnable {
         coroutineScope.launch(Dispatchers.Default) {
-            if (searchQuery != null) adapter.filter(searchQuery!!)
+            searchQuery?.let { searchQuery ->
+                val query = searchQuery.toString().toLowerCase(Locale.ROOT)
+                val filteredList = contactsModel.contacts.value?.filter {
+                    it.displayName.toLowerCase(Locale.ROOT).contains(query) ||
+                            it.displayName.toLowerCase(Locale.ROOT).contains(query) }
+                adapter.submitList(filteredList)
+            }
             withContext(Dispatchers.Main) {
                 setLoading(false)
             }
@@ -65,7 +72,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
         widgetBinding = ContactPickerWidgetBinding.inflate(layoutInflater)
         widgetBinding.apply {
             checkBox.setOnCheckedChangeListener { _, checked ->
-                if (checked) adapter.selectAllContacts()
+                if (checked) adapter.setSelectedContacts(contactsModel.contacts.value!!)
                 else adapter.deselectAllContacts()
             }
             searchView.doAfterTextChanged {
@@ -114,7 +121,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     }
 
     private fun updateContacts(contacts: List<Contact>) {
-        adapter.setContacts(contacts)
+        adapter.submitList(contacts)
         setLoading(false)
         widgetBinding.apply {
             checkBox.isChecked = !adapter.canSelectAllContacts
