@@ -32,15 +32,15 @@ class RingtoneGenerator(
     private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     private val multithreaded = sharedPreferences.getBoolean("multithreaded_generation", false)
     private val volumeMultiplier: Float =
-            (sharedPreferences.getInt("volume_boost", 0) + 10) / 10.0f
+        (sharedPreferences.getInt("volume_boost", 0) + 10) / 10.0f
 
     private val generatorJob by lazy { Job() }
     private val coroutineScope =
-            if (multithreaded) {
-                CoroutineScope(Dispatchers.Default)
-            } else {
-                CoroutineScope(Dispatchers.Default + generatorJob)
-            }
+        if (multithreaded) {
+            CoroutineScope(Dispatchers.Default)
+        } else {
+            CoroutineScope(Dispatchers.Default + generatorJob)
+        }
 
     private val cacheDir: File = context.cacheDir
     private val ttsManager = TtsManager(context)

@@ -12,9 +12,9 @@ import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.ActionCl
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.RingtoneCreatorAdapter
 
 class CustomAudioViewHolder private constructor(
-        private val adapter: RingtoneCreatorAdapter,
-        private val widgetBinding: RingtoneCreatorCustomAudioWidgetBinding,
-        binding: RingtoneCreatorItemBinding
+    private val adapter: RingtoneCreatorAdapter,
+    private val widgetBinding: RingtoneCreatorCustomAudioWidgetBinding,
+    binding: RingtoneCreatorItemBinding
 ) : BaseViewHolder(binding) {
 
     private val noFileText: String = itemView.context.getString(R.string.item_audio_no_file)
@@ -27,7 +27,7 @@ class CustomAudioViewHolder private constructor(
         return widgetBinding.root
     }
 
-    //TODO Find a better way to do this, ignoring the abstract bind function feels wrong
+    // TODO Find a better way to do this, ignoring the abstract bind function feels wrong
     fun bind(item: StructureItem, clickCallback: ActionClickCallback) {
         if (item is AudioItem) {
             val uri = item.audioUri

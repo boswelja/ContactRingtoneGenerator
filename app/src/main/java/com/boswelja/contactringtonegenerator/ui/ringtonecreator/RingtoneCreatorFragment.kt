@@ -32,23 +32,26 @@ private const val SYSTEM_RINGTONE_REQUEST_CODE = 62932
 class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventListener {
 
     private val dataModel: WizardDataViewModel by activityViewModels()
-    private val adapter = RingtoneCreatorAdapter(this, ActionClickCallback { id, position ->
-        pickerItemPosition = position
-        when (id) {
-            ID.CUSTOM_AUDIO -> startActivityForResult(customAudioPickerIntent, CUSTOM_AUDIO_REQUEST_CODE)
-            ID.SYSTEM_RINGTONE -> startActivityForResult(systemRingtonePickerIntent, SYSTEM_RINGTONE_REQUEST_CODE)
-            else -> Timber.w("Unknown action clicked")
+    private val adapter = RingtoneCreatorAdapter(
+        this,
+        ActionClickCallback { id, position ->
+            pickerItemPosition = position
+            when (id) {
+                ID.CUSTOM_AUDIO -> startActivityForResult(customAudioPickerIntent, CUSTOM_AUDIO_REQUEST_CODE)
+                ID.SYSTEM_RINGTONE -> startActivityForResult(systemRingtonePickerIntent, SYSTEM_RINGTONE_REQUEST_CODE)
+                else -> Timber.w("Unknown action clicked")
+            }
         }
-    })
+    )
     private var pickerItemPosition: Int = -1
 
     private val customAudioPickerIntent by lazy {
         Intent.createChooser(
-                Intent(Intent.ACTION_GET_CONTENT).apply {
-                    type = "audio/*"
-                    addCategory(Intent.CATEGORY_OPENABLE)
-                },
-                "Pick an audio file"
+            Intent(Intent.ACTION_GET_CONTENT).apply {
+                type = "audio/*"
+                addCategory(Intent.CATEGORY_OPENABLE)
+            },
+            "Pick an audio file"
         )
     }
 

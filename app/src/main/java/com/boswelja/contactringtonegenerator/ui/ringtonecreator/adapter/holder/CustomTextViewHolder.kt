@@ -14,8 +14,8 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
 class CustomTextViewHolder(
-        private val adapter: RingtoneCreatorAdapter,
-        binding: RingtoneCreatorItemBinding
+    private val adapter: RingtoneCreatorAdapter,
+    binding: RingtoneCreatorItemBinding
 ) :
     BaseViewHolder(binding) {
 

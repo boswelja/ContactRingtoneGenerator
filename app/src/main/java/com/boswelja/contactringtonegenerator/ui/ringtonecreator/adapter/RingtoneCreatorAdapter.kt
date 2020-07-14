@@ -12,8 +12,8 @@ import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.holder.N
 import timber.log.Timber
 
 class RingtoneCreatorAdapter(
-        private val dataListener: DataEventListener,
-        private val actionClickCallback: ActionClickCallback
+    private val dataListener: DataEventListener,
+    private val actionClickCallback: ActionClickCallback
 ) : RecyclerView.Adapter<BaseViewHolder>() {
 
     private val items: ArrayList<StructureItem> = ArrayList()
