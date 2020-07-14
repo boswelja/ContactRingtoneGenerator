@@ -53,7 +53,9 @@
     <string name="label_name_suffix">Name Suffix</string>
     <string name="label_nickname">Nickname</string>
     <string name="label_custom_text">Custom Text</string>
-    <string name="label_custom_audio">Audio</string>
+    <string name="label_custom_audio">Audio File</string>
+    <string name="label_system_ringtone">System Ringtone</string>
 
     <string name="item_audio_no_file">No audio selected</string>
+    <string name="item_ringtone_no_file">No ringtone selected</string>
 </resources>

@@ -20,6 +20,7 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.MiddleName
 import com.boswelja.contactringtonegenerator.ringtonegen.item.NamePrefix
 import com.boswelja.contactringtonegenerator.ringtonegen.item.NameSuffix
 import com.boswelja.contactringtonegenerator.ringtonegen.item.Nickname
+import com.boswelja.contactringtonegenerator.ringtonegen.item.SystemRingtone
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.AudioItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.TextItem
@@ -42,6 +43,7 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
                 ID.SUFFIX -> NameSuffix()
                 ID.NICKNAME -> Nickname()
                 ID.CUSTOM_AUDIO -> CustomAudio()
+                ID.SYSTEM_RINGTONE -> SystemRingtone()
             }
             adapter.addItem(item)
         }
@@ -116,6 +118,7 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
                         ID.SUFFIX -> NameSuffix.labelRes
                         ID.NICKNAME -> Nickname.labelRes
                         ID.CUSTOM_AUDIO -> CustomAudio.labelRes
+                        ID.SYSTEM_RINGTONE -> SystemRingtone.labelRes
                     }
                 )
                 setChipIconResource(
@@ -128,7 +131,9 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
                         ID.SUFFIX,
                         ID.NICKNAME
                         -> TextItem.iconRes
-                        ID.CUSTOM_AUDIO -> AudioItem.iconRes
+                        ID.CUSTOM_AUDIO,
+                        ID.SYSTEM_RINGTONE
+                        -> AudioItem.iconRes
                     }
                 )
                 id = it.ordinal

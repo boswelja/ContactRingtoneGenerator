@@ -8,5 +8,6 @@ enum class ID {
     SUFFIX,
     NICKNAME,
     CUSTOM_TEXT,
-    CUSTOM_AUDIO
+    CUSTOM_AUDIO,
+    SYSTEM_RINGTONE
 }
