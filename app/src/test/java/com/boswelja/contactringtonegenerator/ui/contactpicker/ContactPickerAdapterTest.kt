@@ -32,21 +32,21 @@ class ContactPickerAdapterTest {
     fun testItemCountUpdated() {
         val adapter = createAdapter()
         assertEquals(0, adapter.itemCount)
-        adapter.setContacts(dummyContacts)
+        adapter.submitList(dummyContacts)
         assertEquals(dummyContacts.count(), adapter.itemCount)
     }
 
     @Test
     fun testSelectAll() {
         val adapter = createAdapter()
-        adapter.setContacts(dummyContacts)
-        adapter.selectAllContacts()
+        adapter.submitList(dummyContacts)
+        adapter.selectContacts(dummyContacts)
         dummyContacts.forEach {
-            verify(exactly = 1) { selectionListener.onContactSelected(it) }
+            verify(exactly = 1) { selectionListener.onContactSelected(it.id) }
         }
         adapter.deselectAllContacts()
         dummyContacts.forEach {
-            verify(exactly = 1) { selectionListener.onContactDeselected(it) }
+            verify(exactly = 1) { selectionListener.onContactDeselected(it.id) }
         }
         confirmVerified(selectionListener)
     }
