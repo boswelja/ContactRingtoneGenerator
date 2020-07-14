@@ -7,10 +7,10 @@ import com.arthenica.mobileffmpeg.FFmpeg
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.mediastore.MediaStoreHelper
+import com.boswelja.contactringtonegenerator.ringtonegen.item.AudioItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.Constants
-import com.boswelja.contactringtonegenerator.ringtonegen.item.common.AudioItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.common.TextItem
 import com.boswelja.contactringtonegenerator.tts.SynthesisJob
 import com.boswelja.contactringtonegenerator.tts.SynthesisResult
 import com.boswelja.contactringtonegenerator.tts.TtsManager

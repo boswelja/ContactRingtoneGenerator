@@ -3,8 +3,6 @@ package com.boswelja.contactringtonegenerator.ringtonegen
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import com.boswelja.contactringtonegenerator.contacts.Contact
-import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomText
-import com.boswelja.contactringtonegenerator.ringtonegen.item.FirstName
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
 import io.mockk.impl.annotations.MockK

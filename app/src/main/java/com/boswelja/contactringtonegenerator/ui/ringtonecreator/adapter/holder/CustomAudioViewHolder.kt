@@ -6,7 +6,7 @@ import android.view.ViewGroup
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorCustomAudioWidgetBinding
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorItemBinding
-import com.boswelja.contactringtonegenerator.ringtonegen.item.common.AudioItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.AudioItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.ActionClickCallback
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.RingtoneCreatorAdapter

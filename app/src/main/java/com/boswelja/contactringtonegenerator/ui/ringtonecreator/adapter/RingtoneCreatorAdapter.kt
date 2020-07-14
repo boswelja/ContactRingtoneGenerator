@@ -3,7 +3,7 @@ package com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter
 import android.net.Uri
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.boswelja.contactringtonegenerator.ringtonegen.item.common.AudioItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.AudioItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.holder.BaseViewHolder
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.holder.CustomAudioViewHolder

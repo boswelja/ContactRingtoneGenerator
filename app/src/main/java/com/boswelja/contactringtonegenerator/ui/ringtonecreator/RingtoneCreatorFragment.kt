@@ -13,25 +13,18 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.databinding.FragmentRingtoneCreatorBinding
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorAvailableItemBinding
-import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomAudio
-import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomText
-import com.boswelja.contactringtonegenerator.ringtonegen.item.FirstName
+import com.boswelja.contactringtonegenerator.ringtonegen.item.AudioItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
-import com.boswelja.contactringtonegenerator.ringtonegen.item.LastName
-import com.boswelja.contactringtonegenerator.ringtonegen.item.MiddleName
-import com.boswelja.contactringtonegenerator.ringtonegen.item.NamePrefix
-import com.boswelja.contactringtonegenerator.ringtonegen.item.NameSuffix
-import com.boswelja.contactringtonegenerator.ringtonegen.item.Nickname
-import com.boswelja.contactringtonegenerator.ringtonegen.item.SystemRingtone
-import com.boswelja.contactringtonegenerator.ringtonegen.item.common.AudioItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.common.TextItem
 import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.ActionClickCallback
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.AdapterGestureHelper
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.RingtoneCreatorAdapter
 import com.google.android.material.chip.Chip
 import timber.log.Timber
+import kotlin.reflect.KClass
+import kotlin.reflect.full.createInstance
 
 private const val CUSTOM_AUDIO_REQUEST_CODE = 62931
 private const val SYSTEM_RINGTONE_REQUEST_CODE = 62932
@@ -70,15 +63,15 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
     private val onAvailableItemClickListener = View.OnClickListener {
         if (it is Chip) {
             val item = when (ID.values().first { item -> item.ordinal == it.id }) {
-                ID.FIRST_NAME -> FirstName()
-                ID.CUSTOM_TEXT -> CustomText()
-                ID.MIDDLE_NAME -> MiddleName()
-                ID.LAST_NAME -> LastName()
-                ID.PREFIX -> NamePrefix()
-                ID.SUFFIX -> NameSuffix()
-                ID.NICKNAME -> Nickname()
-                ID.CUSTOM_AUDIO -> CustomAudio()
-                ID.SYSTEM_RINGTONE -> SystemRingtone()
+                ID.FIRST_NAME -> TextItem.FirstName()
+                ID.CUSTOM_TEXT -> TextItem.Custom()
+                ID.MIDDLE_NAME -> TextItem.MiddleName()
+                ID.LAST_NAME -> TextItem.LastName()
+                ID.PREFIX -> TextItem.NamePrefix()
+                ID.SUFFIX -> TextItem.NameSuffix()
+                ID.NICKNAME -> TextItem.Nickname()
+                ID.CUSTOM_AUDIO -> AudioItem.File()
+                ID.SYSTEM_RINGTONE -> AudioItem.SystemRingtone()
             }
             adapter.addItem(item)
         }
@@ -148,38 +141,18 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
     }
 
     private fun setupAvailableMessageItems() {
-        ID.values().forEach {
+        createChipsFor(TextItem::class.sealedSubclasses)
+        createChipsFor(AudioItem::class.sealedSubclasses)
+    }
+
+    private fun createChipsFor(list: List<KClass<out StructureItem>>) {
+        list.forEach {
             val chipBinding = RingtoneCreatorAvailableItemBinding.inflate(layoutInflater)
+            val item = it.createInstance()
             chipBinding.root.apply {
-                setText(
-                    when (it) {
-                        ID.FIRST_NAME -> FirstName.labelRes
-                        ID.CUSTOM_TEXT -> CustomText.labelRes
-                        ID.MIDDLE_NAME -> MiddleName.labelRes
-                        ID.LAST_NAME -> LastName.labelRes
-                        ID.PREFIX -> NamePrefix.labelRes
-                        ID.SUFFIX -> NameSuffix.labelRes
-                        ID.NICKNAME -> Nickname.labelRes
-                        ID.CUSTOM_AUDIO -> CustomAudio.labelRes
-                        ID.SYSTEM_RINGTONE -> SystemRingtone.labelRes
-                    }
-                )
-                setChipIconResource(
-                    when (it) {
-                        ID.FIRST_NAME,
-                        ID.CUSTOM_TEXT,
-                        ID.MIDDLE_NAME,
-                        ID.LAST_NAME,
-                        ID.PREFIX,
-                        ID.SUFFIX,
-                        ID.NICKNAME
-                        -> TextItem.iconRes
-                        ID.CUSTOM_AUDIO,
-                        ID.SYSTEM_RINGTONE
-                        -> AudioItem.iconRes
-                    }
-                )
-                id = it.ordinal
+                id = item.id.ordinal
+                setText(item.getLabelRes())
+                setChipIconResource(item.getIconRes())
                 setOnClickListener(onAvailableItemClickListener)
             }
             binding.availableItems.addView(chipBinding.root)

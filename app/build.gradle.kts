@@ -41,6 +41,7 @@ android {
 
 dependencies {
     implementation(Libraries.kotlinStdlib)
+    implementation(kotlin("reflect"))
 
     implementation(Libraries.coreKtx)
     implementation(Libraries.appCompat)
