@@ -14,9 +14,9 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.common.TextItem
 import com.boswelja.contactringtonegenerator.tts.SynthesisJob
 import com.boswelja.contactringtonegenerator.tts.SynthesisResult
 import com.boswelja.contactringtonegenerator.tts.TtsManager
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -29,7 +29,9 @@ class RingtoneGenerator(
     private val contacts: List<Contact>
 ) : TtsManager.EngineEventListener {
 
-    private val coroutineScope = MainScope()
+    private val generatorJob = Job()
+    private val coroutineScope = CoroutineScope(Dispatchers.Default + generatorJob)
+
     private val cacheDir: File = context.cacheDir
     private val ttsManager = TtsManager(context)
     private val counter = AtomicInteger()
@@ -52,7 +54,7 @@ class RingtoneGenerator(
         ttsManager.apply {
             engineEventListener = this@RingtoneGenerator
         }
-        coroutineScope.launch(Dispatchers.Default) {
+        coroutineScope.launch {
             initialSetupComplete = true
             if (ttsManager.isEngineReady) state = State.READY
         }
@@ -100,7 +102,7 @@ class RingtoneGenerator(
 
     private fun createJobFor(contact: Contact): Job {
         Timber.d("createJobFor($contact)")
-        return coroutineScope.launch(Dispatchers.Default) {
+        return coroutineScope.launch {
             withContext(Dispatchers.Main) {
                 progressListener?.onJobStarted(contact)
             }
@@ -181,6 +183,7 @@ class RingtoneGenerator(
     fun destroy() {
         ttsManager.destroy()
         cacheDir.deleteRecursively()
+        generatorJob.cancel()
     }
 
     interface StateListener {
