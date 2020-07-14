@@ -17,7 +17,7 @@ class RingtoneCreatorAdapter(
 ) : RecyclerView.Adapter<BaseViewHolder>() {
 
     private val items: ArrayList<StructureItem> = ArrayList()
-    private val isDataValid: ArrayList<Boolean> = ArrayList()
+    private val itemValidList: ArrayList<Boolean> = ArrayList()
 
     override fun getItemCount(): Int = items.count()
 
@@ -51,14 +51,14 @@ class RingtoneCreatorAdapter(
     }
 
     fun setIsDataValid(position: Int, isValid: Boolean) {
-        if (position in isDataValid.indices) {
-            if (isDataValid[position] != isValid) {
-                isDataValid[position] = isValid
-                dataListener.onDataValidityChanged(isDataValid.none { !it })
+        if (position in itemValidList.indices) {
+            if (itemValidList[position] != isValid) {
+                itemValidList[position] = isValid
+                dataListener.onDataValidityChanged(itemValidList.none { !it })
             }
         } else {
-            isDataValid.add(position, isValid)
-            dataListener.onDataValidityChanged(isDataValid.none { !it })
+            itemValidList.add(position, isValid)
+            dataListener.onDataValidityChanged(itemValidList.none { !it })
         }
     }
 
@@ -85,16 +85,19 @@ class RingtoneCreatorAdapter(
     fun moveItem(fromPosition: Int, toPosition: Int) {
         val item = items.removeAt(fromPosition)
         items.add(toPosition, item)
+        val isDataValid = itemValidList.removeAt(fromPosition)
+        itemValidList.add(toPosition, isDataValid)
         notifyItemMoved(fromPosition, toPosition)
         dataListener.onItemMoved(fromPosition, toPosition)
+        dataListener.onDataValidityChanged(itemValidList.none { !it })
     }
 
     fun removeItem(position: Int) {
         items.removeAt(position)
-        isDataValid.removeAt(position)
+        itemValidList.removeAt(position)
         notifyItemRemoved(position)
         dataListener.onItemRemoved(position)
-        dataListener.onDataValidityChanged(isDataValid.none { !it })
+        dataListener.onDataValidityChanged(itemValidList.none { !it })
     }
 
     fun updateItems(newItems: List<StructureItem>) {
