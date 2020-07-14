@@ -29,13 +29,22 @@ class RingtoneGenerator(
     private val contacts: List<Contact>
 ) : TtsManager.EngineEventListener {
 
-    private val generatorJob = Job()
-    private val coroutineScope = CoroutineScope(Dispatchers.Default + generatorJob)
+    private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    private val multithreaded = sharedPreferences.getBoolean("multithreaded_generation", false)
+    private val volumeMultiplier: Float =
+            (sharedPreferences.getInt("volume_boost", 0) + 10) / 10.0f
+
+    private val generatorJob by lazy { Job() }
+    private val coroutineScope =
+            if (multithreaded) {
+                CoroutineScope(Dispatchers.Default)
+            } else {
+                CoroutineScope(Dispatchers.Default + generatorJob)
+            }
 
     private val cacheDir: File = context.cacheDir
     private val ttsManager = TtsManager(context)
     private val counter = AtomicInteger()
-    private val volumeMultiplier = calculateVolumeMultiplier()
 
     private var initialSetupComplete: Boolean = false
 
@@ -92,12 +101,6 @@ class RingtoneGenerator(
     private fun handleJobCompleted() {
         jobsCompleted += 1
         if (jobsCompleted >= totalJobCount) state = State.FINISHED
-    }
-
-    private fun calculateVolumeMultiplier(): Float {
-        val userBoost = PreferenceManager.getDefaultSharedPreferences(context).getInt("volume_boost", 0)
-        val baseVolume = 10
-        return (baseVolume + userBoost) / 10f
     }
 
     private fun createJobFor(contact: Contact): Job {
@@ -183,7 +186,7 @@ class RingtoneGenerator(
     fun destroy() {
         ttsManager.destroy()
         cacheDir.deleteRecursively()
-        generatorJob.cancel()
+        if (!multithreaded) generatorJob.cancel()
     }
 
     interface StateListener {
