@@ -51,6 +51,14 @@ class ContactPickerAdapter(
     }
 
     fun setSelectedContacts(newSelection: List<Contact>) {
+        selectedContacts.clear()
+        newSelection.forEach {
+            selectedContacts[it.id] = true
+        }
+        updateAllContactsSelected()
+    }
+
+    fun selectContacts(newSelection: List<Contact>) {
         deselectAllContacts()
         newSelection.forEach {
             selectedContacts[it.id] = true

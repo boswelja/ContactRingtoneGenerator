@@ -56,7 +56,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
         widgetBinding.apply {
             checkBox.setOnClickListener {
                 val contactsSelected = adapter.allContactsSelected.value == true
-                if (!contactsSelected) adapter.setSelectedContacts(viewModel.allContacts)
+                if (!contactsSelected) adapter.selectContacts(viewModel.allContacts)
                 else adapter.deselectAllContacts()
             }
             searchView.doAfterTextChanged {
@@ -70,7 +70,6 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         setLoading(true)
-        adapter.setSelectedContacts(dataModel.selectedContacts.toList())
         updateSelectedContactsView()
         updateNextEnabled()
         binding.recyclerView.adapter = this@ContactPickerFragment.adapter
@@ -104,6 +103,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     }
 
     private fun updateContacts(contacts: List<Contact>) {
+        adapter.setSelectedContacts(dataModel.selectedContacts.toList())
         adapter.submitList(contacts)
         setLoading(false)
         widgetBinding.apply {
