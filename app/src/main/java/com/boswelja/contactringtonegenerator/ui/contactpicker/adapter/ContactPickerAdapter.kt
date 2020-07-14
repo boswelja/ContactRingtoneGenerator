@@ -25,7 +25,6 @@ class ContactPickerAdapter(
     val allContactsSelected: LiveData<Boolean>
         get() = _allContactsSelected
 
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ContactViewHolder {
         return ContactViewHolder.from(parent, useNicknames)
     }
@@ -49,8 +48,8 @@ class ContactPickerAdapter(
      */
     private fun updateAllContactsSelected() {
         _allContactsSelected.value =
-                if (itemCount == 0) false
-                else selectedContacts.count { it.value } >= itemCount
+            if (itemCount == 0) false
+            else selectedContacts.count { it.value } >= itemCount
     }
 
     /**

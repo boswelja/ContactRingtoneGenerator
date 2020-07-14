@@ -37,7 +37,7 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
                 val query = searchQuery.toString().toLowerCase(Locale.ROOT)
                 val filteredList = allContacts.filter {
                     it.displayName.toLowerCase(Locale.ROOT).contains(query) ||
-                            it.displayName.toLowerCase(Locale.ROOT).contains(query)
+                        it.displayName.toLowerCase(Locale.ROOT).contains(query)
                 }
                 withContext(Dispatchers.Main) {
                     _adapterContacts.value = filteredList
