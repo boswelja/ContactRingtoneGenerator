@@ -1,6 +1,7 @@
 package com.boswelja.contactringtonegenerator.ui.contactpicker.adapter
 
 import android.view.ViewGroup
+import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.recyclerview.widget.ListAdapter
@@ -46,10 +47,12 @@ class ContactPickerAdapter(
     /**
      * Checks whether all contacts are currently selected and updates [allContactsSelected].
      */
-    private fun updateAllContactsSelected() {
-        _allContactsSelected.value =
+    @VisibleForTesting
+    fun updateAllContactsSelected() {
+        _allContactsSelected.postValue(
             if (itemCount == 0) false
             else selectedContacts.count { it.value } >= itemCount
+        )
     }
 
     /**
@@ -85,6 +88,6 @@ class ContactPickerAdapter(
             selectionListener.onContactDeselected(it)
         }
         selectedContacts.clear()
-        _allContactsSelected.value = false
+        _allContactsSelected.postValue(false)
     }
 }
