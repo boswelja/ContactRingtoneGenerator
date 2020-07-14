@@ -44,12 +44,19 @@ class ContactPickerAdapter(
         updateAllContactsSelected()
     }
 
+    /**
+     * Checks whether all contacts are currently selected and updates [allContactsSelected].
+     */
     private fun updateAllContactsSelected() {
         _allContactsSelected.value =
                 if (itemCount == 0) false
                 else selectedContacts.count { it.value } >= itemCount
     }
 
+    /**
+     * Sets the currently selected contacts. Note this does not call any listener functions.
+     * @param newSelection The new [List] of [Contact]s to select.
+     */
     fun setSelectedContacts(newSelection: List<Contact>) {
         selectedContacts.clear()
         newSelection.forEach {
@@ -58,6 +65,10 @@ class ContactPickerAdapter(
         updateAllContactsSelected()
     }
 
+    /**
+     * Selects all [Contact]s in a given list. This will call back to [selectionListener].
+     * @param newSelection The [List] of contacts to select.
+     */
     fun selectContacts(newSelection: List<Contact>) {
         deselectAllContacts()
         newSelection.forEach {
@@ -67,6 +78,9 @@ class ContactPickerAdapter(
         updateAllContactsSelected()
     }
 
+    /**
+     * Deselect all currently selected contacts. This will call back to [selectionListener].
+     */
     fun deselectAllContacts() {
         selectedContacts.keys.forEach {
             selectionListener.onContactDeselected(it)
