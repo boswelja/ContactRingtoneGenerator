@@ -23,14 +23,14 @@ commands:
   update_deps:
     steps:
       - restore_cache:
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
+          key: jars-{{ checksum "build.gradle.kts" }}-{{ checksum "app/build.gradle.kts" }}
       - execute_gradle:
           task_name: Update Dependencies
           commands: androidDependencies
       - save_cache:
           paths:
             - ~/.gradle
-          key: jars-{{ checksum "build.gradle" }}-{{ checksum "app/build.gradle" }}
+          key: jars-{{ checksum "build.gradle.kts" }}-{{ checksum "app/build.gradle.kts" }}
 
 jobs:
   build:
