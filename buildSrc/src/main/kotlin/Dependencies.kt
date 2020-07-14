@@ -37,7 +37,7 @@ object Libraries {
 
         const val timber = "4.7.1"
 
-        const val ffmpeg = "4.3.1-LTS"
+        const val ffmpeg = "4.3.1.LTS"
     }
 
     const val kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
@@ -58,7 +58,7 @@ object Libraries {
 
     const val googleMaterial = "com.google.android.material:material:${Versions.material}"
 
-    const val timber = "com.jakewharton.timber:${Versions.timber}"
+    const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
 
     const val ffmpeg = "com.arthenica:mobile-ffmpeg-audio:${Versions.ffmpeg}"
 }
@@ -84,7 +84,6 @@ object TestLibraries {
 
 object AndroidTestLibraries {
     object Versions {
-        const val awaitility = "4.0.3"
         const val mockK = TestLibraries.Versions.mockK
         const val navigation = Libraries.Versions.navigation
         const val junit = "1.1.1"
@@ -92,7 +91,6 @@ object AndroidTestLibraries {
         const val espresso = "3.2.0"
     }
 
-    const val awaitility = "org.awaitility:awaitility-kotlin:${Versions.awaitility}"
     const val mockK = "io.mockk:mockk-android:${Versions.mockK}"
     const val navigation = "androidx.navigation:navigation-testing:${Versions.navigation}"
     const val junit = "androidx.test.ext:junit:${Versions.junit}"
