@@ -3,6 +3,7 @@ package com.boswelja.contactringtonegenerator.ringtonegen
 import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import com.boswelja.contactringtonegenerator.contacts.Contact
+import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
 import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
 import io.mockk.impl.annotations.MockK
@@ -16,8 +17,8 @@ import kotlin.reflect.KProperty0
 class RingtoneGeneratorTest {
 
     private val testRingtoneStructure = listOf(
-        FirstName(),
-        CustomText().apply { text = "is calling" }
+        TextItem.FirstName(),
+        TextItem.Custom().apply { text = "is calling" }
     )
     private val testContacts: List<Contact> = ArrayList<Contact>().apply {
         (0 until TEST_CONTACTS_COUNT).forEach {
