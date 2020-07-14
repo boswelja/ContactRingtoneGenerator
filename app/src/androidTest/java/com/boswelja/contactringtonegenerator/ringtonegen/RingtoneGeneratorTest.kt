@@ -9,13 +9,11 @@ import io.mockk.MockKAnnotations
 import io.mockk.confirmVerified
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
-import org.awaitility.kotlin.await
-import org.hamcrest.BaseMatcher
-import org.hamcrest.Description
 import org.junit.Assert.* // ktlint-disable
 import org.junit.Before
 import org.junit.Test
 import java.util.concurrent.TimeUnit
+import kotlin.reflect.KProperty0
 
 class RingtoneGeneratorTest {
 
@@ -45,7 +43,8 @@ class RingtoneGeneratorTest {
     @Test
     fun testTotalJobCount() {
         val ringtoneGenerator = RingtoneGenerator(context, testRingtoneStructure, testContacts)
-        await.atMost(10, TimeUnit.SECONDS).until(ringtoneGenerator::state, stateMatcher(RingtoneGenerator.State.READY))
+
+        awaitState(TimeUnit.SECONDS.toMillis(10), ringtoneGenerator::state, RingtoneGenerator.State.READY)
         assertEquals(TRUE_JOB_COUNT, ringtoneGenerator.totalJobCount)
         ringtoneGenerator.destroy()
     }
@@ -57,13 +56,13 @@ class RingtoneGeneratorTest {
 
         assertEquals(RingtoneGenerator.State.NOT_READY, ringtoneGenerator.state)
 
-        await.atMost(10, TimeUnit.SECONDS).until(ringtoneGenerator::state, stateMatcher(RingtoneGenerator.State.READY))
+        awaitState(TimeUnit.SECONDS.toMillis(10), ringtoneGenerator::state, RingtoneGenerator.State.READY)
         verify(exactly = 1) { stateListener.onStateChanged(RingtoneGenerator.State.READY) }
 
         ringtoneGenerator.start()
         verify(exactly = 1) { stateListener.onStateChanged(RingtoneGenerator.State.GENERATING) }
 
-        await.atMost(30, TimeUnit.SECONDS).until(ringtoneGenerator::state, stateMatcher(RingtoneGenerator.State.FINISHED))
+        awaitState(TimeUnit.SECONDS.toMillis(30), ringtoneGenerator::state, RingtoneGenerator.State.FINISHED)
         verify(exactly = 1) { stateListener.onStateChanged(RingtoneGenerator.State.FINISHED) }
 
         confirmVerified(stateListener)
@@ -75,10 +74,10 @@ class RingtoneGeneratorTest {
         val ringtoneGenerator = RingtoneGenerator(context, testRingtoneStructure, testContacts)
         ringtoneGenerator.progressListener = progressListener
 
-        await.atMost(10, TimeUnit.SECONDS).until(ringtoneGenerator::state, stateMatcher(RingtoneGenerator.State.READY))
+        awaitState(TimeUnit.SECONDS.toMillis(10), ringtoneGenerator::state, RingtoneGenerator.State.READY)
         ringtoneGenerator.start()
 
-        await.atMost(30, TimeUnit.SECONDS).until(ringtoneGenerator::state, stateMatcher(RingtoneGenerator.State.FINISHED))
+        awaitState(TimeUnit.SECONDS.toMillis(30), ringtoneGenerator::state, RingtoneGenerator.State.FINISHED)
         testContacts.forEach {
             verify(exactly = 1) { progressListener.onJobStarted(it) }
         }
@@ -88,17 +87,13 @@ class RingtoneGeneratorTest {
         ringtoneGenerator.destroy()
     }
 
-    /**
-     * Creates a [BaseMatcher] for matching [RingtoneGenerator.State].
-     * @param state The state to match.
-     * @return The matcher.
-     */
-    private fun stateMatcher(state: RingtoneGenerator.State) = object : BaseMatcher<RingtoneGenerator.State>() {
-        override fun matches(actual: Any?): Boolean {
-            return (actual is RingtoneGenerator.State) && (actual == state)
+    private fun awaitState(atMost: Long, actual: KProperty0<RingtoneGenerator.State>, expected: RingtoneGenerator.State) {
+        val startTime = System.currentTimeMillis()
+        var currentTime = System.currentTimeMillis()
+        while (actual.get() != expected && (currentTime - startTime) < atMost) {
+            currentTime = System.currentTimeMillis()
+            continue
         }
-
-        override fun describeTo(description: Description?) {}
     }
 
     companion object {

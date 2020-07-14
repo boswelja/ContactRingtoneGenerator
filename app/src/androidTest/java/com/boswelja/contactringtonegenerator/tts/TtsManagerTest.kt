@@ -7,11 +7,11 @@ import io.mockk.confirmVerified
 import io.mockk.impl.annotations.MockK
 import io.mockk.verify
 import kotlinx.coroutines.runBlocking
-import org.awaitility.kotlin.await
 import org.junit.Assert.* // ktlint-disable
 import org.junit.Before
 import org.junit.Test
 import java.util.concurrent.TimeUnit
+import kotlin.reflect.KProperty0
 
 class TtsManagerTest {
 
@@ -36,7 +36,7 @@ class TtsManagerTest {
         val ttsManager = TtsManager(context).apply {
             engineEventListener = this@TtsManagerTest.engineEventListener
         }
-        await.atMost(5, TimeUnit.SECONDS).until(ttsManager::isEngineReady)
+        awaitBoolean(TimeUnit.SECONDS.toMillis(5), ttsManager::isEngineReady)
         verify(exactly = 1) { engineEventListener.onInitialised(any()) }
 
         confirmVerified(engineEventListener)
@@ -46,13 +46,22 @@ class TtsManagerTest {
     @Test
     fun synthesizeToFile() {
         val ttsManager = TtsManager(context)
-        await.atMost(5, TimeUnit.SECONDS).until(ttsManager::isEngineReady)
+        awaitBoolean(TimeUnit.SECONDS.toMillis(5), ttsManager::isEngineReady)
         testJobs.forEach {
             runBlocking {
                 val result = ttsManager.synthesizeToFile(it)
                 assertTrue(result.result.exists())
                 assertTrue(result.result.isFile)
             }
+        }
+    }
+
+    private fun awaitBoolean(atMost: Long, actual: KProperty0<Boolean>) {
+        val startTime = System.currentTimeMillis()
+        var currentTime = System.currentTimeMillis()
+        while (!actual.get() && (currentTime - startTime) < atMost) {
+            currentTime = System.currentTimeMillis()
+            continue
         }
     }
 }

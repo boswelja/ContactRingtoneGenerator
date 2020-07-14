@@ -7,13 +7,6 @@ plugins {
     id("com.diffplug.spotless") version "5.1.0"
 }
 
-configurations.all {
-    resolutionStrategy {
-        force("org.hamcrest:hamcrest-core:1.3", "org.hamcrest:hamcrest-core:2.1")
-        force("org.hamcrest:hamcrest-library:1.3", "org.hamcrest:hamcrest-library:2.1")
-    }
-}
-
 android {
     compileSdkVersion(AndroidSdk.compile)
 
@@ -43,9 +36,6 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
-    packagingOptions {
-        exclude("README.txt")
-    }
 }
 
 dependencies {
@@ -74,7 +64,6 @@ dependencies {
     testImplementation(TestLibraries.junit)
     testImplementation(TestLibraries.mockK)
 
-    androidTestImplementation(AndroidTestLibraries.awaitility)
     androidTestImplementation(AndroidTestLibraries.mockK)
     androidTestImplementation(AndroidTestLibraries.navigation)
     androidTestImplementation(AndroidTestLibraries.junit)
