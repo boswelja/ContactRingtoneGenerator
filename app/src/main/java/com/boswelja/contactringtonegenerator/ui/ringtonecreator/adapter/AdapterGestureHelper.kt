@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ui.ringtonecreator
+package com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter
 
 import android.graphics.Canvas
 import android.view.HapticFeedbackConstants

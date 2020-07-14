@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ui.ringtonecreator.holder
+package com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.holder
 
 import android.view.View
 import androidx.recyclerview.widget.RecyclerView

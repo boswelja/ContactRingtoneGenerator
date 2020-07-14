@@ -1,19 +1,21 @@
-package com.boswelja.contactringtonegenerator.ui.ringtonecreator.holder
+package com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.holder
 
 import android.text.InputType
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.widget.doAfterTextChanged
 import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorItemBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomText
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
-import com.boswelja.contactringtonegenerator.ui.ringtonecreator.RingtoneCreatorAdapter
+import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.RingtoneCreatorAdapter
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 
 class CustomTextViewHolder(
-    private val adapter: RingtoneCreatorAdapter,
-    binding: RingtoneCreatorItemBinding
+        private val adapter: RingtoneCreatorAdapter,
+        binding: RingtoneCreatorItemBinding
 ) :
     BaseViewHolder(binding) {
 
@@ -53,6 +55,14 @@ class CustomTextViewHolder(
                 setText(item.text)
                 setHint(item.getLabelRes())
             }
+        }
+    }
+
+    companion object {
+        fun from(adapter: RingtoneCreatorAdapter, parent: ViewGroup): CustomTextViewHolder {
+            val layoutInflater = LayoutInflater.from(parent.context)
+            val itemBinding = RingtoneCreatorItemBinding.inflate(layoutInflater!!, parent, false)
+            return CustomTextViewHolder(adapter, itemBinding)
         }
     }
 }

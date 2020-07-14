@@ -1,6 +1,8 @@
 package com.boswelja.contactringtonegenerator.ui.ringtonecreator
 
 import android.content.Intent
+import android.media.RingtoneManager
+import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -25,12 +27,45 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.common.AudioItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.TextItem
 import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
+import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.ActionClickCallback
+import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.AdapterGestureHelper
+import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.RingtoneCreatorAdapter
 import com.google.android.material.chip.Chip
+import timber.log.Timber
+
+private const val CUSTOM_AUDIO_REQUEST_CODE = 62931
+private const val SYSTEM_RINGTONE_REQUEST_CODE = 62932
 
 class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventListener {
 
     private val dataModel: WizardDataViewModel by activityViewModels()
-    private val adapter = RingtoneCreatorAdapter(this, this)
+    private val adapter = RingtoneCreatorAdapter(this, ActionClickCallback { id, position ->
+        pickerItemPosition = position
+        when (id) {
+            ID.CUSTOM_AUDIO -> startActivityForResult(customAudioPickerIntent, CUSTOM_AUDIO_REQUEST_CODE)
+            ID.SYSTEM_RINGTONE -> startActivityForResult(systemRingtonePickerIntent, SYSTEM_RINGTONE_REQUEST_CODE)
+            else -> Timber.w("Unknown action clicked")
+        }
+    })
+    private var pickerItemPosition: Int = -1
+
+    private val customAudioPickerIntent by lazy {
+        Intent.createChooser(
+                Intent(Intent.ACTION_GET_CONTENT).apply {
+                    type = "audio/*"
+                    addCategory(Intent.CATEGORY_OPENABLE)
+                },
+                "Pick an audio file"
+        )
+    }
+
+    private val systemRingtonePickerIntent by lazy {
+        Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
+            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
+            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
+            putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_RINGTONE)
+        }
+    }
 
     private val onAvailableItemClickListener = View.OnClickListener {
         if (it is Chip) {
@@ -92,8 +127,16 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == RingtoneCreatorAdapter.CHOOSER_REQUEST_CODE) adapter.handleChooserResponse(data)
-        else super.onActivityResult(requestCode, resultCode, data)
+        when (requestCode) {
+            CUSTOM_AUDIO_REQUEST_CODE -> {
+                adapter.handleChooserResponse(data?.data, pickerItemPosition)
+            }
+            SYSTEM_RINGTONE_REQUEST_CODE -> {
+                val uri = data?.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
+                adapter.handleChooserResponse(uri, pickerItemPosition)
+            }
+            else -> super.onActivityResult(requestCode, resultCode, data)
+        }
     }
 
     private fun setupMessageCreatorView() {

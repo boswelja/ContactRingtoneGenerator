@@ -6,9 +6,10 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
 
 abstract class AudioItem(id: ID) : StructureItem(id) {
 
+    var audioUri: Uri? = null
+
     override val isUserAdjustable: Boolean = true
 
-    abstract fun getAudioContentUri(): Uri?
     override fun getIconRes(): Int = iconRes
 
     companion object {

@@ -125,7 +125,7 @@ class RingtoneGenerator(
                 when (it) {
                     is AudioItem -> {
                         Timber.i("Got AudioItem")
-                        val parcelFileDescriptor = context.contentResolver.openFileDescriptor(it.getAudioContentUri()!!, "r")
+                        val parcelFileDescriptor = context.contentResolver.openFileDescriptor(it.audioUri!!, "r")
                         val path = String.format("pipe:%d", parcelFileDescriptor?.fd)
                         val filter = "[a$trueFileCount]"
                         filterInputs += "[$trueFileCount:0]volume=$volumeMultiplier$filter;"
