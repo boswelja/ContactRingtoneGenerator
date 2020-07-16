@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Contact Ringtone Generator</string>
+    <string name="app_name">Ringtonator</string>
 
     <string name="welcome_to">Welcome to</string>
     <string name="get_started">Let\'s get started</string>
