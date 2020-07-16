@@ -17,8 +17,6 @@ class CustomAudioViewHolder private constructor(
     binding: RingtoneCreatorItemBinding
 ) : BaseViewHolder(binding) {
 
-    private val noFileText: String = itemView.context.getString(R.string.item_audio_no_file)
-
     init {
         initWidgetView()
     }
@@ -30,13 +28,11 @@ class CustomAudioViewHolder private constructor(
     // TODO Find a better way to do this, ignoring the abstract bind function feels wrong
     fun bind(item: StructureItem, clickCallback: ActionClickCallback) {
         if (item is AudioItem) {
-            val uri = item.audioUri
-            val filePathText = uri?.lastPathSegment ?: noFileText
             widgetBinding.apply {
-                fileNameView.text = filePathText
+                fileNameView.text = item.displayText
                 browseButton.setOnClickListener { clickCallback.onClick(item, adapterPosition) }
             }
-            adapter.setIsDataValid(adapterPosition, uri != null)
+            adapter.setIsDataValid(adapterPosition, item.audioUri != null)
         }
     }
 

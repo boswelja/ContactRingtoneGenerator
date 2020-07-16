@@ -1,5 +1,6 @@
 package com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter
 
+import android.content.Context
 import android.net.Uri
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -64,12 +65,12 @@ class RingtoneCreatorAdapter(
 
     fun getItem(position: Int): StructureItem = items[position]
 
-    fun handleChooserResponse(uri: Uri?, position: Int) {
+    fun handleChooserResponse(context: Context, uri: Uri?, position: Int) {
         Timber.i("Updating $position uri to $uri")
         if (position in items.indices) {
             val item = items[position]
             if (item is AudioItem) {
-                item.audioUri = uri
+                item.setAudioUri(context, uri)
                 notifyItemChanged(position)
             }
         }

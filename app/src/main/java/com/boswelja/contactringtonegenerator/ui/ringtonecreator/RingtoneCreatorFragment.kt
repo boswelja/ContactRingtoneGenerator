@@ -73,8 +73,8 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
                 ID.PREFIX -> TextItem.NamePrefix()
                 ID.SUFFIX -> TextItem.NameSuffix()
                 ID.NICKNAME -> TextItem.Nickname()
-                ID.CUSTOM_AUDIO -> AudioItem.File()
-                ID.SYSTEM_RINGTONE -> AudioItem.SystemRingtone()
+                ID.CUSTOM_AUDIO -> AudioItem.File(requireContext())
+                ID.SYSTEM_RINGTONE -> AudioItem.SystemRingtone(requireContext())
             }
             adapter.addItem(item)
         }
@@ -125,11 +125,11 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         when (requestCode) {
             CUSTOM_AUDIO_REQUEST_CODE -> {
-                adapter.handleChooserResponse(data?.data, pickerItemPosition)
+                adapter.handleChooserResponse(requireContext(), data?.data, pickerItemPosition)
             }
             SYSTEM_RINGTONE_REQUEST_CODE -> {
                 val uri = data?.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-                adapter.handleChooserResponse(uri, pickerItemPosition)
+                adapter.handleChooserResponse(requireContext(), uri, pickerItemPosition)
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
