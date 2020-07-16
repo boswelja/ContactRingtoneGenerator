@@ -8,9 +8,9 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/app_icon_view"
-        android:layout_width="128dp"
-        android:layout_height="128dp"
-        android:layout_marginTop="32dp"
+        android:layout_width="140dp"
+        android:layout_height="140dp"
+        android:layout_marginTop="56dp"
         app:srcCompat="@mipmap/ic_launcher_round"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -20,7 +20,7 @@
         android:id="@+id/welcome_to_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="18dp"
         android:textAlignment="center"
         android:text="@string/welcome_to"
         android:textColor="?android:textColorSecondary"
