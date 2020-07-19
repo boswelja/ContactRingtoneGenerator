@@ -23,6 +23,9 @@ class ProgressFragment :
     private lateinit var binding: FragmentProgressBinding
     private lateinit var ringtoneGenerator: RingtoneGenerator
 
+    private var successCount = 0
+    private var failCount = 0
+
     override fun onStateChanged(state: RingtoneGenerator.State) {
         Timber.d("onStateChanged($state)")
         when (state) {
@@ -43,9 +46,7 @@ class ProgressFragment :
             }
             RingtoneGenerator.State.FINISHED -> {
                 binding.apply {
-                    val successes = progressBar.progress
-                    val failures = progressBar.secondaryProgress - progressBar.progress
-                    findNavController().navigate(ProgressFragmentDirections.toFinishedFragment(successes, failures))
+                    findNavController().navigate(ProgressFragmentDirections.toFinishedFragment(successCount, failCount))
                 }
             }
             else -> {
@@ -62,6 +63,10 @@ class ProgressFragment :
     override fun onJobCompleted(success: Boolean, contact: Contact) {
         Timber.d("onJobCompleted($success, $contact)")
         binding.progressBar.progress += 1
+        if (success)
+            successCount += 1
+        else
+            failCount += 1
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
