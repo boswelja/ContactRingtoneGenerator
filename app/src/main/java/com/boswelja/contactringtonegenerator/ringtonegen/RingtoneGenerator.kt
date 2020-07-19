@@ -214,6 +214,7 @@ class RingtoneGenerator private constructor(private val context: Context) :
         ttsManager.destroy()
         cacheDir.deleteRecursively()
         generatorJob.cancel()
+        INSTANCE = null
     }
 
     interface ProgressListener {
