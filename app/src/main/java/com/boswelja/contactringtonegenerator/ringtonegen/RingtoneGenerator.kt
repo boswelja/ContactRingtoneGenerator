@@ -25,11 +25,11 @@ import timber.log.Timber
 import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
-class RingtoneGenerator(
-    private val context: Context,
-    private val ringtoneStructure: List<StructureItem>,
-    private val contacts: List<Contact>
-) : TtsManager.EngineEventListener {
+class RingtoneGenerator private constructor(private val context: Context) :
+        TtsManager.EngineEventListener {
+
+    private var ringtoneStructure: List<StructureItem> = emptyList()
+    private var contacts: List<Contact> = emptyList()
 
     private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     private val multithreaded = sharedPreferences.getBoolean("multithreaded_generation", false)
@@ -63,13 +63,13 @@ class RingtoneGenerator(
         }
         coroutineScope.launch {
             initialSetupComplete = true
-            if (ttsManager.isEngineReady) state = State.READY
+            checkIsReady()
         }
     }
 
     override fun onInitialised(success: Boolean) {
         if (!success) throw IllegalStateException("TTS failed to initialise")
-        if (initialSetupComplete) state = State.READY
+        checkIsReady()
     }
 
     private suspend fun handleGenerateCompleted(contact: Contact, ringtone: File): Boolean {
@@ -93,6 +93,16 @@ class RingtoneGenerator(
                 .replace(Constants.NAME_SUFFIX_PLACEHOLDER, contact.suffix ?: "")
                 .replace(Constants.NICKNAME_PLACEHOLDER, contact.nickname ?: "")
             return@withContext ttsManager.synthesizeToFile(SynthesisJob(id, message))
+        }
+    }
+
+    private fun checkIsReady() {
+        if (initialSetupComplete &&
+                contacts.isNotEmpty() &&
+                ringtoneStructure.isNotEmpty() &&
+                ttsManager.isEngineReady &&
+                state == State.NOT_READY) {
+            state = State.READY
         }
     }
 
@@ -172,6 +182,20 @@ class RingtoneGenerator(
         }
     }
 
+    fun setContacts(newContacts: List<Contact>) {
+        if (state == State.NOT_READY) {
+            contacts = newContacts
+            checkIsReady()
+        }
+    }
+
+    fun setRingtoneStructure(newStructure: List<StructureItem>) {
+        if (state == State.NOT_READY) {
+            ringtoneStructure = newStructure
+            checkIsReady()
+        }
+    }
+
     fun start() {
         if (state == State.READY) {
             state = State.GENERATING
@@ -205,5 +229,17 @@ class RingtoneGenerator(
         READY,
         GENERATING,
         FINISHED
+    }
+
+    companion object {
+        private var INSTANCE: RingtoneGenerator? = null
+
+        fun get(context: Context): RingtoneGenerator {
+            synchronized(this) {
+                if (INSTANCE == null)
+                    INSTANCE = RingtoneGenerator(context)
+                return INSTANCE!!
+            }
+        }
     }
 }

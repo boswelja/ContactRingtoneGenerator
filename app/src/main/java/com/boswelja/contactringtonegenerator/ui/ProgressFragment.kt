@@ -21,7 +21,6 @@ class ProgressFragment :
     private val dataModel: WizardDataViewModel by activityViewModels()
 
     private lateinit var binding: FragmentProgressBinding
-    private lateinit var ringtoneGenerator: RingtoneGenerator
 
     private var successCount = 0
     private var failCount = 0
@@ -30,7 +29,7 @@ class ProgressFragment :
         Timber.d("onStateChanged($state)")
         when (state) {
             RingtoneGenerator.State.READY -> {
-                ringtoneGenerator.start()
+                dataModel.ringtoneGenerator.start()
             }
             RingtoneGenerator.State.GENERATING -> {
                 binding.apply {
@@ -38,7 +37,7 @@ class ProgressFragment :
                         isIndeterminate = false
                         progress = 0
                         secondaryProgress = 0
-                        max = ringtoneGenerator.totalJobCount
+                        max = dataModel.ringtoneGenerator.totalJobCount
                     }
                     loadingTitle.text = getString(R.string.progress_title_generating)
                     loadingStatus.text = getString(R.string.progress_status_generating)
@@ -76,14 +75,10 @@ class ProgressFragment :
 
     override fun onStart() {
         super.onStart()
-        ringtoneGenerator = dataModel.createRingtoneGenerator(requireContext()).apply {
+        dataModel.ringtoneGenerator.apply {
             progressListener = this@ProgressFragment
             stateListener = this@ProgressFragment
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        ringtoneGenerator.destroy()
+        dataModel.startGenerating()
     }
 }
