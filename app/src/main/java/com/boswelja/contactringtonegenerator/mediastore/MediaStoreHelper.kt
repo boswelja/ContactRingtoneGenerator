@@ -63,6 +63,7 @@ object MediaStoreHelper {
                         contentResolver.update(it, values, null, null)
                     }
                 }
+
                 uri
             } catch (e: Exception) {
                 Timber.w(e)
@@ -108,6 +109,11 @@ object MediaStoreHelper {
             Timber.d("Deleting ${fileNames.count()} ringtones")
             try {
                 context.contentResolver.delete(RINGTONE_COLLECTION, "${MediaStore.Audio.Media.DISPLAY_NAME} = ?", fileNames)
+                fileNames.map { File(it) }.forEach {
+                    try {
+                        it.delete()
+                    } catch (ignored: Exception) {}
+                }
             } catch (e: Exception) {
                 Timber.w(e)
             }
