@@ -19,8 +19,9 @@ import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactSel
 
 class ContactPickerFragment : ListFragment(), ContactSelectionListener {
 
-    private val dataModel: WizardDataViewModel by activityViewModels()
+    private val wizardDataModel: WizardDataViewModel by activityViewModels()
     private val viewModel: ContactsViewModel by activityViewModels()
+    private val selectedContacts = ArrayList<Contact>()
     private val searchHandler = Handler(Looper.myLooper()!!)
     private val searchRunnable = Runnable {
         viewModel.filterContacts(searchQuery)
@@ -39,14 +40,14 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     private var searchQuery: CharSequence? = null
 
     override fun onContactDeselected(contactId: Long) {
-        dataModel.selectedContacts.removeAll { it.id == contactId }
+        selectedContacts.removeAll { it.id == contactId }
         widgetBinding.checkBox.isChecked = false
         updateSelectedContactsView()
         updateNextEnabled()
     }
 
     override fun onContactSelected(contactId: Long) {
-        dataModel.selectedContacts.add(viewModel.allContacts.first { it.id == contactId })
+        selectedContacts.add(viewModel.allContacts.first { it.id == contactId })
         updateSelectedContactsView()
         updateNextEnabled()
     }
@@ -88,6 +89,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     override fun onStop() {
         super.onStop()
         removeSubtitle()
+        wizardDataModel.submitSelectedContacts(selectedContacts)
     }
 
     override fun setLoading(loading: Boolean) {
@@ -103,7 +105,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     }
 
     private fun updateContacts(contacts: List<Contact>) {
-        adapter.setSelectedContacts(dataModel.selectedContacts.toList())
+        adapter.setSelectedContacts(selectedContacts.toList())
         adapter.submitList(contacts)
         setLoading(false)
         widgetBinding.apply {
@@ -112,7 +114,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     }
 
     private fun updateSelectedContactsView() {
-        val count = dataModel.selectedContacts.count()
+        val count = selectedContacts.count()
         val activity = requireActivity()
         if (activity is MainActivity) {
             activity.setSubtitle(resources.getQuantityString(R.plurals.selected_contacts_summary, count, count))
@@ -128,7 +130,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
 
     private fun updateNextEnabled() {
         binding.nextButton.apply {
-            isEnabled = dataModel.selectedContacts.isNotEmpty()
+            isEnabled = selectedContacts.isNotEmpty()
             if (isEnabled) extend()
             else shrink()
         }

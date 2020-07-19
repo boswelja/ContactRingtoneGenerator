@@ -1,6 +1,8 @@
 package com.boswelja.contactringtonegenerator.ringtonegen
 
 import android.content.Context
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import com.arthenica.mobileffmpeg.Config
 import com.arthenica.mobileffmpeg.FFmpeg
@@ -50,12 +52,10 @@ class RingtoneGenerator private constructor(private val context: Context) :
     var jobsCompleted: Int = 0
 
     var progressListener: ProgressListener? = null
-    var stateListener: StateListener? = null
-    var state: State = State.NOT_READY
-        private set(value) {
-            field = value
-            stateListener?.onStateChanged(value)
-        }
+
+    private val _state = MutableLiveData(State.NOT_READY)
+    val state: LiveData<State>
+        get() = _state
 
     init {
         ttsManager.apply {
@@ -101,14 +101,14 @@ class RingtoneGenerator private constructor(private val context: Context) :
                 contacts.isNotEmpty() &&
                 ringtoneStructure.isNotEmpty() &&
                 ttsManager.isEngineReady &&
-                state == State.NOT_READY) {
-            state = State.READY
+                _state.value == State.NOT_READY) {
+            _state.postValue(State.READY)
         }
     }
 
     private fun handleJobCompleted() {
         jobsCompleted += 1
-        if (jobsCompleted >= totalJobCount) state = State.FINISHED
+        if (jobsCompleted >= totalJobCount) _state.postValue(State.FINISHED)
     }
 
     private fun createJobFor(contact: Contact): Job {
@@ -183,22 +183,22 @@ class RingtoneGenerator private constructor(private val context: Context) :
     }
 
     fun setContacts(newContacts: List<Contact>) {
-        if (state == State.NOT_READY) {
+        if (_state.value == State.NOT_READY) {
             contacts = newContacts
             checkIsReady()
         }
     }
 
     fun setRingtoneStructure(newStructure: List<StructureItem>) {
-        if (state == State.NOT_READY) {
+        if (_state.value == State.NOT_READY) {
             ringtoneStructure = newStructure
             checkIsReady()
         }
     }
 
     fun start() {
-        if (state == State.READY) {
-            state = State.GENERATING
+        if (_state.value == State.READY) {
+            _state.postValue(State.GENERATING)
             coroutineScope.launch {
                 contacts.forEach {
                     createJobFor(it)
@@ -213,10 +213,6 @@ class RingtoneGenerator private constructor(private val context: Context) :
         ttsManager.destroy()
         cacheDir.deleteRecursively()
         generatorJob.cancel()
-    }
-
-    interface StateListener {
-        fun onStateChanged(state: State)
     }
 
     interface ProgressListener {

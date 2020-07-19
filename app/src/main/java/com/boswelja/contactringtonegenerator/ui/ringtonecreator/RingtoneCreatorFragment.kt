@@ -31,7 +31,8 @@ private const val SYSTEM_RINGTONE_REQUEST_CODE = 62932
 
 class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventListener {
 
-    private val dataModel: WizardDataViewModel by activityViewModels()
+    private val ringtoneStructure = ArrayList<StructureItem>()
+    private val wizardDataModel: WizardDataViewModel by activityViewModels()
     private val adapter = RingtoneCreatorAdapter(
         this,
         ActionClickCallback { id, position ->
@@ -80,25 +81,25 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
         }
     }
 
-    private val isDataEmpty: Boolean get() = dataModel.ringtoneStructure.isEmpty()
+    private val isDataEmpty: Boolean get() = ringtoneStructure.isEmpty()
     private var isDataValid: Boolean = true
 
     private lateinit var binding: FragmentRingtoneCreatorBinding
 
     override fun onItemAdded(item: StructureItem) {
-        dataModel.ringtoneStructure.add(item)
+        ringtoneStructure.add(item)
         updateNoDataViewVisibility()
         binding.messageBuilderView.smoothScrollToPosition(adapter.itemCount - 1)
     }
 
     override fun onItemRemoved(position: Int) {
-        dataModel.ringtoneStructure.removeAt(position)
+        ringtoneStructure.removeAt(position)
         updateNoDataViewVisibility()
     }
 
     override fun onItemMoved(fromPosition: Int, toPosition: Int) {
-        val item = dataModel.ringtoneStructure.removeAt(fromPosition)
-        dataModel.ringtoneStructure.add(toPosition, item)
+        val item = ringtoneStructure.removeAt(fromPosition)
+        ringtoneStructure.add(toPosition, item)
     }
 
     override fun onDataValidityChanged(isDataValid: Boolean) {
@@ -112,7 +113,7 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        adapter.updateItems(dataModel.ringtoneStructure)
+        adapter.updateItems(ringtoneStructure)
         setupAvailableMessageItems()
         setupMessageCreatorView()
         updateNextButtonEnabled()
@@ -133,6 +134,11 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
             }
             else -> super.onActivityResult(requestCode, resultCode, data)
         }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        wizardDataModel.submitRingtoneStructure(ringtoneStructure)
     }
 
     private fun setupMessageCreatorView() {
