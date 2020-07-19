@@ -12,7 +12,7 @@ import org.junit.Assert.* // ktlint-disable
 import org.junit.Before
 import org.junit.Test
 import java.util.concurrent.TimeUnit
-import kotlin.reflect.KProperty0
+import kotlin.reflect.KFunction0
 
 class RingtoneGeneratorTest {
 
@@ -28,8 +28,6 @@ class RingtoneGeneratorTest {
 
     @MockK
     lateinit var progressListener: RingtoneGenerator.ProgressListener
-    @MockK
-    lateinit var stateListener: RingtoneGenerator.StateListener
 
     private lateinit var context: Context
 
@@ -41,42 +39,22 @@ class RingtoneGeneratorTest {
 
     @Test
     fun testTotalJobCount() {
-        val ringtoneGenerator = RingtoneGenerator(context, testRingtoneStructure, testContacts)
+        val ringtoneGenerator = createRingtoneGenerator()
 
-        awaitState(TimeUnit.SECONDS.toMillis(10), ringtoneGenerator::state, RingtoneGenerator.State.READY)
+        awaitState(TimeUnit.SECONDS.toMillis(10), ringtoneGenerator.state::getValue, RingtoneGenerator.State.READY)
         assertEquals(TRUE_JOB_COUNT, ringtoneGenerator.totalJobCount)
         ringtoneGenerator.destroy()
     }
 
     @Test
-    fun testStateListener() {
-        val ringtoneGenerator = RingtoneGenerator(context, testRingtoneStructure, testContacts)
-        ringtoneGenerator.stateListener = stateListener
-
-        assertEquals(RingtoneGenerator.State.NOT_READY, ringtoneGenerator.state)
-
-        awaitState(TimeUnit.SECONDS.toMillis(10), ringtoneGenerator::state, RingtoneGenerator.State.READY)
-        verify(exactly = 1) { stateListener.onStateChanged(RingtoneGenerator.State.READY) }
-
-        ringtoneGenerator.start()
-        verify(exactly = 1) { stateListener.onStateChanged(RingtoneGenerator.State.GENERATING) }
-
-        awaitState(TimeUnit.SECONDS.toMillis(30), ringtoneGenerator::state, RingtoneGenerator.State.FINISHED)
-        verify(exactly = 1) { stateListener.onStateChanged(RingtoneGenerator.State.FINISHED) }
-
-        confirmVerified(stateListener)
-        ringtoneGenerator.destroy()
-    }
-
-    @Test
     fun testProgressListener() {
-        val ringtoneGenerator = RingtoneGenerator(context, testRingtoneStructure, testContacts)
+        val ringtoneGenerator = createRingtoneGenerator()
         ringtoneGenerator.progressListener = progressListener
 
-        awaitState(TimeUnit.SECONDS.toMillis(10), ringtoneGenerator::state, RingtoneGenerator.State.READY)
+        awaitState(TimeUnit.SECONDS.toMillis(10), ringtoneGenerator.state::getValue, RingtoneGenerator.State.READY)
         ringtoneGenerator.start()
 
-        awaitState(TimeUnit.SECONDS.toMillis(30), ringtoneGenerator::state, RingtoneGenerator.State.FINISHED)
+        awaitState(TimeUnit.SECONDS.toMillis(30), ringtoneGenerator.state::getValue, RingtoneGenerator.State.FINISHED)
         testContacts.forEach {
             verify(exactly = 1) { progressListener.onJobStarted(it) }
         }
@@ -86,14 +64,20 @@ class RingtoneGeneratorTest {
         ringtoneGenerator.destroy()
     }
 
-    private fun awaitState(atMost: Long, actual: KProperty0<RingtoneGenerator.State>, expected: RingtoneGenerator.State) {
+    private fun awaitState(atMost: Long, actual: KFunction0<RingtoneGenerator.State?>, expected: RingtoneGenerator.State) {
         val startTime = System.currentTimeMillis()
         var currentTime = System.currentTimeMillis()
-        while (actual.get() != expected && (currentTime - startTime) < atMost) {
+        while (actual.invoke() != expected && (currentTime - startTime) < atMost) {
             currentTime = System.currentTimeMillis()
             continue
         }
     }
+
+    private fun createRingtoneGenerator(): RingtoneGenerator =
+            RingtoneGenerator.get(context).apply {
+                setContacts(testContacts)
+                setRingtoneStructure(testRingtoneStructure)
+            }
 
     companion object {
         private const val TEST_CONTACTS_COUNT = 3
