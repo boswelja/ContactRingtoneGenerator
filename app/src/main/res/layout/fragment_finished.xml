@@ -25,7 +25,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="@string/finished_title_unknown"
-        style="@style/WizardTextTitle" />
+        style="@style/WizardTitle" />
 
     <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/status_description"
@@ -34,7 +34,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         tools:text="@string/finished_status_unknown"
-        style="@style/WizardTextStatus" />
+        style="@style/WizardStatus" />
 
     <com.google.android.material.floatingactionbutton.ExtendedFloatingActionButton
         android:id="@+id/finish_button"
