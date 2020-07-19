@@ -18,6 +18,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Semaphore
+import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
@@ -41,6 +43,7 @@ class RingtoneGenerator(
         } else {
             CoroutineScope(Dispatchers.Default + generatorJob)
         }
+    private val semaphore = Semaphore(if (multithreaded) Runtime.getRuntime().availableProcessors() else 1)
 
     private val cacheDir: File = context.cacheDir
     private val ttsManager = TtsManager(context)
@@ -106,18 +109,47 @@ class RingtoneGenerator(
     private fun createJobFor(contact: Contact): Job {
         Timber.d("createJobFor($contact)")
         return coroutineScope.launch {
-            withContext(Dispatchers.Main) {
-                progressListener?.onJobStarted(contact)
-            }
-            var workingString = ""
-            var commandInputs = ""
-            var filterInputs = ""
-            var filters = ""
-            val cacheFiles = ArrayList<File>()
-            var trueFileCount = 0
-            ringtoneStructure.forEach {
-                if (it !is TextItem && workingString.isNotEmpty()) {
-                    Timber.i("End of TTS block, synthesizing")
+            semaphore.withPermit {
+                withContext(Dispatchers.Main) {
+                    progressListener?.onJobStarted(contact)
+                }
+                var workingString = ""
+                var commandInputs = ""
+                var filterInputs = ""
+                var filters = ""
+                val cacheFiles = ArrayList<File>()
+                var trueFileCount = 0
+                ringtoneStructure.forEach {
+                    if (it !is TextItem && workingString.isNotEmpty()) {
+                        Timber.i("End of TTS block, synthesizing")
+                        val result = synthesizeString(workingString, contact)
+                        cacheFiles.add(result.result)
+                        val filter = "[a$trueFileCount]"
+                        filterInputs += "[$trueFileCount:0]volume=$volumeMultiplier$filter;"
+                        filters += filter
+                        trueFileCount += 1
+                        commandInputs += " -i ${result.result.absolutePath}"
+                        workingString = ""
+                    }
+                    when (it) {
+                        is AudioItem -> {
+                            Timber.i("Got AudioItem")
+                            val parcelFileDescriptor = context.contentResolver.openFileDescriptor(it.audioUri!!, "r")
+                            val path = String.format("pipe:%d", parcelFileDescriptor?.fd)
+                            val filter = "[a$trueFileCount]"
+                            filterInputs += "[$trueFileCount:0]volume=$volumeMultiplier$filter;"
+                            filters += filter
+                            trueFileCount += 1
+                            commandInputs += " -i $path"
+                        }
+                        is TextItem -> {
+                            Timber.i("Got TextItem")
+                            workingString += it.getEngineText()
+                        }
+                    }
+                }
+                if (workingString.isNotEmpty()) {
+                    Timber.i("TTS working string not empty, synthesizing")
                     val result = synthesizeString(workingString, contact)
                     cacheFiles.add(result.result)
                     val filter = "[a$trueFileCount]"
@@ -127,56 +159,31 @@ class RingtoneGenerator(
                     commandInputs += " -i ${result.result.absolutePath}"
                     workingString = ""
                 }
-                when (it) {
-                    is AudioItem -> {
-                        Timber.i("Got AudioItem")
-                        val parcelFileDescriptor = context.contentResolver.openFileDescriptor(it.audioUri!!, "r")
-                        val path = String.format("pipe:%d", parcelFileDescriptor?.fd)
-                        val filter = "[a$trueFileCount]"
-                        filterInputs += "[$trueFileCount:0]volume=$volumeMultiplier$filter;"
-                        filters += filter
-                        trueFileCount += 1
-                        commandInputs += " -i $path"
-                    }
-                    is TextItem -> {
-                        Timber.i("Got TextItem")
-                        workingString += it.getEngineText()
-                    }
-                }
-            }
-            if (workingString.isNotEmpty()) {
-                Timber.i("TTS working string not empty, synthesizing")
-                val result = synthesizeString(workingString, contact)
-                cacheFiles.add(result.result)
-                val filter = "[a$trueFileCount]"
-                filterInputs += "[$trueFileCount:0]volume=$volumeMultiplier$filter;"
-                filters += filter
-                trueFileCount += 1
-                commandInputs += " -i ${result.result.absolutePath}"
-                workingString = ""
-            }
 
-            Timber.d("Got $trueFileCount files")
-            val output = File(cacheDir, "${contact.displayName.replace(" ", "-")}.ogg")
-            cacheFiles.add(output)
-            val command = "$commandInputs -filter_complex '${filterInputs}${filters}concat=n=$trueFileCount:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
-            Timber.i("ffmpeg $command")
-            val result = FFmpeg.execute(command)
-            val generateSuccess = result == Config.RETURN_CODE_SUCCESS
-            val success = if (generateSuccess) handleGenerateCompleted(contact, output) else false
-            withContext(Dispatchers.Main) {
-                progressListener?.onJobCompleted(success, contact)
+                Timber.d("Got $trueFileCount files")
+                val output = File(cacheDir, "${contact.displayName.replace(" ", "-")}.ogg")
+                cacheFiles.add(output)
+                val command = "$commandInputs -filter_complex '${filterInputs}${filters}concat=n=$trueFileCount:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
+                Timber.i("ffmpeg $command")
+                val result = FFmpeg.execute(command)
+                val generateSuccess = result == Config.RETURN_CODE_SUCCESS
+                val success = if (generateSuccess) handleGenerateCompleted(contact, output) else false
+                withContext(Dispatchers.Main) {
+                    progressListener?.onJobCompleted(success, contact)
+                }
+                cacheFiles.forEach { it.delete() }
+                handleJobCompleted()
             }
-            cacheFiles.forEach { it.delete() }
-            handleJobCompleted()
         }
     }
 
     fun start() {
         if (state == State.READY) {
             state = State.GENERATING
-            contacts.forEach {
-                createJobFor(it)
+            coroutineScope.launch {
+                contacts.forEach {
+                    createJobFor(it)
+                }
             }
         } else {
             throw IllegalStateException("Generator not ready")
