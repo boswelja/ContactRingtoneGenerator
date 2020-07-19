@@ -6,6 +6,7 @@ import android.os.Looper
 import android.view.View
 import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.boswelja.contactringtonegenerator.R
@@ -20,7 +21,8 @@ import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactSel
 class ContactPickerFragment : ListFragment(), ContactSelectionListener {
 
     private val wizardDataModel: WizardDataViewModel by activityViewModels()
-    private val viewModel: ContactsViewModel by activityViewModels()
+    private val viewModel: ContactsViewModel by viewModels()
+
     private val selectedContacts = ArrayList<Contact>()
     private val searchHandler = Handler(Looper.myLooper()!!)
     private val searchRunnable = Runnable {
