@@ -74,10 +74,10 @@ class RingtoneGeneratorTest {
     }
 
     private fun createRingtoneGenerator(): RingtoneGenerator =
-            RingtoneGenerator.get(context).apply {
-                setContacts(testContacts)
-                setRingtoneStructure(testRingtoneStructure)
-            }
+        RingtoneGenerator.get(context).apply {
+            setContacts(testContacts)
+            setRingtoneStructure(testRingtoneStructure)
+        }
 
     companion object {
         private const val TEST_CONTACTS_COUNT = 3
