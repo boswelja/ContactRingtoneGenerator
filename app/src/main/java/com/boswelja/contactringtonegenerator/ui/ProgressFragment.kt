@@ -32,6 +32,7 @@ class ProgressFragment :
             RingtoneGenerator.State.GENERATING -> {
                 binding.apply {
                     progressBar.apply {
+                        isIndeterminate = false
                         progress = 0
                         secondaryProgress = 0
                         max = ringtoneGenerator.totalJobCount
@@ -55,18 +56,12 @@ class ProgressFragment :
 
     override fun onJobStarted(contact: Contact) {
         Timber.d("onJobStarted($contact)")
+        binding.progressBar.secondaryProgress += 1
     }
 
     override fun onJobCompleted(success: Boolean, contact: Contact) {
         Timber.d("onJobCompleted($success, $contact)")
-        binding.progressBar.apply {
-            isIndeterminate = false
-            if (success) {
-                incrementProgress()
-            } else {
-                secondaryProgress += 1
-            }
-        }
+        binding.progressBar.progress += 1
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -87,10 +82,4 @@ class ProgressFragment :
         ringtoneGenerator.destroy()
     }
 
-    private fun incrementProgress() {
-        binding.progressBar.apply {
-            progress += 1
-            secondaryProgress += 1
-        }
-    }
 }
