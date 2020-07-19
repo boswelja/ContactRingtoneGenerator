@@ -36,13 +36,8 @@ class RingtoneGenerator(
     private val volumeMultiplier: Float =
         (sharedPreferences.getInt("volume_boost", 0) + 10) / 10.0f
 
-    private val generatorJob by lazy { Job() }
-    private val coroutineScope =
-        if (multithreaded) {
-            CoroutineScope(Dispatchers.Default)
-        } else {
-            CoroutineScope(Dispatchers.Default + generatorJob)
-        }
+    private val generatorJob = Job()
+    private val coroutineScope = CoroutineScope(Dispatchers.Default + generatorJob)
     private val semaphore = Semaphore(if (multithreaded) Runtime.getRuntime().availableProcessors() else 1)
 
     private val cacheDir: File = context.cacheDir
@@ -193,7 +188,7 @@ class RingtoneGenerator(
     fun destroy() {
         ttsManager.destroy()
         cacheDir.deleteRecursively()
-        if (!multithreaded) generatorJob.cancel()
+        generatorJob.cancel()
     }
 
     interface StateListener {
