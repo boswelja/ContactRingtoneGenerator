@@ -28,9 +28,9 @@ class WizardDataViewModel(application: Application) : AndroidViewModel(applicati
     }
 
     private val ringtoneGenerator: RingtoneGenerator =
-            RingtoneGenerator.get(application).apply {
-                progressListener = generatorProgressListener
-            }
+        RingtoneGenerator.get(application).apply {
+            progressListener = generatorProgressListener
+        }
 
     private val _startedJobCount = MutableLiveData(0)
     private val _successCount = MutableLiveData(0)

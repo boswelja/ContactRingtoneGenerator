@@ -28,7 +28,7 @@ import java.io.File
 import java.util.concurrent.atomic.AtomicInteger
 
 class RingtoneGenerator private constructor(private val context: Context) :
-        TtsManager.EngineEventListener {
+    TtsManager.EngineEventListener {
 
     private var ringtoneStructure: List<StructureItem> = emptyList()
     private var contacts: List<Contact> = emptyList()
@@ -98,10 +98,11 @@ class RingtoneGenerator private constructor(private val context: Context) :
 
     private fun checkIsReady() {
         if (initialSetupComplete &&
-                contacts.isNotEmpty() &&
-                ringtoneStructure.isNotEmpty() &&
-                ttsManager.isEngineReady &&
-                _state.value == State.NOT_READY) {
+            contacts.isNotEmpty() &&
+            ringtoneStructure.isNotEmpty() &&
+            ttsManager.isEngineReady &&
+            _state.value == State.NOT_READY
+        ) {
             _state.postValue(State.READY)
         }
     }
