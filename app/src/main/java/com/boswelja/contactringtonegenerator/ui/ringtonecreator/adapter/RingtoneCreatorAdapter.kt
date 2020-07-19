@@ -51,15 +51,19 @@ class RingtoneCreatorAdapter(
         if (!item.isUserAdjustable) setIsDataValid(position, true)
     }
 
+    private fun notifyDataValidityChanged() {
+        dataListener.onDataValidityChanged(itemValidList.isNotEmpty() && itemValidList.all { it })
+    }
+
     fun setIsDataValid(position: Int, isValid: Boolean) {
         if (position in itemValidList.indices) {
             if (itemValidList[position] != isValid) {
                 itemValidList[position] = isValid
-                dataListener.onDataValidityChanged(itemValidList.none { !it })
+                notifyDataValidityChanged()
             }
         } else {
             itemValidList.add(position, isValid)
-            dataListener.onDataValidityChanged(itemValidList.none { !it })
+            notifyDataValidityChanged()
         }
     }
 
@@ -90,7 +94,7 @@ class RingtoneCreatorAdapter(
         itemValidList.add(toPosition, isDataValid)
         notifyItemMoved(fromPosition, toPosition)
         dataListener.onItemMoved(fromPosition, toPosition)
-        dataListener.onDataValidityChanged(itemValidList.none { !it })
+        notifyDataValidityChanged()
     }
 
     fun removeItem(position: Int) {
@@ -98,7 +102,7 @@ class RingtoneCreatorAdapter(
         itemValidList.removeAt(position)
         notifyItemRemoved(position)
         dataListener.onItemRemoved(position)
-        dataListener.onDataValidityChanged(itemValidList.none { !it })
+        notifyDataValidityChanged()
     }
 
     fun updateItems(newItems: List<StructureItem>) {
