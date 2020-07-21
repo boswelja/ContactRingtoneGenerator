@@ -18,7 +18,7 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.AudioItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
 import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
-import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
+import com.boswelja.contactringtonegenerator.ui.WizardViewModel
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.ActionClickCallback
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.AdapterGestureHelper
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.RingtoneCreatorAdapter
@@ -32,7 +32,7 @@ private const val SYSTEM_RINGTONE_REQUEST_CODE = 62932
 
 class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventListener {
 
-    private val wizardDataModel: WizardDataViewModel by activityViewModels()
+    private val wizardModel: WizardViewModel by activityViewModels()
     private val viewModel: RingtoneCreatorViewModel by viewModels()
 
     private val adapter = RingtoneCreatorAdapter(
@@ -140,7 +140,7 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
 
     override fun onStop() {
         super.onStop()
-        wizardDataModel.submitRingtoneStructure(viewModel.ringtoneStructure)
+        wizardModel.submitRingtoneStructure(viewModel.ringtoneStructure)
     }
 
     private fun setupMessageBuilderView() {

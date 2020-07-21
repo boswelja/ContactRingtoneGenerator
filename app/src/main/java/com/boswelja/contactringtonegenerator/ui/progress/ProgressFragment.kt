@@ -11,12 +11,12 @@ import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.databinding.FragmentProgressBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
 import com.boswelja.contactringtonegenerator.ui.ProgressFragmentDirections
-import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
+import com.boswelja.contactringtonegenerator.ui.WizardViewModel
 
 class ProgressFragment :
     Fragment() {
 
-    private val wizardViewModel: WizardDataViewModel by activityViewModels()
+    private val wizardViewModel: WizardViewModel by activityViewModels()
 
     private lateinit var binding: FragmentProgressBinding
 

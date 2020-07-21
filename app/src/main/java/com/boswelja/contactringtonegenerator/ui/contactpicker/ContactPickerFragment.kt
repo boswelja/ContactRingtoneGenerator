@@ -13,14 +13,14 @@ import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.databinding.ContactPickerWidgetBinding
 import com.boswelja.contactringtonegenerator.ui.MainActivity
-import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
+import com.boswelja.contactringtonegenerator.ui.WizardViewModel
 import com.boswelja.contactringtonegenerator.ui.common.ListFragment
 import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactPickerAdapter
 import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactSelectionListener
 
 class ContactPickerFragment : ListFragment(), ContactSelectionListener {
 
-    private val wizardDataModel: WizardDataViewModel by activityViewModels()
+    private val wizardModel: WizardViewModel by activityViewModels()
     private val viewModel: ContactsViewModel by viewModels()
 
     private val selectedContacts = ArrayList<Contact>()
@@ -91,7 +91,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     override fun onStop() {
         super.onStop()
         removeSubtitle()
-        wizardDataModel.submitSelectedContacts(selectedContacts)
+        wizardModel.submitSelectedContacts(selectedContacts)
     }
 
     override fun setLoading(loading: Boolean) {

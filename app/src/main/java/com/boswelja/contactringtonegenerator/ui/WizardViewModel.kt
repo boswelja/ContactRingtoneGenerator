@@ -8,7 +8,7 @@ import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 
-class WizardDataViewModel(application: Application) : AndroidViewModel(application) {
+class WizardViewModel(application: Application) : AndroidViewModel(application) {
 
     private val generatorProgressListener = object : RingtoneGenerator.ProgressListener {
         override fun onJobStarted(contact: Contact) {
