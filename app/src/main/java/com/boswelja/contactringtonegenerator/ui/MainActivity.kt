@@ -31,7 +31,7 @@ class MainActivity : AppCompatActivity() {
         val navController = supportFragmentManager.findFragmentById(R.id.nav_host_fragment_container)?.findNavController()
         if (navController != null) {
             val appBarConfiguration = AppBarConfiguration(
-                setOf(R.id.getStartedFragment, R.id.loadingFragment, R.id.finishedFragment)
+                setOf(R.id.getStartedFragment, R.id.loadingFragment, R.id.resultsFragment)
             )
             binding.toolbar.apply {
                 setupWithNavController(navController, appBarConfiguration)

@@ -59,7 +59,7 @@
         tools:layout="@layout/fragment_progress" >
         <action
             android:id="@+id/to_finishedFragment"
-            app:destination="@id/finishedFragment"
+            app:destination="@id/resultsFragment"
             app:enterAnim="@anim/slide_in_right"
             app:exitAnim="@anim/slide_out_left"
             app:popEnterAnim="@anim/slide_in_left"
@@ -72,7 +72,7 @@
         android:name="com.boswelja.contactringtonegenerator.ui.settings.SettingsFragment"
         android:label="@string/settings_title" />
     <fragment
-        android:id="@+id/finishedFragment"
+        android:id="@+id/resultsFragment"
         android:name="com.boswelja.contactringtonegenerator.ui.results.ResultsFragment"
         tools:layout="@layout/fragment_results" >
         <argument

@@ -31,14 +31,14 @@
     <string name="progress_status_getting_ready">Preparing to create your Ringtones</string>
     <string name="progress_status_generating">Creating your new ringtones</string>
 
-    <string name="finished_title_success">Success</string>
-    <string name="finished_title_mixed">Partial Success</string>
-    <string name="finished_title_error">Failed</string>
-    <string name="finished_title_unknown">Unknown</string>
-    <string name="finished_status_success">Applied %s contact\'s ringtones</string>
-    <string name="finished_status_mixed">Applied %s contact ringtones,\nFailed to create %s ringtones</string>
-    <string name="finished_status_error">Failed to create %s ringtones</string>
-    <string name="finished_status_unknown">Status unknown</string>
+    <string name="result_success_title">Success</string>
+    <string name="result_success_status">All ringtones successfully created &amp; applied</string>
+    <string name="result_mixed_title">Partial Success</string>
+    <string name="result_mixed_status">Failed to create some ringtones</string>
+    <string name="result_failed_title">Failed</string>
+    <string name="result_failed_status">Failed to create all ringtones</string>
+    <string name="result_unknown_title">Unknown</string>
+    <string name="result_unknown_status">Status unknown</string>
 
     <string name="ringtone_creator_no_content">Choose an item below to start building your ringtone</string>
 
