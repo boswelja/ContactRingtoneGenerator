@@ -26,6 +26,7 @@ class ProgressFragment :
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         wizardViewModel.generatorState.observe(viewLifecycleOwner) { state ->
             when (state) {
+                RingtoneGenerator.State.NOT_READY -> wizardViewModel.initialiseGenerator()
                 RingtoneGenerator.State.READY -> wizardViewModel.startGenerating()
                 RingtoneGenerator.State.GENERATING -> onGenerateStarted()
                 RingtoneGenerator.State.FINISHED -> navigateNext()

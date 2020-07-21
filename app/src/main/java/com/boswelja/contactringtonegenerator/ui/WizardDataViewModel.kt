@@ -47,10 +47,12 @@ class WizardDataViewModel(application: Application) : AndroidViewModel(applicati
     val failCount: LiveData<Int>
         get() = _failCount
 
+    fun initialiseGenerator() {
+        ringtoneGenerator.initialise()
+    }
+
     fun startGenerating() {
-        if (ringtoneGenerator.state.value == RingtoneGenerator.State.READY) {
-            ringtoneGenerator.start()
-        }
+        ringtoneGenerator.start()
     }
 
     fun submitSelectedContacts(selectedContacts: List<Contact>) {

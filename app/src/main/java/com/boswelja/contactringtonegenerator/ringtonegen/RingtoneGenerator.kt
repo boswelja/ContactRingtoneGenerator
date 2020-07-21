@@ -1,6 +1,7 @@
 package com.boswelja.contactringtonegenerator.ringtonegen
 
 import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
@@ -25,6 +26,7 @@ import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.File
+import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicInteger
 
 class RingtoneGenerator private constructor(private val context: Context) :
@@ -43,6 +45,7 @@ class RingtoneGenerator private constructor(private val context: Context) :
     private val semaphore = Semaphore(if (multithreaded) Runtime.getRuntime().availableProcessors() else 1)
 
     private val cacheDir: File = context.cacheDir
+    private val audioItemPaths = HashMap<Uri, String>()
     private val ttsManager = TtsManager(context)
     private val counter = AtomicInteger()
 
@@ -61,10 +64,6 @@ class RingtoneGenerator private constructor(private val context: Context) :
         ttsManager.apply {
             engineEventListener = this@RingtoneGenerator
         }
-        coroutineScope.launch {
-            initialSetupComplete = true
-            checkIsReady()
-        }
     }
 
     override fun onInitialised(success: Boolean) {
@@ -79,6 +78,39 @@ class RingtoneGenerator private constructor(private val context: Context) :
                 ContactsHelper.setContactRingtone(context, contact, uri)
                 true
             } else false
+        }
+    }
+
+    fun initialise() {
+        if (!initialSetupComplete) {
+            coroutineScope.launch {
+                saveAudioItems()
+                initialSetupComplete = true
+                checkIsReady()
+            }
+        }
+    }
+
+    private suspend fun saveAudioItems() {
+        Timber.d("saveAudioItem() called")
+        withContext(Dispatchers.IO) {
+            ringtoneStructure.filterIsInstance(AudioItem::class.java).forEach { item ->
+                Timber.i("Found AudioItem with uri ${item.audioUri}")
+                item.audioUri?.let { uri ->
+                    context.contentResolver.openInputStream(uri).use { inStream ->
+                        val outFile = File(cacheDir, item.displayText!!)
+                        Timber.i("Saving $uri to ${outFile.absolutePath}")
+                        FileOutputStream(outFile).use { outStream ->
+                            val buffer = ByteArray(4 * 1024)
+                            var read: Int
+                            while (inStream!!.read(buffer).also { read = it } != -1) {
+                                outStream.write(buffer, 0, read)
+                            }
+                        }
+                        audioItemPaths[uri] = outFile.absolutePath
+                    }
+                }
+            }
         }
     }
 
@@ -140,8 +172,8 @@ class RingtoneGenerator private constructor(private val context: Context) :
                     when (it) {
                         is AudioItem -> {
                             Timber.i("Got AudioItem")
-                            val parcelFileDescriptor = context.contentResolver.openFileDescriptor(it.audioUri!!, "r")
-                            val path = String.format("pipe:%d", parcelFileDescriptor?.fd)
+                            val uri = it.audioUri!!
+                            val path = audioItemPaths[uri]
                             val filter = "[a$trueFileCount]"
                             filterInputs += "[$trueFileCount:0]volume=$volumeMultiplier$filter;"
                             filters += filter
