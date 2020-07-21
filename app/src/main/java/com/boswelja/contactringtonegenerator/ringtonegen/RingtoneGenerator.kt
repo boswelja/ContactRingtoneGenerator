@@ -29,7 +29,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.concurrent.atomic.AtomicInteger
 
-class RingtoneGenerator private constructor(private val context: Context) :
+class RingtoneGenerator(private val context: Context) :
     TtsManager.EngineEventListener {
 
     private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
@@ -243,7 +243,6 @@ class RingtoneGenerator private constructor(private val context: Context) :
         ttsManager.destroy()
         cacheDir.deleteRecursively()
         generatorJob.cancel()
-        INSTANCE = null
     }
 
     interface ProgressListener {
@@ -256,17 +255,5 @@ class RingtoneGenerator private constructor(private val context: Context) :
         READY,
         GENERATING,
         FINISHED
-    }
-
-    companion object {
-        private var INSTANCE: RingtoneGenerator? = null
-
-        fun get(context: Context): RingtoneGenerator {
-            synchronized(this) {
-                if (INSTANCE == null)
-                    INSTANCE = RingtoneGenerator(context)
-                return INSTANCE!!
-            }
-        }
     }
 }
