@@ -9,10 +9,9 @@ import com.boswelja.contactringtonegenerator.contacts.Contact
 
 class ContactPickerAdapter(
     private val useNicknames: Boolean,
-    private val selectionListener: ContactSelectionListener
+    private val selectionListener: ContactSelectionListener,
+    private val selectedContacts: HashMap<Long, Boolean> = HashMap()
 ) : ListAdapter<Contact, ContactViewHolder>(ContactDiffCallback()) {
-
-    private val selectedContacts = HashMap<Long, Boolean>()
 
     private val selectionCallback = object : SelectionCallback {
         override fun onSelected(contact: Contact, isSelected: Boolean) {
