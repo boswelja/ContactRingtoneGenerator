@@ -34,7 +34,7 @@
             android:key="multithreaded_generation"
             android:title="@string/multithread_title"
             android:summary="@string/multithread_summary"
-            android:defaultValue="false" />
+            android:defaultValue="true" />
 
     </androidx.preference.PreferenceCategory>
 

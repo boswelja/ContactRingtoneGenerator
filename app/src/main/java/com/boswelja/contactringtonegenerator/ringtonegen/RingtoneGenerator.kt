@@ -33,7 +33,7 @@ class RingtoneGenerator private constructor(private val context: Context) :
     TtsManager.EngineEventListener {
 
     private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
-    private val multithreaded = sharedPreferences.getBoolean("multithreaded_generation", false)
+    private val multithreaded = sharedPreferences.getBoolean("multithreaded_generation", true)
     private val volumeMultiplier: Float =
         (sharedPreferences.getInt("volume_boost", 0) + 10) / 10.0f
 

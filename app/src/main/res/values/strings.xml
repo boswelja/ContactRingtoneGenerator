@@ -22,7 +22,7 @@
     <string name="volume_boost_title">Boost Ringtone Volume</string>
     <string name="volume_boost_summary">Boost the volume of all generated ringtones. This can cause audio issues if set incorrectly.\nCurrently set to %.1fx</string>
     <string name="multithread_title">Multithreaded Generation</string>
-    <string name="multithread_summary">Enable multithreaded ringtone generation, which can significantly speed up generation.\nWARNING: This is known to cause problems, especially when adding your own audio to the ringtone builder.</string>
+    <string name="multithread_summary">Cann significantly speed up ringtone generation.\nDisable this if you have reliability issues.</string>
 
     <string name="contact_picker_title">Select Contacts</string>
 
