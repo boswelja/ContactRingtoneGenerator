@@ -14,7 +14,7 @@ android {
         applicationId = "com.boswelja.contactringtonegenerator"
         minSdkVersion(AndroidSdk.min)
         targetSdkVersion(AndroidSdk.target)
-        versionCode = 8
+        versionCode = 9
         versionName = "2.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
