@@ -27,10 +27,11 @@ class WizardViewModel(application: Application) : AndroidViewModel(application) 
         }
     }
 
-    private val ringtoneGenerator: RingtoneGenerator =
+    private val ringtoneGenerator: RingtoneGenerator by lazy {
         RingtoneGenerator.get(application).apply {
             progressListener = generatorProgressListener
         }
+    }
 
     private val _startedJobCount = MutableLiveData(0)
     private val _successCount = MutableLiveData(0)
