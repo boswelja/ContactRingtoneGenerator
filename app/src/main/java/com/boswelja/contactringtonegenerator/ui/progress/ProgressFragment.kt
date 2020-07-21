@@ -10,7 +10,6 @@ import androidx.navigation.fragment.findNavController
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.databinding.FragmentProgressBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
-import com.boswelja.contactringtonegenerator.ui.ProgressFragmentDirections
 import com.boswelja.contactringtonegenerator.ui.WizardViewModel
 
 class ProgressFragment :
