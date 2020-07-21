@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ui
+package com.boswelja.contactringtonegenerator.ui.entry
 
 import android.Manifest
 import android.content.pm.PackageManager
@@ -9,6 +9,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.boswelja.contactringtonegenerator.databinding.FragmentGetStartedBinding
+import com.boswelja.contactringtonegenerator.ui.GetStartedFragmentDirections
+import com.boswelja.contactringtonegenerator.ui.PermissionSheet
 
 class GetStartedFragment : Fragment() {
 
