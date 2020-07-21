@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ui
+package com.boswelja.contactringtonegenerator.ui.results
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,16 +7,17 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.navArgs
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.databinding.FragmentFinishedBinding
+import com.boswelja.contactringtonegenerator.databinding.FragmentResultsBinding
+import com.boswelja.contactringtonegenerator.ui.FinishedFragmentArgs
 
-class FinishedFragment : Fragment() {
+class ResultsFragment : Fragment() {
 
     private val args: FinishedFragmentArgs by navArgs()
 
-    private lateinit var binding: FragmentFinishedBinding
+    private lateinit var binding: FragmentResultsBinding
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
-        binding = FragmentFinishedBinding.inflate(inflater)
+        binding = FragmentResultsBinding.inflate(inflater)
         return binding.root
     }
 

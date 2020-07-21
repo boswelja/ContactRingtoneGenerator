@@ -73,8 +73,8 @@
         android:label="@string/settings_title" />
     <fragment
         android:id="@+id/finishedFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.FinishedFragment"
-        tools:layout="@layout/fragment_finished" >
+        android:name="com.boswelja.contactringtonegenerator.ui.results.ResultsFragment"
+        tools:layout="@layout/fragment_results" >
         <argument
             android:name="success_count"
             app:argType="integer" />
