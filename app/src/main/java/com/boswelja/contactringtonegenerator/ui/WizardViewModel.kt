@@ -56,12 +56,16 @@ class WizardViewModel(application: Application) : AndroidViewModel(application) 
     }
 
     fun submitSelectedContacts(selectedContacts: List<Contact>) {
-        ringtoneGenerator.setContacts(selectedContacts)
+        ringtoneGenerator.contacts = selectedContacts
     }
 
+    fun getSelectedContacts(): List<Contact> = ringtoneGenerator.contacts
+
     fun submitRingtoneStructure(ringtoneStructure: List<StructureItem>) {
-        ringtoneGenerator.setRingtoneStructure(ringtoneStructure)
+        ringtoneGenerator.ringtoneStructure = ringtoneStructure
     }
+
+    fun getRingtoneStructure(): List<StructureItem> = ringtoneGenerator.ringtoneStructure
 
     override fun onCleared() {
         super.onCleared()

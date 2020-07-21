@@ -32,9 +32,6 @@ import java.util.concurrent.atomic.AtomicInteger
 class RingtoneGenerator private constructor(private val context: Context) :
     TtsManager.EngineEventListener {
 
-    private var ringtoneStructure: List<StructureItem> = emptyList()
-    private var contacts: List<Contact> = emptyList()
-
     private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
     private val multithreaded = sharedPreferences.getBoolean("multithreaded_generation", false)
     private val volumeMultiplier: Float =
@@ -55,6 +52,20 @@ class RingtoneGenerator private constructor(private val context: Context) :
     var jobsCompleted: Int = 0
 
     var progressListener: ProgressListener? = null
+    var contacts: List<Contact> = emptyList()
+        set(value) {
+            if (_state.value == State.NOT_READY) {
+                field = value
+                checkIsReady()
+            }
+        }
+    var ringtoneStructure: List<StructureItem> = emptyList()
+        set(value) {
+            if (_state.value == State.NOT_READY) {
+                field = value
+                checkIsReady()
+            }
+        }
 
     private val _state = MutableLiveData(State.NOT_READY)
     val state: LiveData<State>
@@ -212,20 +223,6 @@ class RingtoneGenerator private constructor(private val context: Context) :
                 cacheFiles.forEach { it.delete() }
                 handleJobCompleted()
             }
-        }
-    }
-
-    fun setContacts(newContacts: List<Contact>) {
-        if (_state.value == State.NOT_READY) {
-            contacts = newContacts
-            checkIsReady()
-        }
-    }
-
-    fun setRingtoneStructure(newStructure: List<StructureItem>) {
-        if (_state.value == State.NOT_READY) {
-            ringtoneStructure = newStructure
-            checkIsReady()
         }
     }
 

@@ -55,18 +55,6 @@ class ContactPickerAdapter(
     }
 
     /**
-     * Sets the currently selected contacts. Note this does not call any listener functions.
-     * @param newSelection The new [List] of [Contact]s to select.
-     */
-    fun setSelectedContacts(newSelection: List<Contact>) {
-        selectedContacts.clear()
-        newSelection.forEach {
-            selectedContacts[it.id] = true
-        }
-        updateAllContactsSelected()
-    }
-
-    /**
      * Selects all [Contact]s in a given list. This will call back to [selectionListener].
      * @param newSelection The [List] of contacts to select.
      */

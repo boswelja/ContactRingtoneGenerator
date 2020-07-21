@@ -23,7 +23,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     private val wizardModel: WizardViewModel by activityViewModels()
     private val viewModel: ContactsViewModel by viewModels()
 
-    private val selectedContacts = ArrayList<Contact>()
+    private val selectedContacts by lazy { ArrayList(wizardModel.getSelectedContacts()) }
     private val searchHandler = Handler(Looper.myLooper()!!)
     private val searchRunnable = Runnable {
         viewModel.filterContacts(searchQuery)
@@ -33,7 +33,8 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
         ContactPickerAdapter(
             PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .getBoolean("use_nicknames", true),
-            this
+            this,
+                HashMap(selectedContacts.map { it.id to true }.toMap())
         )
     }
 
@@ -107,7 +108,6 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
     }
 
     private fun updateContacts(contacts: List<Contact>) {
-        adapter.setSelectedContacts(selectedContacts.toList())
         adapter.submitList(contacts)
         setLoading(false)
         widgetBinding.apply {
