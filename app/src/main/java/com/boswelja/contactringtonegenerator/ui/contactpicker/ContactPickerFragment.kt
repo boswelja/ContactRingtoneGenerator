@@ -34,7 +34,7 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
             PreferenceManager.getDefaultSharedPreferences(requireContext())
                 .getBoolean("use_nicknames", true),
             this,
-                HashMap(selectedContacts.map { it.id to true }.toMap())
+            HashMap(selectedContacts.map { it.id to true }.toMap())
         )
     }
 
