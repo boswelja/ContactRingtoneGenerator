@@ -55,7 +55,7 @@
     </fragment>
     <fragment
         android:id="@+id/loadingFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.ProgressFragment"
+        android:name="com.boswelja.contactringtonegenerator.ui.progress.ProgressFragment"
         tools:layout="@layout/fragment_progress" >
         <action
             android:id="@+id/to_finishedFragment"

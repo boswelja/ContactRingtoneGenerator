@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ui
+package com.boswelja.contactringtonegenerator.ui.progress
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -10,6 +10,8 @@ import androidx.navigation.fragment.findNavController
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.databinding.FragmentProgressBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
+import com.boswelja.contactringtonegenerator.ui.ProgressFragmentDirections
+import com.boswelja.contactringtonegenerator.ui.WizardDataViewModel
 
 class ProgressFragment :
     Fragment() {
@@ -30,9 +32,7 @@ class ProgressFragment :
                 RingtoneGenerator.State.READY -> wizardViewModel.startGenerating()
                 RingtoneGenerator.State.GENERATING -> onGenerateStarted()
                 RingtoneGenerator.State.FINISHED -> navigateNext()
-                else -> {
-                    // Do nothing
-                }
+                else -> {} // Do nothing
             }
         }
 
@@ -46,10 +46,10 @@ class ProgressFragment :
 
     private fun navigateNext() {
         findNavController().navigate(
-            ProgressFragmentDirections.toFinishedFragment(
-                wizardViewModel.successCount.value!!,
-                wizardViewModel.failCount.value!!
-            )
+                ProgressFragmentDirections.toFinishedFragment(
+                        wizardViewModel.successCount.value!!,
+                        wizardViewModel.failCount.value!!
+                )
         )
     }
 
