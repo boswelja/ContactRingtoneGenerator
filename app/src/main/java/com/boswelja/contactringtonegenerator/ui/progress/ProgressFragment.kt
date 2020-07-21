@@ -46,10 +46,10 @@ class ProgressFragment :
 
     private fun navigateNext() {
         findNavController().navigate(
-                ProgressFragmentDirections.toFinishedFragment(
-                        wizardViewModel.successCount.value!!,
-                        wizardViewModel.failCount.value!!
-                )
+            ProgressFragmentDirections.toFinishedFragment(
+                wizardViewModel.successCount.value!!,
+                wizardViewModel.failCount.value!!
+            )
         )
     }
 
