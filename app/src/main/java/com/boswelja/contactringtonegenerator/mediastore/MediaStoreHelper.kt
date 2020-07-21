@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.net.Uri
 import android.os.Build
+import android.os.Environment
 import android.provider.MediaStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -36,6 +37,7 @@ object MediaStoreHelper {
             val values = ContentValues().apply {
                 put(MediaStore.Audio.Media.DISPLAY_NAME, file.name)
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) put(MediaStore.Audio.Media.IS_PENDING, 1)
+                put(MediaStore.Audio.Media.RELATIVE_PATH, Environment.DIRECTORY_RINGTONES)
                 put(MediaStore.Audio.Media.MIME_TYPE, "audio/ogg")
                 put(MediaStore.Audio.Media.IS_RINGTONE, true)
             }
