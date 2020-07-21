@@ -74,7 +74,7 @@ class RingtoneGeneratorTest {
     }
 
     private fun createRingtoneGenerator(): RingtoneGenerator =
-        RingtoneGenerator.get(context).apply {
+        RingtoneGenerator(context).apply {
             contacts = testContacts
             ringtoneStructure = testRingtoneStructure
         }
