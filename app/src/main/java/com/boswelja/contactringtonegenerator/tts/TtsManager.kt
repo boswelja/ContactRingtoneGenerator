@@ -65,7 +65,9 @@ class TtsManager(context: Context) :
             val id = synthesisJob.id
 
             val file = File(cacheDirectory, "${id.replace(" ", "-")}.ogg")
-            if (!file.exists()) file.createNewFile()
+            withContext(Dispatchers.IO) {
+                if (!file.exists()) file.createNewFile()
+            }
 
             val result = SynthesisResult(id, file)
             tts.synthesizeToFile(synthesisJob.text, null, file, id)
