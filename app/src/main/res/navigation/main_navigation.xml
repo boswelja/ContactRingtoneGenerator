@@ -8,8 +8,7 @@
 
     <fragment
         android:id="@+id/getStartedFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.entry.GetStartedFragment"
-        tools:layout="@layout/fragment_get_started" >
+        android:name="com.boswelja.contactringtonegenerator.ui.entry.GetStartedFragment">
         <action
             android:id="@+id/to_contactPickerFragment"
             app:destination="@id/contactPickerFragment"
