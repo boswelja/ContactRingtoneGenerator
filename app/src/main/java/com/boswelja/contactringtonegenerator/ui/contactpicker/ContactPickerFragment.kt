@@ -1,126 +1,214 @@
 package com.boswelja.contactringtonegenerator.ui.contactpicker
 
+import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.os.Handler
-import android.os.Looper
+import android.view.LayoutInflater
 import android.view.View
-import androidx.core.widget.doAfterTextChanged
+import android.view.ViewGroup
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.Checkbox
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ExtendedFloatingActionButton
+import androidx.compose.material.Icon
+import androidx.compose.material.ListItem
+import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.Scaffold
+import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.AccountCircle
+import androidx.compose.material.icons.outlined.NavigateNext
+import androidx.compose.material.icons.outlined.Search
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.fragment.findNavController
 import androidx.preference.PreferenceManager
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
-import com.boswelja.contactringtonegenerator.databinding.ContactPickerWidgetBinding
+import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.ui.MainActivity
 import com.boswelja.contactringtonegenerator.ui.WizardViewModel
-import com.boswelja.contactringtonegenerator.ui.common.ListFragment
-import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactPickerAdapter
-import com.boswelja.contactringtonegenerator.ui.contactpicker.adapter.ContactSelectionListener
+import com.boswelja.contactringtonegenerator.ui.common.AppTheme
 
-class ContactPickerFragment : ListFragment(), ContactSelectionListener {
+class ContactPickerFragment : Fragment() {
 
     private val wizardModel: WizardViewModel by activityViewModels()
-    private val viewModel: ContactsViewModel by viewModels()
 
-    private val selectedContacts by lazy { ArrayList(wizardModel.getSelectedContacts()) }
-    private val searchHandler = Handler(Looper.myLooper()!!)
-    private val searchRunnable = Runnable {
-        viewModel.filterContacts(searchQuery)
+    private val selectedContactsMap = HashMap<Long, Boolean>()
+
+    @ExperimentalMaterialApi
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        val useNicknames = PreferenceManager.getDefaultSharedPreferences(requireContext())
+            .getBoolean("use_nicknames", true)
+        return ComposeView(requireContext()).apply {
+            setContent {
+                val viewModel: ContactsViewModel = viewModel()
+                AppTheme {
+                    Scaffold(
+                        floatingActionButton = {
+                            ExtendedFloatingActionButton(
+                                text = { Text(stringResource(R.string.next)) },
+                                icon = { Icon(Icons.Outlined.NavigateNext, null) },
+                                onClick = {
+                                    // Map contact IDs to contacts and submit
+                                    selectedContactsMap.map {
+                                        viewModel.allContacts.first { contact ->
+                                            it.key == contact.id
+                                        }
+                                    }.also { wizardModel.submitSelectedContacts(it) }
+                                    findNavController()
+                                        .navigate(ContactPickerFragmentDirections.toRingtoneCreatorFragment())
+                                }
+                            )
+                        }
+                    ) {
+                        var searchQuery by remember { mutableStateOf("") }
+                        var allSelected by remember { mutableStateOf(false) }
+                        val contacts by viewModel.adapterContacts.observeAsState()
+                        Column {
+                            ListHeader(
+                                searchQuery = searchQuery,
+                                onSearchQueryChanged = {
+                                    searchQuery = it
+                                    viewModel.filterContacts(it)
+                                },
+                                allSelected = allSelected,
+                                onAllSelectedChange = {
+                                    allSelected = it
+                                    // Select all currently displayed contacts
+                                    contacts?.forEach { contact ->
+                                        selectedContactsMap[contact.id] = allSelected
+                                    }
+                                }
+                            )
+                            ContactsList(
+                                useNicknames = useNicknames,
+                                contacts = contacts,
+                                onContactSelectionChanged = { contact, isSelected ->
+                                    if (isSelected) selectedContactsMap[contact.id] = isSelected
+                                    else selectedContactsMap.remove(contact.id)
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+        }
     }
 
-    private val adapter: ContactPickerAdapter by lazy {
-        ContactPickerAdapter(
-            PreferenceManager.getDefaultSharedPreferences(requireContext())
-                .getBoolean("use_nicknames", true),
-            this,
-            HashMap(selectedContacts.map { it.id to true }.toMap())
+    @Composable
+    fun SearchBar(
+        searchQuery: String,
+        onSearchQueryChanged: (String) -> Unit,
+        modifier: Modifier = Modifier
+    ) {
+        OutlinedTextField(
+            value = searchQuery,
+            onValueChange = onSearchQueryChanged,
+            placeholder = {
+                Text(stringResource(R.string.search_hint))
+            },
+            leadingIcon = {
+                Icon(Icons.Outlined.Search, stringResource(R.string.search_hint))
+            },
+            modifier = modifier
         )
     }
 
-    private lateinit var widgetBinding: ContactPickerWidgetBinding
-
-    private var searchQuery: CharSequence? = null
-
-    override fun onContactDeselected(contactId: Long) {
-        selectedContacts.removeAll { it.id == contactId }
-        widgetBinding.checkBox.isChecked = false
-        updateSelectedContactsView()
-        updateNextEnabled()
+    @Composable
+    fun ListHeader(
+        searchQuery: String,
+        onSearchQueryChanged: (String) -> Unit,
+        allSelected: Boolean,
+        onAllSelectedChange: (Boolean) -> Unit
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(16.dp)
+        ) {
+            SearchBar(
+                searchQuery = searchQuery,
+                onSearchQueryChanged = onSearchQueryChanged,
+                Modifier.weight(1f)
+            )
+            Checkbox(
+                checked = allSelected,
+                onCheckedChange = onAllSelectedChange,
+                modifier = Modifier.padding(start = 8.dp)
+            )
+        }
     }
 
-    override fun onContactSelected(contactId: Long) {
-        selectedContacts.add(viewModel.allContacts.first { it.id == contactId })
-        updateSelectedContactsView()
-        updateNextEnabled()
-    }
-
-    override fun onCreateWidgetView(): View? {
-        widgetBinding = ContactPickerWidgetBinding.inflate(layoutInflater)
-        widgetBinding.apply {
-            checkBox.setOnClickListener {
-                val contactsSelected = adapter.allContactsSelected.value == true
-                if (!contactsSelected) adapter.selectContacts(viewModel.allContacts)
-                else adapter.deselectAllContacts()
+    @ExperimentalMaterialApi
+    @Composable
+    fun ContactsList(
+        useNicknames: Boolean,
+        contacts: List<Contact>?,
+        onContactSelectionChanged: (Contact, Boolean) -> Unit
+    ) {
+        val context = LocalContext.current
+        contacts?.let {
+            LazyColumn {
+                items(contacts) { contact ->
+                    var selected by remember {
+                        mutableStateOf(selectedContactsMap[contact.id] == true)
+                    }
+                    ListItem(
+                        text = {
+                            if (useNicknames) {
+                                Text(contact.nickname ?: contact.displayName)
+                            } else {
+                                Text(contact.displayName)
+                            }
+                        },
+                        icon = {
+                            ContactsHelper.openContactPhotoStream(context, contact.id)?.let {
+                                val imageBitmap = BitmapFactory.decodeStream(it).asImageBitmap()
+                                it.close()
+                                Image(imageBitmap, null, Modifier.clip(CircleShape))
+                            } ?: Icon(Icons.Outlined.AccountCircle, null)
+                        },
+                        trailing = {
+                            Checkbox(checked = selected, onCheckedChange = null)
+                        },
+                        modifier = Modifier.clickable {
+                            selected = !selected
+                            onContactSelectionChanged(contact, selected)
+                        }
+                    )
+                }
             }
-            searchView.doAfterTextChanged {
-                setLoading(true)
-                searchQuery = it.toString()
-                startContactSearchTimer()
-            }
-        }
-        return widgetBinding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        setLoading(true)
-        updateSelectedContactsView()
-        updateNextEnabled()
-        binding.recyclerView.adapter = this@ContactPickerFragment.adapter
-        binding.nextButton.setOnClickListener {
-            findNavController().navigate(ContactPickerFragmentDirections.toRingtoneCreatorFragment())
-        }
-
-        adapter.allContactsSelected.observe(viewLifecycleOwner) {
-            widgetBinding.checkBox.isChecked = it
-        }
-        viewModel.adapterContacts.observe(viewLifecycleOwner) {
-            updateContacts(it)
         }
     }
 
     override fun onStop() {
         super.onStop()
         removeSubtitle()
-        wizardModel.submitSelectedContacts(selectedContacts)
-    }
-
-    override fun setLoading(loading: Boolean) {
-        super.setLoading(loading)
-        widgetBinding.apply {
-            checkBox.isEnabled = !loading
-        }
-    }
-
-    private fun startContactSearchTimer() {
-        searchHandler.removeCallbacks(searchRunnable)
-        searchHandler.postDelayed(searchRunnable, SEARCH_TIMER_MILLIS)
-    }
-
-    private fun updateContacts(contacts: List<Contact>) {
-        adapter.submitList(contacts)
-        setLoading(false)
-        widgetBinding.apply {
-            searchView.isEnabled = true
-        }
-    }
-
-    private fun updateSelectedContactsView() {
-        val count = selectedContacts.count()
-        val activity = requireActivity()
-        if (activity is MainActivity) {
-            activity.setSubtitle(resources.getQuantityString(R.plurals.selected_contacts_summary, count, count))
-        }
     }
 
     private fun removeSubtitle() {
@@ -128,17 +216,5 @@ class ContactPickerFragment : ListFragment(), ContactSelectionListener {
         if (activity is MainActivity) {
             activity.setSubtitle(null)
         }
-    }
-
-    private fun updateNextEnabled() {
-        binding.nextButton.apply {
-            isEnabled = selectedContacts.isNotEmpty()
-            if (isEnabled) extend()
-            else shrink()
-        }
-    }
-
-    companion object {
-        private const val SEARCH_TIMER_MILLIS: Long = 300
     }
 }

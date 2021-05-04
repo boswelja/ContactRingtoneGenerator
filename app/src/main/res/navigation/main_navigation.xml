@@ -28,8 +28,7 @@
     <fragment
         android:id="@+id/contactPickerFragment"
         android:name="com.boswelja.contactringtonegenerator.ui.contactpicker.ContactPickerFragment"
-        android:label="@string/contact_picker_title"
-        tools:layout="@layout/common_fragment_list" >
+        android:label="@string/contact_picker_title">
         <action
             android:id="@+id/to_ringtoneCreatorFragment"
             app:destination="@id/ringtoneCreatorFragment"

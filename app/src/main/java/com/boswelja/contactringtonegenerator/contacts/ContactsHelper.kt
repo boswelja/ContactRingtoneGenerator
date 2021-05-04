@@ -10,6 +10,7 @@ import androidx.annotation.VisibleForTesting.PRIVATE
 import androidx.core.database.getStringOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.io.InputStream
 
 object ContactsHelper {
 
@@ -47,21 +48,21 @@ object ContactsHelper {
                 while (cursor.moveToNext()) {
                     val id = cursor.getLong(idColumn)
                     val lookupKey = cursor.getString(lookupKeyColumn)
-                    val structuredName = getContactStructuredName(context, lookupKey)!!
-                    val contact =
-                        Contact(
-                            id,
-                            lookupKey,
-                            structuredName[1]!!,
-                            structuredName[3],
-                            structuredName[2],
-                            structuredName[0],
-                            structuredName[4],
-                            getContactNickname(context, lookupKey),
-                            getContactPhotoUri(context, id)
-                        )
-                    if (!contacts.any { it.id == contact.id }) {
-                        contacts.add(contact)
+                    getContactStructuredName(context, lookupKey)?.let { structuredName ->
+                        val contact =
+                            Contact(
+                                id,
+                                lookupKey,
+                                structuredName[1],
+                                structuredName[3],
+                                structuredName[2],
+                                structuredName[0],
+                                structuredName[4],
+                                getContactNickname(context, lookupKey)
+                            )
+                        if (!contacts.any { it.id == contact.id }) {
+                            contacts.add(contact)
+                        }
                     }
                 }
                 cursor.close()
@@ -91,19 +92,6 @@ object ContactsHelper {
             }
 
             return@withContext nickname
-        }
-    }
-
-    private suspend fun getContactPhotoUri(context: Context, contactId: Long): Uri? {
-        return withContext(Dispatchers.IO) {
-            val contactUri = ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId)
-            val photoUri = Uri.withAppendedPath(contactUri, ContactsContract.Contacts.Photo.CONTENT_DIRECTORY)
-            val cursor = context.contentResolver.query(photoUri, arrayOf(ContactsContract.Contacts.Photo.PHOTO), null, null, null)
-            if (cursor == null || !cursor.moveToFirst()) {
-                return@withContext null
-            }
-            cursor.close()
-            return@withContext photoUri
         }
     }
 
@@ -149,5 +137,15 @@ object ContactsHelper {
             values.putNull(ContactsContract.Contacts.CUSTOM_RINGTONE)
             context.contentResolver.update(contactUri, values, null, null)
         }
+    }
+
+    fun openContactPhotoStream(context: Context, contactId: Long): InputStream? {
+        val contactUri =
+            ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId)
+        return ContactsContract.Contacts.openContactPhotoInputStream(
+            context.contentResolver,
+            contactUri,
+            false
+        )
     }
 }

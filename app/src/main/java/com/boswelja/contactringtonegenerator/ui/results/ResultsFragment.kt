@@ -16,7 +16,7 @@ class ResultsFragment : Fragment() {
 
     private lateinit var binding: FragmentResultsBinding
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         binding = FragmentResultsBinding.inflate(inflater)
         return binding.root
     }

@@ -4,13 +4,11 @@
     <color name="primaryLightColor">#76d275</color>
     <color name="primaryDarkColor">#00701a</color>
     <color name="secondaryColor">#43a047</color>
-    <color name="secondaryLightColor">#76d275</color>
     <color name="secondaryDarkColor">#00701a</color>
     <color name="primaryTextColor">#FFFFFF</color>
     <color name="secondaryTextColor">#FFFFFF</color>
 
     <color name="windowBackground">#FFFFFF</color>
-    <color name="searchBackground">#FFFFFF</color>
 
     <color name="successColor">#4CAF50</color>
     <color name="failColor">#F44336</color>
