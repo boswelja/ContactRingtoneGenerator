@@ -7,12 +7,12 @@ plugins {
 }
 
 android {
-    compileSdk = AndroidSdk.compile
+    compileSdk = 30
 
     defaultConfig {
         applicationId = "com.boswelja.contactringtonegenerator"
-        minSdk = AndroidSdk.min
-        targetSdk = AndroidSdk.target
+        minSdk = 23
+        targetSdk = 30
         versionCode = 9
         versionName = "2.0"
 
@@ -37,7 +37,6 @@ android {
 }
 
 dependencies {
-    implementation(Libraries.kotlinStdlib)
     implementation(kotlin("reflect"))
 
     implementation(Libraries.coreKtx)

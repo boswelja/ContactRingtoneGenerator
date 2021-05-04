@@ -1,13 +1,3 @@
-@file:Suppress("SpellCheckingInspection")
-
-const val kotlinVersion = "1.4.32"
-
-object AndroidSdk {
-    const val min = 23
-    const val compile = 30
-    const val target = compile
-}
-
 object Libraries {
     object Versions {
         const val appCompat = "1.2.0-rc01"
@@ -24,8 +14,6 @@ object Libraries {
 
         const val ffmpeg = "4.4"
     }
-
-    const val kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
 
     const val coreKtx = "androidx.core:core-ktx:${Versions.coreKtx}"
     const val appCompat = "androidx.appcompat:appcompat:${Versions.appCompat}"
