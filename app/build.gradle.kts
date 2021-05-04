@@ -10,7 +10,7 @@ android {
 
     defaultConfig {
         applicationId = "com.boswelja.contactringtonegenerator"
-        minSdk = 23
+        minSdk = 24
         targetSdk = 30
         versionCode = 9
         versionName = "2.0"
