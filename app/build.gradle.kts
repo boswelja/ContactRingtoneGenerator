@@ -3,7 +3,6 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     id("androidx.navigation.safeargs.kotlin")
-    id("com.diffplug.spotless") version "5.1.0"
 }
 
 android {
@@ -75,24 +74,4 @@ dependencies {
     androidTestImplementation(libs.strikt.mockk)
     androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.mockk.android)
-}
-
-spotless {
-    kotlin {
-        target("**/*.kt")
-
-        ktlint("0.37.2")
-        endWithNewline()
-    }
-    kotlinGradle {
-        ktlint("0.37.2")
-        endWithNewline()
-    }
-    format("xml") {
-        target("**/*.xml")
-
-        trimTrailingWhitespace()
-        indentWithSpaces()
-        endWithNewline()
-    }
 }
