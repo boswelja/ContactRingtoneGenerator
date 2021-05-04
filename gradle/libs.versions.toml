@@ -20,6 +20,7 @@ lifecycleCompose = "1.0.0-alpha04"
 # Misc versions
 billingClient = "3.0.3"
 coroutines = "1.4.3"
+ffmpeg = "4.4"
 firebaseAnalytics = "18.0.3"
 googlePlayCore = "1.10.0"
 googlePlayCoreKtx = "1.8.1"
@@ -68,6 +69,7 @@ androidx-compose-activity = { module = "androidx.activity:activity-compose", ver
 androidx-compose-viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-compose", version.ref = "lifecycleCompose" }
 # Misc libraries
 billingclient = { module = "com.android.billingclient:billing-ktx", version.ref = "billingClient" }
+ffmpeg-audio = { module = "com.arthenica:ffmpeg-kit-audio", version.ref = "ffmpeg" }
 firebase-analytics = { module = "com.google.firebase:firebase-analytics-ktx", version.ref = "firebaseAnalytics" }
 googleplay-core = { module = "com.google.android.play:core", version.ref = "googlePlayCore" }
 googleplay-corektx = { module = "com.google.android.play:core-ktx", version.ref = "googlePlayCoreKtx" }

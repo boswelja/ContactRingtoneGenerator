@@ -39,34 +39,42 @@ android {
 dependencies {
     implementation(kotlin("reflect"))
 
-    implementation(Libraries.coreKtx)
-    implementation(Libraries.appCompat)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
     implementation(Libraries.constraintLayout)
     implementation(Libraries.fragment)
     implementation(Libraries.navigationFragment)
     implementation(Libraries.navigationUi)
     implementation(Libraries.preference)
-    implementation(Libraries.lifecycleViewModel)
-    implementation(Libraries.LifecycleCommon)
-    implementation(Libraries.LifecycleLiveData)
+    implementation(libs.bundles.lifecycle)
 
+    implementation(libs.bundles.compose)
     implementation(Libraries.googleMaterial)
-
-    implementation(Libraries.timber)
-
-    implementation(Libraries.ffmpeg)
+    implementation(libs.timber)
+    implementation(libs.ffmpeg.audio)
 
     debugImplementation(DebugLibraries.fragment)
 
-    testImplementation(TestLibraries.arch)
-    testImplementation(TestLibraries.junit)
-    testImplementation(TestLibraries.mockK)
+    testImplementation(libs.androidx.arch.core.test)
+    testImplementation(libs.androidx.test.corektx)
+    testImplementation(libs.androidx.test.ext.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.junit)
+    testImplementation(libs.strikt.core)
+    testImplementation(libs.strikt.mockk)
+    testImplementation(libs.mockk.core)
+    testImplementation(libs.robolectric)
 
-    androidTestImplementation(AndroidTestLibraries.mockK)
     androidTestImplementation(AndroidTestLibraries.navigation)
-    androidTestImplementation(AndroidTestLibraries.junit)
-    androidTestImplementation(AndroidTestLibraries.rules)
-    androidTestImplementation(AndroidTestLibraries.espresso)
+    androidTestImplementation(libs.androidx.arch.core.test)
+    androidTestImplementation(libs.androidx.test.espresso)
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.androidx.test.corektx)
+    androidTestImplementation(libs.strikt.core)
+    androidTestImplementation(libs.strikt.mockk)
+    androidTestImplementation(libs.androidx.compose.ui.test)
+    androidTestImplementation(libs.mockk.android)
 }
 
 spotless {

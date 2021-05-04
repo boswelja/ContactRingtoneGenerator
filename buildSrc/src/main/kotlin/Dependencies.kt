@@ -2,7 +2,6 @@ object Libraries {
     object Versions {
         const val appCompat = "1.2.0-rc01"
         const val constraintLayout = "2.0.0-beta8"
-        const val coreKtx = "1.4.0-alpha01"
         const val fragment = "1.3.0-alpha06"
         const val lifecycle = "2.3.0-alpha05"
         const val navigation = "2.3.0"
@@ -15,8 +14,6 @@ object Libraries {
         const val ffmpeg = "4.4"
     }
 
-    const val coreKtx = "androidx.core:core-ktx:${Versions.coreKtx}"
-    const val appCompat = "androidx.appcompat:appcompat:${Versions.appCompat}"
     const val constraintLayout = "androidx.constraintlayout:constraintlayout:${Versions.constraintLayout}"
     const val fragment = "androidx.fragment:fragment-ktx:${Versions.fragment}"
 
@@ -24,10 +21,6 @@ object Libraries {
     const val navigationUi = "androidx.navigation:navigation-ui-ktx:${Versions.navigation}"
 
     const val preference = "androidx.preference:preference-ktx:${Versions.preference}"
-
-    const val lifecycleViewModel = "androidx.lifecycle:lifecycle-viewmodel-ktx:${Versions.lifecycle}"
-    const val LifecycleCommon = "androidx.lifecycle:lifecycle-common-java8:${Versions.lifecycle}"
-    const val LifecycleLiveData = "androidx.lifecycle:lifecycle-livedata-ktx:${Versions.lifecycle}"
 
     const val googleMaterial = "com.google.android.material:material:${Versions.material}"
 
@@ -43,30 +36,10 @@ object DebugLibraries {
     const val fragment = "androidx.fragment:fragment-testing:${Versions.fragment}"
 }
 
-object TestLibraries {
-    object Versions {
-        const val arch = "2.1.0"
-        const val junit = "4.13"
-        const val mockK = "1.10.0"
-    }
-
-    const val arch = "androidx.arch.core:core-testing:${Versions.arch}"
-    const val junit = "junit:junit:${Versions.junit}"
-    const val mockK = "io.mockk:mockk:${Versions.mockK}"
-}
-
 object AndroidTestLibraries {
     object Versions {
-        const val mockK = TestLibraries.Versions.mockK
         const val navigation = Libraries.Versions.navigation
-        const val junit = "1.1.1"
-        const val rules = "1.2.0"
-        const val espresso = "3.2.0"
     }
 
-    const val mockK = "io.mockk:mockk-android:${Versions.mockK}"
     const val navigation = "androidx.navigation:navigation-testing:${Versions.navigation}"
-    const val junit = "androidx.test.ext:junit:${Versions.junit}"
-    const val rules = "androidx.test:rules:${Versions.rules}"
-    const val espresso = "androidx.test.espresso:espresso-core:${Versions.espresso}"
 }
