@@ -39,7 +39,7 @@ object Libraries {
 
         const val timber = "4.7.1"
 
-        const val ffmpeg = "4.3.1.LTS"
+        const val ffmpeg = "4.4"
     }
 
     const val kotlinStdlib = "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
@@ -62,7 +62,7 @@ object Libraries {
 
     const val timber = "com.jakewharton.timber:timber:${Versions.timber}"
 
-    const val ffmpeg = "com.arthenica:mobile-ffmpeg-audio:${Versions.ffmpeg}"
+    const val ffmpeg = "com.arthenica:ffmpeg-kit-audio:${Versions.ffmpeg}"
 }
 
 object DebugLibraries {
