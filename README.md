@@ -1,6 +1,4 @@
-<p align="center">
-  <img style="border-radius: 50%;" width="250px" src="app/src/main/ic_launcher-playstore.png">
-</p>
+# <img style="border-radius: 50%;" width="250px" src="app/src/main/ic_launcher-playstore.png">
 
 # Ringtonator
 
