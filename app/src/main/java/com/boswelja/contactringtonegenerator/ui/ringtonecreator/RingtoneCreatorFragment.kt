@@ -1,12 +1,12 @@
 package com.boswelja.contactringtonegenerator.ui.ringtonecreator
 
-import android.content.Intent
 import android.media.RingtoneManager
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
@@ -27,44 +27,31 @@ import timber.log.Timber
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
-private const val CUSTOM_AUDIO_REQUEST_CODE = 62931
-private const val SYSTEM_RINGTONE_REQUEST_CODE = 62932
-
 class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventListener {
 
     private val wizardModel: WizardViewModel by activityViewModels()
     private val viewModel: RingtoneCreatorViewModel by viewModels()
+
+    private val audioPickerLauncher: ActivityResultLauncher<String> = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { adapter.handleChooserResponse(requireContext(), it, pickerItemPosition) }
+
+    private val ringtonePickerLauncher: ActivityResultLauncher<Int> = registerForActivityResult(
+        PickRingtone()
+    ) { adapter.handleChooserResponse(requireContext(), it, pickerItemPosition) }
 
     private val adapter = RingtoneCreatorAdapter(
         this,
         ActionClickCallback { id, position ->
             pickerItemPosition = position
             when (id) {
-                ID.CUSTOM_AUDIO -> startActivityForResult(customAudioPickerIntent, CUSTOM_AUDIO_REQUEST_CODE)
-                ID.SYSTEM_RINGTONE -> startActivityForResult(systemRingtonePickerIntent, SYSTEM_RINGTONE_REQUEST_CODE)
+                ID.CUSTOM_AUDIO -> audioPickerLauncher.launch("audio/*")
+                ID.SYSTEM_RINGTONE -> ringtonePickerLauncher.launch(RingtoneManager.TYPE_RINGTONE)
                 else -> Timber.w("Unknown action clicked")
             }
         }
     )
     private var pickerItemPosition: Int = -1
-
-    private val customAudioPickerIntent by lazy {
-        Intent.createChooser(
-            Intent(Intent.ACTION_GET_CONTENT).apply {
-                type = "audio/*"
-                addCategory(Intent.CATEGORY_OPENABLE)
-            },
-            "Pick an audio file"
-        )
-    }
-
-    private val systemRingtonePickerIntent by lazy {
-        Intent(RingtoneManager.ACTION_RINGTONE_PICKER).apply {
-            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_DEFAULT, true)
-            putExtra(RingtoneManager.EXTRA_RINGTONE_SHOW_SILENT, false)
-            putExtra(RingtoneManager.EXTRA_RINGTONE_TYPE, RingtoneManager.TYPE_RINGTONE)
-        }
-    }
 
     private val onAvailableItemClickListener = View.OnClickListener {
         if (it is Chip) {
@@ -101,7 +88,11 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
         viewModel.isDataValid.postValue(isDataValid)
     }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         binding = FragmentRingtoneCreatorBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -122,19 +113,6 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
             } else {
                 binding.messageNoContentView.visibility = View.GONE
             }
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        when (requestCode) {
-            CUSTOM_AUDIO_REQUEST_CODE -> {
-                adapter.handleChooserResponse(requireContext(), data?.data, pickerItemPosition)
-            }
-            SYSTEM_RINGTONE_REQUEST_CODE -> {
-                val uri = data?.getParcelableExtra<Uri>(RingtoneManager.EXTRA_RINGTONE_PICKED_URI)
-                adapter.handleChooserResponse(requireContext(), uri, pickerItemPosition)
-            }
-            else -> super.onActivityResult(requestCode, resultCode, data)
         }
     }
 
