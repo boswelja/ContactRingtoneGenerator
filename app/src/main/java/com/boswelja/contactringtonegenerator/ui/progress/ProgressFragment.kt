@@ -4,23 +4,80 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.LinearProgressIndicator
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.databinding.FragmentProgressBinding
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
 import com.boswelja.contactringtonegenerator.ui.WizardViewModel
+import com.boswelja.contactringtonegenerator.ui.common.AppTheme
 
 class ProgressFragment : Fragment() {
 
     private val wizardViewModel: WizardViewModel by activityViewModels()
 
-    private lateinit var binding: FragmentProgressBinding
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                AppTheme {
+                    val progress by wizardViewModel.successCount.observeAsState()
+                    val generatorState by wizardViewModel.generatorState.observeAsState()
+                    ProgressScreen(
+                        indeterminate = generatorState == RingtoneGenerator.State.NOT_READY,
+                        progress = ((progress?.toFloat() ?: 0f) / wizardViewModel.totalJobCount),
+                        status = stringResource(R.string.progress_title_generating),
+                        step = stringResource(R.string.progress_status_generating)
+                    )
+                }
+            }
+        }
+    }
 
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
-        binding = FragmentProgressBinding.inflate(inflater, container, false)
-        return binding.root
+    @Composable
+    fun ProgressScreen(
+        indeterminate: Boolean,
+        progress: Float,
+        status: String,
+        step: String
+    ) {
+        Column(
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Text(
+                text = status,
+                style = MaterialTheme.typography.h4
+            )
+            Text(
+                text = step,
+                style = MaterialTheme.typography.h5
+            )
+            if (indeterminate) {
+                LinearProgressIndicator()
+            } else {
+                LinearProgressIndicator(
+                    progress = progress
+                )
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -28,17 +85,9 @@ class ProgressFragment : Fragment() {
             when (state) {
                 RingtoneGenerator.State.NOT_READY -> wizardViewModel.initialiseGenerator()
                 RingtoneGenerator.State.READY -> wizardViewModel.startGenerating()
-                RingtoneGenerator.State.GENERATING -> onGenerateStarted()
                 RingtoneGenerator.State.FINISHED -> navigateNext()
                 else -> {} // Do nothing
             }
-        }
-
-        wizardViewModel.successCount.observe(viewLifecycleOwner) {
-            binding.progressBar.progress = it
-        }
-        wizardViewModel.startedJobCount.observe(viewLifecycleOwner) {
-            binding.progressBar.secondaryProgress = it
         }
     }
 
@@ -49,18 +98,5 @@ class ProgressFragment : Fragment() {
                 wizardViewModel.failCount.value!!
             )
         )
-    }
-
-    private fun onGenerateStarted() {
-        binding.apply {
-            progressBar.apply {
-                isIndeterminate = false
-                progress = 0
-                secondaryProgress = 0
-                max = wizardViewModel.totalJobCount
-            }
-            loadingTitle.text = getString(R.string.progress_title_generating)
-            loadingStatus.text = getString(R.string.progress_status_generating)
-        }
     }
 }
