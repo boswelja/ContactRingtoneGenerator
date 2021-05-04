@@ -18,6 +18,7 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    buildFeatures.compose = true
     buildFeatures.viewBinding = true
     buildFeatures.dataBinding = true
     buildTypes {
@@ -25,6 +26,10 @@ android {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.compose.get()
     }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_1_8
