@@ -1,2 +1,3 @@
 include(":app")
-rootProject.name = "Ringtonator"
+
+enableFeaturePreview("VERSION_CATALOGS")
