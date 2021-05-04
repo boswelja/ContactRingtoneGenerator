@@ -5,8 +5,7 @@ import android.net.Uri
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
-import com.arthenica.mobileffmpeg.Config
-import com.arthenica.mobileffmpeg.FFmpeg
+import com.arthenica.ffmpegkit.FFmpegKit
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.mediastore.MediaStoreHelper
@@ -214,8 +213,8 @@ class RingtoneGenerator(private val context: Context) :
                 cacheFiles.add(output)
                 val command = "$commandInputs -filter_complex '${filterInputs}${filters}concat=n=$trueFileCount:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
                 Timber.i("ffmpeg $command")
-                val result = FFmpeg.execute(command)
-                val generateSuccess = result == Config.RETURN_CODE_SUCCESS
+                val result = FFmpegKit.execute(command)
+                val generateSuccess = result.returnCode.isSuccess
                 val success = if (generateSuccess) handleGenerateCompleted(contact, output) else false
                 withContext(Dispatchers.Main) {
                     progressListener?.onJobCompleted(success, contact)
