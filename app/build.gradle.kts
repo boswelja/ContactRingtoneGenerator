@@ -1,9 +1,8 @@
 plugins {
-    id(BuildPlugins.androidApplication)
-    id(BuildPlugins.kotlinAndroid)
-    id(BuildPlugins.kotlinAndroidExtensions)
-    id(BuildPlugins.kotlinKapt)
-    id(BuildPlugins.safeArgs)
+    id("com.android.application")
+    kotlin("android")
+    kotlin("kapt")
+    id("androidx.navigation.safeargs.kotlin")
     id("com.diffplug.spotless") version "5.1.0"
 }
 

@@ -2,23 +2,6 @@
 
 const val kotlinVersion = "1.4.32"
 
-object BuildPlugins {
-    object Versions {
-        const val buildToolsVersion = "7.0.0-alpha15"
-        const val safeArgsVersion = Libraries.Versions.navigation
-    }
-
-    const val androidGradlePlugin = "com.android.tools.build:gradle:${Versions.buildToolsVersion}"
-    const val kotlinGradlePlugin = "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
-    const val safeArgsGradlePlugin = "androidx.navigation:navigation-safe-args-gradle-plugin:${Versions.safeArgsVersion}"
-
-    const val androidApplication = "com.android.application"
-    const val kotlinAndroid = "kotlin-android"
-    const val kotlinAndroidExtensions = "kotlin-android-extensions"
-    const val kotlinKapt = "kotlin-kapt"
-    const val safeArgs = "androidx.navigation.safeargs.kotlin"
-}
-
 object AndroidSdk {
     const val min = 23
     const val compile = 30

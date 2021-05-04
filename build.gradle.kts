@@ -3,10 +3,13 @@ buildscript {
         google()
         mavenCentral()
     }
+
+    val kotlinVersion = "1.4.32"
+
     dependencies {
-        classpath(BuildPlugins.androidGradlePlugin)
-        classpath(BuildPlugins.kotlinGradlePlugin)
-        classpath(BuildPlugins.safeArgsGradlePlugin)
+        classpath("com.android.tools.build:gradle:7.0.0-alpha15")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion")
+        classpath("androidx.navigation:navigation-safe-args-gradle-plugin:2.3.5")
     }
 }
 
