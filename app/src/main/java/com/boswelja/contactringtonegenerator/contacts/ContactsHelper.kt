@@ -22,7 +22,8 @@ object ContactsHelper {
     @VisibleForTesting(otherwise = PRIVATE)
     val CONTACTS_PROJECTION = arrayOf(
         ContactsContract.Contacts._ID,
-        ContactsContract.Contacts.LOOKUP_KEY
+        ContactsContract.Contacts.LOOKUP_KEY,
+        ContactsContract.Contacts.DISPLAY_NAME_PRIMARY
     )
 
     private val CONTACT_NAME_PROJECTION = arrayOf(
@@ -57,22 +58,20 @@ object ContactsHelper {
         cursor?.let {
             val idColumn = cursor.getColumnIndex(ContactsContract.Contacts._ID)
             val lookupKeyColumn = cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)
+            val displayNameColumn = cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)
             while (cursor.moveToNext()) {
                 val id = cursor.getLong(idColumn)
-                val lookupKey = cursor.getString(lookupKeyColumn)
-                getContactStructuredName(contentResolver, lookupKey)?.let { structuredName ->
-                    val contact =
-                        Contact(
+                // Only continue if this contact is unique
+                if (!contacts.any { it.id == id }) {
+                    val lookupKey = cursor.getString(lookupKeyColumn)
+                    val displayName = cursor.getStringOrNull(displayNameColumn)
+                    displayName?.let {
+                        val contact = Contact(
                             id,
                             lookupKey,
-                            structuredName[1],
-                            structuredName[3],
-                            structuredName[2],
-                            structuredName[0],
-                            structuredName[4],
-                            getContactNickname(contentResolver, lookupKey)
+                            displayName,
+                            ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id)
                         )
-                    if (!contacts.any { it.id == contact.id }) {
                         contacts.add(contact)
                         currentGrowth++
                         if (currentGrowth >= pageSize) {
@@ -81,6 +80,7 @@ object ContactsHelper {
                         }
                     }
                 }
+
             }
             // Send contacts on finished anyways
             send(contacts)
@@ -92,7 +92,7 @@ object ContactsHelper {
         }
     }
 
-    private suspend fun getContactNickname(contentResolver: ContentResolver, lookupKey: String): String? {
+    suspend fun getContactNickname(contentResolver: ContentResolver, lookupKey: String): String? {
         return withContext(Dispatchers.IO) {
             val cursor = contentResolver.query(
                 ContactsContract.Data.CONTENT_URI,
@@ -114,7 +114,7 @@ object ContactsHelper {
         }
     }
 
-    private suspend fun getContactStructuredName(contentResolver: ContentResolver, lookupKey: String): Array<String?>? {
+    suspend fun getContactStructuredName(contentResolver: ContentResolver, lookupKey: String): Array<String?>? {
         return withContext(Dispatchers.IO) {
             val cursor = contentResolver.query(
                 ContactsContract.Data.CONTENT_URI,
@@ -158,12 +158,10 @@ object ContactsHelper {
         }
     }
 
-    fun openContactPhotoStream(context: Context, contactId: Long): InputStream? {
-        val contactUri =
-            ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, contactId)
+    fun openContactPhotoStream(context: Context, contact: Contact): InputStream? {
         return ContactsContract.Contacts.openContactPhotoInputStream(
             context.contentResolver,
-            contactUri,
+            contact.uri,
             false
         )
     }
