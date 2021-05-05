@@ -80,7 +80,6 @@ object ContactsHelper {
                         }
                     }
                 }
-
             }
             // Send contacts on finished anyways
             send(contacts)
@@ -114,7 +113,10 @@ object ContactsHelper {
         }
     }
 
-    suspend fun getContactStructuredName(contentResolver: ContentResolver, lookupKey: String): Array<String?>? {
+    suspend fun getContactStructuredName(
+        contentResolver: ContentResolver,
+        lookupKey: String
+    ): StructuredName? {
         return withContext(Dispatchers.IO) {
             val cursor = contentResolver.query(
                 ContactsContract.Data.CONTENT_URI,
@@ -130,13 +132,13 @@ object ContactsHelper {
             val lastNameColumn = cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME)
             val prefixColumn = cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.PREFIX)
             val suffixColumn = cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.SUFFIX)
-            val firstName = cursor.getString(firstNameColumn)
+            val firstName = cursor.getStringOrNull(firstNameColumn)
             val middleName = cursor.getStringOrNull(middleNameColumn)
             val lastName = cursor.getStringOrNull(lastNameColumn)
             val prefix = cursor.getStringOrNull(prefixColumn)
             val suffix = cursor.getStringOrNull(suffixColumn)
             cursor.close()
-            return@withContext arrayOf(prefix, firstName, middleName, lastName, suffix)
+            return@withContext StructuredName(prefix, firstName, middleName, lastName, suffix)
         }
     }
 
