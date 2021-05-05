@@ -1,12 +1,10 @@
 package com.boswelja.contactringtonegenerator.ui
 
-import android.net.Uri
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.databinding.BindingAdapter
-import com.boswelja.contactringtonegenerator.R
 
 @BindingAdapter("srcRes")
 fun ImageView.setImageRes(@DrawableRes drawableRes: Int) {
