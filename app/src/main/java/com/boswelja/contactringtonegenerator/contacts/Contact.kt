@@ -1,6 +1,6 @@
 package com.boswelja.contactringtonegenerator.contacts
 
-import com.boswelja.contactringtonegenerator.StringJoinerCompat
+import java.util.StringJoiner
 
 data class Contact(
     val id: Long,
@@ -13,7 +13,7 @@ data class Contact(
     val nickname: String? = null
 ) {
     val displayName: String =
-        StringJoinerCompat(" ").apply {
+        StringJoiner(" ").apply {
             if (prefix != null) add(prefix)
             if (firstName != null) add(firstName)
             if (middleName != null) add(middleName)
