@@ -1,5 +1,6 @@
 package com.boswelja.contactringtonegenerator.contacts
 
+import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.ContentValues
 import android.content.Context
@@ -9,6 +10,10 @@ import androidx.annotation.VisibleForTesting
 import androidx.annotation.VisibleForTesting.PRIVATE
 import androidx.core.database.getStringOrNull
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.withContext
 import java.io.InputStream
 
@@ -35,47 +40,61 @@ object ContactsHelper {
         ContactsContract.CommonDataKinds.Nickname.NAME
     )
 
-    suspend fun getContacts(context: Context): List<Contact> {
-        val contacts = ArrayList<Contact>()
-        withContext(Dispatchers.IO) {
-            val cursor = context.contentResolver.query(
-                ContactsContract.Contacts.CONTENT_URI,
-                CONTACTS_PROJECTION, null, null, null
-            )
-            if (cursor != null) {
-                val idColumn = cursor.getColumnIndex(ContactsContract.Contacts._ID)
-                val lookupKeyColumn = cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)
-                while (cursor.moveToNext()) {
-                    val id = cursor.getLong(idColumn)
-                    val lookupKey = cursor.getString(lookupKeyColumn)
-                    getContactStructuredName(context, lookupKey)?.let { structuredName ->
-                        val contact =
-                            Contact(
-                                id,
-                                lookupKey,
-                                structuredName[1],
-                                structuredName[3],
-                                structuredName[2],
-                                structuredName[0],
-                                structuredName[4],
-                                getContactNickname(context, lookupKey)
-                            )
-                        if (!contacts.any { it.id == contact.id }) {
-                            contacts.add(contact)
+    @ExperimentalCoroutinesApi
+    fun getContacts(
+        contentResolver: ContentResolver,
+        pageSize: Int
+    ): Flow<List<Contact>> = callbackFlow {
+        val contacts = mutableListOf<Contact>()
+        val cursor = contentResolver.query(
+            ContactsContract.Contacts.CONTENT_URI,
+            CONTACTS_PROJECTION,
+            null,
+            null,
+            ContactsContract.Contacts.SORT_KEY_PRIMARY
+        )
+        var currentGrowth = 0
+        cursor?.let {
+            val idColumn = cursor.getColumnIndex(ContactsContract.Contacts._ID)
+            val lookupKeyColumn = cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)
+            while (cursor.moveToNext()) {
+                val id = cursor.getLong(idColumn)
+                val lookupKey = cursor.getString(lookupKeyColumn)
+                getContactStructuredName(contentResolver, lookupKey)?.let { structuredName ->
+                    val contact =
+                        Contact(
+                            id,
+                            lookupKey,
+                            structuredName[1],
+                            structuredName[3],
+                            structuredName[2],
+                            structuredName[0],
+                            structuredName[4],
+                            getContactNickname(contentResolver, lookupKey)
+                        )
+                    if (!contacts.any { it.id == contact.id }) {
+                        contacts.add(contact)
+                        currentGrowth++
+                        if (currentGrowth >= pageSize) {
+                            send(contacts)
+                            currentGrowth = 0
                         }
                     }
                 }
-                cursor.close()
             }
+            // Send contacts on finished anyways
+            send(contacts)
+            cursor.close()
         }
-        return withContext(Dispatchers.Default) {
-            return@withContext contacts.sortedBy { it.nickname ?: it.firstName }
+
+        awaitClose {
+            if (cursor?.isClosed == false) cursor.close()
         }
     }
 
-    private suspend fun getContactNickname(context: Context, lookupKey: String): String? {
+    private suspend fun getContactNickname(contentResolver: ContentResolver, lookupKey: String): String? {
         return withContext(Dispatchers.IO) {
-            val cursor = context.contentResolver.query(
+            val cursor = contentResolver.query(
                 ContactsContract.Data.CONTENT_URI,
                 CONTACT_NICKNAME_PROJECTION,
                 "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.Nickname.MIMETYPE} = ?",
@@ -95,9 +114,9 @@ object ContactsHelper {
         }
     }
 
-    private suspend fun getContactStructuredName(context: Context, lookupKey: String): Array<String?>? {
+    private suspend fun getContactStructuredName(contentResolver: ContentResolver, lookupKey: String): Array<String?>? {
         return withContext(Dispatchers.IO) {
-            val cursor = context.contentResolver.query(
+            val cursor = contentResolver.query(
                 ContactsContract.Data.CONTENT_URI,
                 CONTACT_NAME_PROJECTION,
                 "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.StructuredName.MIMETYPE} = ?",

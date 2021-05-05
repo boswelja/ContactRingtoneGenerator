@@ -50,6 +50,7 @@ import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.ui.MainActivity
 import com.boswelja.contactringtonegenerator.ui.WizardViewModel
 import com.boswelja.contactringtonegenerator.ui.common.AppTheme
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 class ContactPickerFragment : Fragment() {
 
@@ -57,6 +58,7 @@ class ContactPickerFragment : Fragment() {
 
     private val selectedContactsMap = HashMap<Long, Boolean>()
 
+    @ExperimentalCoroutinesApi
     @ExperimentalMaterialApi
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,12 +77,12 @@ class ContactPickerFragment : Fragment() {
                                 text = { Text(stringResource(R.string.next)) },
                                 icon = { Icon(Icons.Outlined.NavigateNext, null) },
                                 onClick = {
-                                    // Map contact IDs to contacts and submit
-                                    selectedContactsMap.map {
-                                        viewModel.allContacts.first { contact ->
-                                            it.key == contact.id
-                                        }
-                                    }.also { wizardModel.submitSelectedContacts(it) }
+                                    // TODO Map contact IDs to contacts and submit
+//                                    selectedContactsMap.map {
+//                                        viewModel.allContacts.first { contact ->
+//                                            it.key == contact.id
+//                                        }
+//                                    }.also { wizardModel.submitSelectedContacts(it) }
                                     findNavController()
                                         .navigate(ContactPickerFragmentDirections.toRingtoneCreatorFragment())
                                 }
@@ -95,7 +97,7 @@ class ContactPickerFragment : Fragment() {
                                 searchQuery = searchQuery,
                                 onSearchQueryChanged = {
                                     searchQuery = it
-                                    viewModel.filterContacts(it)
+                                    viewModel.searchQuery.postValue(searchQuery)
                                 },
                                 allSelected = allSelected,
                                 onAllSelectedChange = {

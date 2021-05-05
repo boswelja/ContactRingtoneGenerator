@@ -2,47 +2,30 @@ package com.boswelja.contactringtonegenerator.ui.contactpicker
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.boswelja.contactringtonegenerator.contacts.Contact
+import androidx.lifecycle.asLiveData
+import androidx.lifecycle.switchMap
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.map
 import java.util.Locale
 
 class ContactsViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val coroutineScope = CoroutineScope(Dispatchers.Default)
+    val searchQuery = MutableLiveData("")
 
-    private val _adapterContacts = MutableLiveData<List<Contact>>()
-    val adapterContacts: LiveData<List<Contact>>
-        get() = _adapterContacts
+    @ExperimentalCoroutinesApi
+    val allContacts = ContactsHelper.getContacts(application.contentResolver, 25)
 
-    lateinit var allContacts: List<Contact>
-
-    init {
-        coroutineScope.launch {
-            allContacts = ContactsHelper.getContacts(application)
-            withContext(Dispatchers.Main) {
-                _adapterContacts.value = allContacts
+    @ExperimentalCoroutinesApi
+    val adapterContacts = searchQuery.switchMap { query ->
+        val formattedQuery = query.toLowerCase(Locale.ROOT)
+        allContacts.map { contacts ->
+            contacts.filter {
+                it.displayName.toLowerCase(Locale.ROOT).contains(formattedQuery) ||
+                    it.nickname?.toLowerCase(Locale.ROOT)?.contains(formattedQuery) == true
             }
-        }
-    }
-
-    fun filterContacts(searchQuery: CharSequence?) {
-        coroutineScope.launch {
-            searchQuery?.let { searchQuery ->
-                val query = searchQuery.toString().toLowerCase(Locale.ROOT)
-                val filteredList = allContacts.filter {
-                    it.displayName.toLowerCase(Locale.ROOT).contains(query) ||
-                        it.displayName.toLowerCase(Locale.ROOT).contains(query)
-                }
-                withContext(Dispatchers.Main) {
-                    _adapterContacts.value = filteredList
-                }
-            }
-        }
+        }.asLiveData(Dispatchers.IO)
     }
 }

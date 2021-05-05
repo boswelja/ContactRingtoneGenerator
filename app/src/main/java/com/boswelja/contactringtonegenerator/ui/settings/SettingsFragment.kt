@@ -11,7 +11,9 @@ import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.mediastore.MediaStoreHelper
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class SettingsFragment :
@@ -28,6 +30,7 @@ class SettingsFragment :
         }
     }
 
+    @ExperimentalCoroutinesApi
     override fun onPreferenceClick(preference: Preference?): Boolean {
         return when (preference?.key) {
             RESET_RINGTONES_KEY -> {
@@ -77,9 +80,13 @@ class SettingsFragment :
         return (baseVolume + userBoost) / 10f
     }
 
+    @ExperimentalCoroutinesApi
     private fun resetContactRingtones() {
         coroutineScope.launch(Dispatchers.IO) {
-            ContactsHelper.getContacts(requireContext()).forEach {
+            ContactsHelper.getContacts(
+                requireContext().contentResolver,
+                Int.MAX_VALUE // Collect all contacts
+            ).first().forEach {
                 ContactsHelper.removeContactRingtone(requireContext(), it)
             }
             MediaStoreHelper.deleteAllRingtones(requireContext())
