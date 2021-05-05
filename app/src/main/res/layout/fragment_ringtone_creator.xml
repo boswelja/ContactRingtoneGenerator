@@ -5,28 +5,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <HorizontalScrollView
+    <androidx.compose.ui.platform.ComposeView
         android:id="@+id/chip_scroller"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="72dp"
-        android:requiresFadingEdge="horizontal"
-        android:fadingEdgeLength="32dp"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <com.google.android.material.chip.ChipGroup
-            android:id="@+id/available_items"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:paddingStart="@dimen/content_side_margins"
-            android:paddingEnd="@dimen/content_side_margins"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:clipToPadding="false"
-            app:chipSpacingHorizontal="8dp"
-            app:singleLine="true" />
-
-    </HorizontalScrollView>
+        app:layout_constraintBottom_toBottomOf="parent" />
 
     <View
         android:id="@+id/divider"

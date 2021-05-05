@@ -7,25 +7,37 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.boswelja.contactringtonegenerator.databinding.FragmentRingtoneCreatorBinding
-import com.boswelja.contactringtonegenerator.databinding.RingtoneCreatorAvailableItemBinding
-import com.boswelja.contactringtonegenerator.ringtonegen.item.AudioItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ID
-import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureChoice
 import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 import com.boswelja.contactringtonegenerator.ui.WizardViewModel
+import com.boswelja.contactringtonegenerator.ui.common.AppTheme
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.ActionClickCallback
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.AdapterGestureHelper
 import com.boswelja.contactringtonegenerator.ui.ringtonecreator.adapter.RingtoneCreatorAdapter
-import com.google.android.material.chip.Chip
 import timber.log.Timber
-import kotlin.reflect.KClass
-import kotlin.reflect.full.createInstance
 
 class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventListener {
 
@@ -52,23 +64,6 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
         }
     )
     private var pickerItemPosition: Int = -1
-
-    private val onAvailableItemClickListener = View.OnClickListener {
-        if (it is Chip) {
-            val item = when (ID.values().first { item -> item.ordinal == it.id }) {
-                ID.FIRST_NAME -> TextItem.FirstName()
-                ID.CUSTOM_TEXT -> TextItem.Custom()
-                ID.MIDDLE_NAME -> TextItem.MiddleName()
-                ID.LAST_NAME -> TextItem.LastName()
-                ID.PREFIX -> TextItem.NamePrefix()
-                ID.SUFFIX -> TextItem.NameSuffix()
-                ID.NICKNAME -> TextItem.Nickname()
-                ID.CUSTOM_AUDIO -> AudioItem.File(requireContext())
-                ID.SYSTEM_RINGTONE -> AudioItem.SystemRingtone(requireContext())
-            }
-            adapter.addItem(item)
-        }
-    }
 
     private lateinit var binding: FragmentRingtoneCreatorBinding
 
@@ -99,7 +94,20 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         adapter.updateItems(viewModel.ringtoneStructure)
-        setupAvailableMessageItems()
+        binding.chipScroller.setContent {
+            AppTheme {
+                LazyRow(
+                    contentPadding = PaddingValues(16.dp),
+                    horizontalArrangement = Arrangement.spacedBy(16.dp)
+                ) {
+                    items(StructureChoice.ALL) { choice ->
+                        ItemChip(choice) {
+                            adapter.addItem(it.createStructureItem())
+                        }
+                    }
+                }
+            }
+        }
         setupMessageBuilderView()
         binding.nextButton.setOnClickListener {
             findNavController().navigate(RingtoneCreatorFragmentDirections.toLoadingFragment())
@@ -129,22 +137,23 @@ class RingtoneCreatorFragment : Fragment(), RingtoneCreatorAdapter.DataEventList
         }
     }
 
-    private fun setupAvailableMessageItems() {
-        createChipsFor(TextItem::class.sealedSubclasses)
-        createChipsFor(AudioItem::class.sealedSubclasses)
-    }
-
-    private fun createChipsFor(list: List<KClass<out StructureItem>>) {
-        list.forEach {
-            val chipBinding = RingtoneCreatorAvailableItemBinding.inflate(layoutInflater)
-            val item = it.createInstance()
-            chipBinding.root.apply {
-                id = item.id.ordinal
-                setText(item.getLabelRes())
-                setChipIconResource(item.getIconRes())
-                setOnClickListener(onAvailableItemClickListener)
+    @Composable
+    fun ItemChip(
+        item: StructureChoice,
+        onClick: (StructureChoice) -> Unit
+    ) {
+        Surface(
+            color = Color.LightGray,
+            shape = MaterialTheme.shapes.small
+        ) {
+            Row(
+                Modifier
+                    .clickable { onClick(item) }
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                Icon(item.icon, null)
+                Text(stringResource(item.textRes))
             }
-            binding.availableItems.addView(chipBinding.root)
         }
     }
 }
