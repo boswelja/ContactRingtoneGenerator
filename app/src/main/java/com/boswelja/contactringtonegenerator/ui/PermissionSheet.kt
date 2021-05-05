@@ -1,89 +1,94 @@
 package com.boswelja.contactringtonegenerator.ui
 
 import android.Manifest
-import android.content.Intent
-import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Bundle
-import android.provider.Settings
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.StringJoinerCompat
-import com.boswelja.contactringtonegenerator.databinding.SheetPermissionBinding
+import com.boswelja.contactringtonegenerator.ui.common.AppTheme
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import java.util.StringJoiner
 
 class PermissionSheet : BottomSheetDialogFragment() {
 
-    private val permissions =
-        arrayOf(Manifest.permission.READ_CONTACTS, Manifest.permission.WRITE_CONTACTS)
     private val requestPermissionLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
         if (result.all { it.value }) {
             dismiss()
-        } else {
-            checkMissingPermissions()
         }
     }
-
-    private lateinit var binding: SheetPermissionBinding
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        binding = SheetPermissionBinding.inflate(inflater, container, false)
-        return binding.root
-    }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        binding.grantButton.setOnClickListener {
-            if (permissions.any { shouldShowRequestPermissionRationale(it) }) {
-                launchApplicationSettings()
-            } else {
-                requestPermissionLauncher.launch(permissions)
+        return ComposeView(requireContext()).apply {
+            setContent {
+                AppTheme {
+                    PermissionSheetContent(
+                        onGrantClick = {
+                            requestPermissionLauncher.launch(
+                                arrayOf(
+                                    Manifest.permission.READ_CONTACTS,
+                                    Manifest.permission.WRITE_CONTACTS
+                                )
+                            )
+                        }
+                    )
+                }
             }
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        checkMissingPermissions()
-    }
+    @Composable
+    @Preview
+    fun PermissionSheetContent(
+        onGrantClick: () -> Unit = { }
+    ) {
+        val permissionString = StringJoiner("\n")
+        permissionString.add(stringResource(R.string.permission_missing_read_contacts))
+        permissionString.add(stringResource(R.string.permission_missing_write_contacts))
 
-    private fun checkMissingPermissions() {
-        val permissionRequestTextBuilder = StringJoinerCompat("\n")
-        if (!hasPermission(Manifest.permission.READ_CONTACTS)) {
-            permissionRequestTextBuilder.add(getString(R.string.permission_missing_read_contacts))
-        }
-        if (!hasPermission(Manifest.permission.WRITE_CONTACTS)) {
-            permissionRequestTextBuilder.add(getString(R.string.permission_missing_write_contacts))
-        }
-        if (permissionRequestTextBuilder.length > 0) {
-            binding.permissionDescriptionView.text = permissionRequestTextBuilder.toString()
-        } else {
-            dismiss()
-        }
-    }
-
-    private fun launchApplicationSettings() {
-        Toast.makeText(
-            requireContext(),
-            "Please grant the required permission here",
-            Toast.LENGTH_LONG
-        ).show()
-        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            data = Uri.fromParts("package", requireContext().packageName, null)
-        }.also {
-            startActivity(it)
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 32.dp, horizontal = 16.dp)
+        ) {
+            Text(
+                text = stringResource(R.string.permission_missing_title),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.h6
+            )
+            Text(
+                permissionString.toString(),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.body1
+            )
+            Button(
+                onClick = onGrantClick,
+                modifier = Modifier.padding(top = 16.dp)
+            ) {
+                Text(stringResource(R.string.grant))
+            }
         }
     }
-
-    private fun hasPermission(permission: String) =
-        requireContext().checkSelfPermission(permission) == PackageManager.PERMISSION_GRANTED
 }

@@ -29,7 +29,7 @@ private val LightColors = lightColors(
 private val shapes = Shapes(
     small = RoundedCornerShape(50),
     medium = RoundedCornerShape(16.dp),
-    large = RoundedCornerShape(16.dp)
+    large = RoundedCornerShape(32.dp)
 )
 
 @Composable
