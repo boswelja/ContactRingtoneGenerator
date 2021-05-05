@@ -56,7 +56,7 @@ class ContactPickerFragment : Fragment() {
 
     private val wizardModel: WizardViewModel by activityViewModels()
 
-    private val selectedContactsMap = HashMap<Long, Boolean>()
+    private val selectedContacts = mutableListOf<Contact>()
 
     @ExperimentalCoroutinesApi
     @ExperimentalMaterialApi
@@ -77,12 +77,7 @@ class ContactPickerFragment : Fragment() {
                                 text = { Text(stringResource(R.string.next)) },
                                 icon = { Icon(Icons.Outlined.NavigateNext, null) },
                                 onClick = {
-                                    // TODO Map contact IDs to contacts and submit
-//                                    selectedContactsMap.map {
-//                                        viewModel.allContacts.first { contact ->
-//                                            it.key == contact.id
-//                                        }
-//                                    }.also { wizardModel.submitSelectedContacts(it) }
+                                    wizardModel.submitSelectedContacts(selectedContacts)
                                     findNavController()
                                         .navigate(ContactPickerFragmentDirections.toRingtoneCreatorFragment())
                                 }
@@ -102,9 +97,12 @@ class ContactPickerFragment : Fragment() {
                                 allSelected = allSelected,
                                 onAllSelectedChange = {
                                     allSelected = it
-                                    // Select all currently displayed contacts
-                                    contacts?.forEach { contact ->
-                                        selectedContactsMap[contact.id] = allSelected
+                                    if (it) {
+                                        // Select all currently displayed contacts
+                                        contacts?.union(selectedContacts)?.let { newSelection ->
+                                            selectedContacts.clear()
+                                            selectedContacts.addAll(newSelection)
+                                        }
                                     }
                                 }
                             )
@@ -112,8 +110,8 @@ class ContactPickerFragment : Fragment() {
                                 useNicknames = useNicknames,
                                 contacts = contacts,
                                 onContactSelectionChanged = { contact, isSelected ->
-                                    if (isSelected) selectedContactsMap[contact.id] = isSelected
-                                    else selectedContactsMap.remove(contact.id)
+                                    if (isSelected) selectedContacts.add(contact)
+                                    else selectedContacts.remove(contact)
                                 }
                             )
                         }
@@ -178,7 +176,7 @@ class ContactPickerFragment : Fragment() {
             LazyColumn {
                 items(contacts) { contact ->
                     var selected by remember {
-                        mutableStateOf(selectedContactsMap[contact.id] == true)
+                        mutableStateOf(selectedContacts.contains(contact))
                     }
                     ListItem(
                         text = {
