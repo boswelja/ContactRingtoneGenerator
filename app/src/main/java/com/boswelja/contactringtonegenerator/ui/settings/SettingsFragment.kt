@@ -1,64 +1,87 @@
 package com.boswelja.contactringtonegenerator.ui.settings
 
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.preference.Preference
-import androidx.preference.PreferenceFragmentCompat
-import androidx.preference.PreferenceManager
-import androidx.preference.SeekBarPreference
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ListItem
+import androidx.compose.material.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.res.stringResource
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
-import com.boswelja.contactringtonegenerator.mediastore.MediaStoreHelper
-import kotlinx.coroutines.Dispatchers
+import com.boswelja.contactringtonegenerator.ui.common.AppTheme
+import com.boswelja.contactringtonegenerator.ui.common.CheckboxPreference
+import com.boswelja.contactringtonegenerator.ui.common.SliderPreference
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.launch
 
-class SettingsFragment :
-    PreferenceFragmentCompat(),
-    Preference.OnPreferenceClickListener,
-    SharedPreferences.OnSharedPreferenceChangeListener {
+class SettingsFragment : Fragment() {
 
-    private val coroutineScope = MainScope()
-    private val volumeBoostPreference: SeekBarPreference by lazy { findPreference(VOLUME_BOOST_KEY)!! }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        when (key) {
-            VOLUME_BOOST_KEY -> updateVolumeBoostSummary()
+    @ExperimentalCoroutinesApi
+    @ExperimentalMaterialApi
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setContent {
+                AppTheme {
+                    SettingsScreen()
+                }
+            }
         }
     }
 
     @ExperimentalCoroutinesApi
-    override fun onPreferenceClick(preference: Preference?): Boolean {
-        return when (preference?.key) {
-            RESET_RINGTONES_KEY -> {
-                resetContactRingtones()
-                true
-            }
-            LAUNCH_TTS_SETTINGS_KEY -> {
-                launchTtsSettings()
-                true
-            }
-            else -> false
+    @ExperimentalMaterialApi
+    @Composable
+    fun SettingsScreen() {
+        val viewModel: SettingsViewModel = viewModel()
+        Column {
+            ListItem(
+                text = { Text(stringResource(R.string.launch_tts_settings_title)) },
+                icon = { },
+                modifier = Modifier.clickable { launchTtsSettings() }
+            )
+            SliderPreference(
+                text = stringResource(R.string.volume_boost_title),
+                value = viewModel.volumeBoostValue,
+                valueRange = 0f..3f,
+                trailing = {
+                    val boost = it + 1
+                    Text("%.1fx".format(boost))
+                },
+                onSliderValueChanged = {
+                    viewModel.volumeBoostValue = it
+                },
+                onSliderValueFinished = {
+                    viewModel.updateVolumeBoost()
+                }
+            )
+            CheckboxPreference(
+                text = stringResource(R.string.multithread_title),
+                secondaryText = stringResource(R.string.multithread_summary),
+                isChecked = viewModel.multithreadedGeneration,
+                onCheckChanged = {
+                    viewModel.multithreadedGeneration = it
+                    viewModel.updateMultithreadedGeneration()
+                }
+            )
+            ListItem(
+                text = { Text(stringResource(R.string.reset_ringtones_title)) },
+                secondaryText = { Text(stringResource(R.string.reset_ringtones_summary)) },
+                icon = { },
+                modifier = Modifier.clickable { viewModel.resetContactRingtones() }
+            )
         }
-    }
-
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        addPreferencesFromResource(R.xml.settings)
-        findPreference<Preference>(RESET_RINGTONES_KEY)!!.onPreferenceClickListener = this
-        findPreference<Preference>(LAUNCH_TTS_SETTINGS_KEY)!!.onPreferenceClickListener = this
-        volumeBoostPreference.apply {
-            updatesContinuously = true
-        }
-        updateVolumeBoostSummary()
-        preferenceManager.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        preferenceManager.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
     }
 
     private fun launchTtsSettings() {
@@ -68,35 +91,5 @@ class SettingsFragment :
         }.also {
             startActivity(it)
         }
-    }
-
-    private fun updateVolumeBoostSummary() {
-        volumeBoostPreference.summary = getString(R.string.volume_boost_summary, calculateVolumeMultiplier())
-    }
-
-    private fun calculateVolumeMultiplier(): Float {
-        val userBoost = PreferenceManager.getDefaultSharedPreferences(context).getInt("volume_boost", 0)
-        val baseVolume = 10
-        return (baseVolume + userBoost) / 10f
-    }
-
-    @ExperimentalCoroutinesApi
-    private fun resetContactRingtones() {
-        coroutineScope.launch(Dispatchers.IO) {
-            ContactsHelper.getContacts(
-                requireContext().contentResolver,
-                Int.MAX_VALUE // Collect all contacts
-            ).first().forEach {
-                ContactsHelper.removeContactRingtone(requireContext(), it)
-            }
-            MediaStoreHelper.deleteAllRingtones(requireContext())
-        }
-    }
-
-    companion object {
-        private const val RESET_RINGTONES_KEY = "reset_ringtones"
-        private const val LAUNCH_TTS_SETTINGS_KEY = "launch_tts_settings"
-
-        const val VOLUME_BOOST_KEY = "volume_boost"
     }
 }
