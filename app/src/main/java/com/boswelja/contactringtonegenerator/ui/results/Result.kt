@@ -1,6 +1,6 @@
 package com.boswelja.contactringtonegenerator.ui.results
 
-enum class State {
+enum class Result {
     FAILED,
     MIXED,
     SUCCESSFUL,
