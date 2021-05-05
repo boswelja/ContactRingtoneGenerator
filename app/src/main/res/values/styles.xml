@@ -24,18 +24,4 @@
         <item name="android:layout_marginEnd">@dimen/content_side_margins</item>
     </style>
 
-    <style name="WizardTitle">
-        <item name="android:textAppearance">?attr/textAppearanceHeadline4</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textAlignment">center</item>
-    </style>
-
-    <style name="WizardStatus">
-        <item name="android:textAppearance">?attr/textAppearanceHeadline5</item>
-        <item name="android:layout_width">match_parent</item>
-        <item name="android:layout_height">wrap_content</item>
-        <item name="android:textAlignment">center</item>
-    </style>
-
 </resources>
