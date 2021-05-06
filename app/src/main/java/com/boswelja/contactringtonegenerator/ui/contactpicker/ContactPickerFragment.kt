@@ -43,7 +43,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.fragment.findNavController
-import androidx.preference.PreferenceManager
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
@@ -65,8 +64,6 @@ class ContactPickerFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        val useNicknames = PreferenceManager.getDefaultSharedPreferences(requireContext())
-            .getBoolean("use_nicknames", true)
         return ComposeView(requireContext()).apply {
             setContent {
                 val viewModel: ContactsViewModel = viewModel()
@@ -92,7 +89,7 @@ class ContactPickerFragment : Fragment() {
                                 searchQuery = searchQuery,
                                 onSearchQueryChanged = {
                                     searchQuery = it
-                                    viewModel.searchQuery.postValue(searchQuery)
+                                    viewModel.searchQuery.value = searchQuery
                                 },
                                 allSelected = allSelected,
                                 onAllSelectedChange = {
@@ -107,7 +104,6 @@ class ContactPickerFragment : Fragment() {
                                 }
                             )
                             ContactsList(
-                                useNicknames = useNicknames,
                                 contacts = contacts,
                                 onContactSelectionChanged = { contact, isSelected ->
                                     if (isSelected) selectedContacts.add(contact)
@@ -167,7 +163,6 @@ class ContactPickerFragment : Fragment() {
     @ExperimentalMaterialApi
     @Composable
     fun ContactsList(
-        useNicknames: Boolean,
         contacts: List<Contact>?,
         onContactSelectionChanged: (Contact, Boolean) -> Unit
     ) {
@@ -179,15 +174,9 @@ class ContactPickerFragment : Fragment() {
                         mutableStateOf(selectedContacts.contains(contact))
                     }
                     ListItem(
-                        text = {
-                            if (useNicknames) {
-                                Text(contact.nickname ?: contact.displayName)
-                            } else {
-                                Text(contact.displayName)
-                            }
-                        },
+                        text = { Text(contact.displayName) },
                         icon = {
-                            ContactsHelper.openContactPhotoStream(context, contact.id)?.let {
+                            ContactsHelper.openContactPhotoStream(context, contact)?.let {
                                 val imageBitmap = BitmapFactory.decodeStream(it).asImageBitmap()
                                 it.close()
                                 Image(imageBitmap, null, Modifier.clip(CircleShape))
