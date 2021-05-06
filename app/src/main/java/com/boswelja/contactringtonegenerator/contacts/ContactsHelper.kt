@@ -11,10 +11,10 @@ import androidx.annotation.VisibleForTesting.PRIVATE
 import androidx.core.database.getStringOrNull
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import timber.log.Timber
 import java.io.InputStream
 
 object ContactsHelper {
@@ -44,14 +44,20 @@ object ContactsHelper {
     @ExperimentalCoroutinesApi
     fun getContacts(
         contentResolver: ContentResolver,
-        pageSize: Int
-    ): Flow<List<Contact>> = callbackFlow {
+        pageSize: Int,
+        filter: String? = null
+    ): Flow<List<Contact>> = flow {
+        val selection = filter?.let {
+            "${ContactsContract.Contacts.DISPLAY_NAME_PRIMARY} LIKE ?"
+        }
+        val selectionArgs = filter?.let { arrayOf("%$filter%") }
+        Timber.d("Getting all contacts where %s matches %s", selection, filter)
         val contacts = mutableListOf<Contact>()
         val cursor = contentResolver.query(
             ContactsContract.Contacts.CONTENT_URI,
             CONTACTS_PROJECTION,
-            null,
-            null,
+            selection,
+            selectionArgs,
             ContactsContract.Contacts.SORT_KEY_PRIMARY
         )
         var currentGrowth = 0
@@ -63,9 +69,9 @@ object ContactsHelper {
                 val id = cursor.getLong(idColumn)
                 // Only continue if this contact is unique
                 if (!contacts.any { it.id == id }) {
-                    val lookupKey = cursor.getString(lookupKeyColumn)
                     val displayName = cursor.getStringOrNull(displayNameColumn)
                     displayName?.let {
+                        val lookupKey = cursor.getString(lookupKeyColumn)
                         val contact = Contact(
                             id,
                             lookupKey,
@@ -75,19 +81,15 @@ object ContactsHelper {
                         contacts.add(contact)
                         currentGrowth++
                         if (currentGrowth >= pageSize) {
-                            send(contacts)
+                            emit(contacts)
                             currentGrowth = 0
                         }
                     }
                 }
             }
             // Send contacts on finished anyways
-            send(contacts)
+            emit(contacts)
             cursor.close()
-        }
-
-        awaitClose {
-            if (cursor?.isClosed == false) cursor.close()
         }
     }
 

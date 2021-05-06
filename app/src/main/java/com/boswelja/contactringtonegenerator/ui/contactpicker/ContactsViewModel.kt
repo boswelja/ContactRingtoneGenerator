@@ -8,24 +8,23 @@ import androidx.lifecycle.switchMap
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.map
-import java.util.Locale
 
+@ExperimentalCoroutinesApi
 class ContactsViewModel(application: Application) : AndroidViewModel(application) {
 
     val searchQuery = MutableLiveData("")
 
-    @ExperimentalCoroutinesApi
-    val allContacts = ContactsHelper.getContacts(application.contentResolver, 25)
-
-    @ExperimentalCoroutinesApi
     val adapterContacts = searchQuery.switchMap { query ->
-        val formattedQuery = query.toLowerCase(Locale.ROOT)
-        allContacts.map { contacts ->
-            contacts.filter {
-                it.displayName.toLowerCase(Locale.ROOT).contains(formattedQuery) ||
-                    it.nickname?.toLowerCase(Locale.ROOT)?.contains(formattedQuery) == true
-            }
-        }.asLiveData(Dispatchers.IO)
+        val formattedQuery = query.trim().let { trimmedQuery ->
+            // If we actually have a query, format it as lower case
+            if (trimmedQuery.isNotEmpty())
+                trimmedQuery
+            else null
+        }
+        ContactsHelper.getContacts(
+            application.contentResolver,
+            500,
+            formattedQuery
+        ).asLiveData(Dispatchers.Default)
     }
 }

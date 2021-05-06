@@ -89,7 +89,7 @@ class ContactPickerFragment : Fragment() {
                                 searchQuery = searchQuery,
                                 onSearchQueryChanged = {
                                     searchQuery = it
-                                    viewModel.searchQuery.value = searchQuery
+                                    viewModel.searchQuery.postValue(searchQuery)
                                 },
                                 allSelected = allSelected,
                                 onAllSelectedChange = {
