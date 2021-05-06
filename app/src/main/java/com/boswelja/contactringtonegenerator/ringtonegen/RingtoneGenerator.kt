@@ -127,13 +127,21 @@ class RingtoneGenerator(private val context: Context) :
     private suspend fun synthesizeString(workingString: String, contact: Contact): SynthesisResult {
         return withContext(Dispatchers.IO) {
             val id = counter.incrementAndGet().toString()
+            val structuredName = ContactsHelper.getContactStructuredName(
+                context.contentResolver,
+                contact.lookupKey
+            )
+            val nickname = ContactsHelper.getContactNickname(
+                context.contentResolver,
+                contact.lookupKey
+            )
             val message = workingString
-                .replace(Constants.FIRST_NAME_PLACEHOLDER, contact.firstName ?: "")
-                .replace(Constants.MIDDLE_NAME_PLACEHOLDER, contact.middleName ?: "")
-                .replace(Constants.LAST_NAME_PLACEHOLDER, contact.lastName ?: "")
-                .replace(Constants.NAME_PREFIX_PLACEHOLDER, contact.prefix ?: "")
-                .replace(Constants.NAME_SUFFIX_PLACEHOLDER, contact.suffix ?: "")
-                .replace(Constants.NICKNAME_PLACEHOLDER, contact.nickname ?: "")
+                .replace(Constants.FIRST_NAME_PLACEHOLDER, structuredName?.firstName ?: "")
+                .replace(Constants.MIDDLE_NAME_PLACEHOLDER, structuredName?.middleName ?: "")
+                .replace(Constants.LAST_NAME_PLACEHOLDER, structuredName?.lastName ?: "")
+                .replace(Constants.NAME_PREFIX_PLACEHOLDER, structuredName?.prefix ?: "")
+                .replace(Constants.NAME_SUFFIX_PLACEHOLDER, structuredName?.suffix ?: "")
+                .replace(Constants.NICKNAME_PLACEHOLDER, nickname ?: "")
             return@withContext ttsManager.synthesizeToFile(SynthesisJob(id, message))
         }
     }
