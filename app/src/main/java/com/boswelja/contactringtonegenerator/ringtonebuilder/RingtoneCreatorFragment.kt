@@ -111,7 +111,7 @@ class RingtoneCreatorFragment : Fragment() {
                                     else -> Timber.w("Unknown action clicked")
                                 }
                             },
-                            onItemRemoved = { viewModel.ringtoneStructure.remove(it) },
+                            onItemRemoved = { item -> viewModel.ringtoneStructure.remove(item) },
                             modifier = Modifier.padding(it)
                         )
                     }
@@ -119,153 +119,153 @@ class RingtoneCreatorFragment : Fragment() {
             }
         }
     }
+}
 
-    @ExperimentalMaterialApi
-    @Composable
-    fun RingtoneBuilderScreen(
-        structure: List<StructureItem<*>>?,
-        onItemAdded: (StructureItem<*>) -> Unit,
-        onActionClicked: (StructureItem<*>) -> Unit,
-        onItemRemoved: (StructureItem<*>) -> Unit,
-        modifier: Modifier = Modifier
-    ) {
-        Column(modifier = modifier) {
-            StructureChoices { choice ->
-                Timber.d("Adding %s", choice)
-                onItemAdded(choice.createStructureItem())
-            }
-            Divider()
-            LazyColumn(Modifier.weight(1f)) {
-                structure?.let { structure ->
-                    items(structure) { item ->
-                        val dismissState = rememberDismissState {
-                            if (it != DismissValue.Default) {
-                                onItemRemoved(item)
-                                true
-                            } else false
-                        }
-                        SwipeToDismiss(
-                            state = dismissState,
-                            background = {
-                                val direction =
-                                    dismissState.dismissDirection ?: return@SwipeToDismiss
-                                val color = Color.LightGray
-                                val alignment = when (direction) {
-                                    DismissDirection.StartToEnd -> Alignment.CenterStart
-                                    DismissDirection.EndToStart -> Alignment.CenterEnd
-                                }
-                                val icon = Icons.Outlined.Delete
-
-                                Box(
-                                    Modifier
-                                        .fillMaxSize()
-                                        .background(color)
-                                        .padding(horizontal = 32.dp),
-                                    contentAlignment = alignment
-                                ) {
-                                    Icon(
-                                        icon,
-                                        contentDescription = null,
-                                        modifier = Modifier.size(36.dp)
-                                    )
-                                }
+@ExperimentalMaterialApi
+@Composable
+fun RingtoneBuilderScreen(
+    structure: List<StructureItem<*>>?,
+    onItemAdded: (StructureItem<*>) -> Unit,
+    onActionClicked: (StructureItem<*>) -> Unit,
+    onItemRemoved: (StructureItem<*>) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(modifier = modifier) {
+        StructureChoices { choice ->
+            Timber.d("Adding %s", choice)
+            onItemAdded(choice.createStructureItem())
+        }
+        Divider()
+        LazyColumn(Modifier.weight(1f)) {
+            structure?.let { structure ->
+                items(structure) { item ->
+                    val dismissState = rememberDismissState {
+                        if (it != DismissValue.Default) {
+                            onItemRemoved(item)
+                            true
+                        } else false
+                    }
+                    SwipeToDismiss(
+                        state = dismissState,
+                        background = {
+                            val direction =
+                                dismissState.dismissDirection ?: return@SwipeToDismiss
+                            val color = Color.LightGray
+                            val alignment = when (direction) {
+                                DismissDirection.StartToEnd -> Alignment.CenterStart
+                                DismissDirection.EndToStart -> Alignment.CenterEnd
                             }
-                        ) {
-                            Card(
-                                elevation = animateDpAsState(
-                                    if (dismissState.dismissDirection != null) 4.dp else 0.dp
-                                ).value
+                            val icon = Icons.Outlined.Delete
+
+                            Box(
+                                Modifier
+                                    .fillMaxSize()
+                                    .background(color)
+                                    .padding(horizontal = 32.dp),
+                                contentAlignment = alignment
                             ) {
-                                StructureItem(
-                                    item,
-                                    onActionClicked
+                                Icon(
+                                    icon,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(36.dp)
                                 )
                             }
                         }
-                    }
-                }
-            }
-        }
-    }
-
-    @ExperimentalMaterialApi
-    @Composable
-    fun StructureItem(
-        item: StructureItem<*>,
-        onActionClicked: (StructureItem<*>) -> Unit,
-        modifier: Modifier = Modifier
-    ) {
-        ListItem(
-            icon = { Icon(item.icon, null) },
-            text = {
-                when (item.dataType) {
-                    StructureItem.DataType.IMMUTABLE ->
-                        Text(stringResource(item.labelRes))
-                    StructureItem.DataType.CUSTOM_TEXT -> {
-                        var currentText by mutableStateOf(item.data?.toString() ?: "")
-                        OutlinedTextField(
-                            value = currentText,
-                            onValueChange = {
-                                currentText = it
-                                item.setData(it)
-                            },
-                            singleLine = true
-                        )
-                    }
-                    StructureItem.DataType.AUDIO_FILE,
-                    StructureItem.DataType.SYSTEM_RINGTONE -> {
-                        val context = LocalContext.current
-                        Row(verticalAlignment = Alignment.CenterVertically) {
-                            Text(
-                                text = Utils.getDisplayText(context, item.data as Uri?)
-                                    ?: stringResource(item.labelRes),
-                                modifier = Modifier.weight(1f)
+                    ) {
+                        Card(
+                            elevation = animateDpAsState(
+                                if (dismissState.dismissDirection != null) 4.dp else 0.dp
+                            ).value
+                        ) {
+                            StructureItem(
+                                item,
+                                onActionClicked
                             )
-                            TextButton(onClick = { onActionClicked(item) }) {
-                                Text(stringResource(R.string.browse))
-                            }
                         }
                     }
                 }
-            },
-//            trailing = {
-//                Icon(Icons.Filled.DragHandle, null)
-//            },
-            modifier = modifier
-        )
-    }
-
-    @Composable
-    fun StructureChoices(
-        onItemClick: (StructureChoice) -> Unit
-    ) {
-        LazyRow(
-            contentPadding = PaddingValues(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(StructureChoice.ALL) { choice ->
-                ItemChip(choice, onItemClick)
             }
         }
     }
+}
 
-    @Composable
-    fun ItemChip(
-        item: StructureChoice,
-        onClick: (StructureChoice) -> Unit
-    ) {
-        Surface(
-            color = Color.LightGray,
-            shape = MaterialTheme.shapes.small
-        ) {
-            Row(
-                Modifier
-                    .clickable { onClick(item) }
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-            ) {
-                Icon(item.icon, null)
-                Text(stringResource(item.textRes))
+@ExperimentalMaterialApi
+@Composable
+fun StructureItem(
+    item: StructureItem<*>,
+    onActionClicked: (StructureItem<*>) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    ListItem(
+        icon = { Icon(item.icon, null) },
+        text = {
+            when (item.dataType) {
+                StructureItem.DataType.IMMUTABLE ->
+                    Text(stringResource(item.labelRes))
+                StructureItem.DataType.CUSTOM_TEXT -> {
+                    var currentText by mutableStateOf(item.data?.toString() ?: "")
+                    OutlinedTextField(
+                        value = currentText,
+                        onValueChange = {
+                            currentText = it
+                            item.setData(it)
+                        },
+                        singleLine = true
+                    )
+                }
+                StructureItem.DataType.AUDIO_FILE,
+                StructureItem.DataType.SYSTEM_RINGTONE -> {
+                    val context = LocalContext.current
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(
+                            text = Utils.getDisplayText(context, item.data as Uri?)
+                                ?: stringResource(item.labelRes),
+                            modifier = Modifier.weight(1f)
+                        )
+                        TextButton(onClick = { onActionClicked(item) }) {
+                            Text(stringResource(R.string.browse))
+                        }
+                    }
+                }
             }
+        },
+//            trailing = {
+//                Icon(Icons.Filled.DragHandle, null)
+//            },
+        modifier = modifier
+    )
+}
+
+@Composable
+fun StructureChoices(
+    onItemClick: (StructureChoice) -> Unit
+) {
+    LazyRow(
+        contentPadding = PaddingValues(16.dp),
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        items(StructureChoice.ALL) { choice ->
+            ItemChip(choice, onItemClick)
+        }
+    }
+}
+
+@Composable
+fun ItemChip(
+    item: StructureChoice,
+    onClick: (StructureChoice) -> Unit
+) {
+    Surface(
+        color = Color.LightGray,
+        shape = MaterialTheme.shapes.small
+    ) {
+        Row(
+            Modifier
+                .clickable { onClick(item) }
+                .padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+            Icon(item.icon, null)
+            Text(stringResource(item.textRes))
         }
     }
 }

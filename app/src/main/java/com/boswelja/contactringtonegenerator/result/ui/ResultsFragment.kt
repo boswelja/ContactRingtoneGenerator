@@ -53,84 +53,87 @@ class ResultsFragment : Fragment() {
             setContent {
                 val result by viewModel.state.observeAsState()
                 AppTheme {
-                    ResultScreen(result)
+                    ResultScreen(result) { activity?.finish() }
                 }
             }
         }
     }
+}
 
-    @Composable
-    fun ResultScreen(result: Result?) {
-        Scaffold(
-            floatingActionButtonPosition = FabPosition.End,
-            floatingActionButton = {
-                ExtendedFloatingActionButton(
-                    text = { Text(stringResource(R.string.finish)) },
-                    icon = { Icon(Icons.Outlined.Check, null) },
-                    onClick = { activity?.finish() }
-                )
-            }
-        ) {
-            Result(
-                result = result,
-                modifier = Modifier.fillMaxSize()
+@Composable
+fun ResultScreen(
+    result: Result?,
+    onFinishClick: () -> Unit
+) {
+    Scaffold(
+        floatingActionButtonPosition = FabPosition.End,
+        floatingActionButton = {
+            ExtendedFloatingActionButton(
+                text = { Text(stringResource(R.string.finish)) },
+                icon = { Icon(Icons.Outlined.Check, null) },
+                onClick = onFinishClick
             )
         }
+    ) {
+        Result(
+            result = result,
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+@Composable
+fun Result(
+    result: Result?,
+    modifier: Modifier = Modifier
+) {
+    // Get result display info
+    val (icon, resultTitle, resultText) = when (result) {
+        Result.FAILED ->
+            Triple(
+                Icons.Outlined.ErrorOutline,
+                R.string.result_failed_title,
+                R.string.result_failed_status
+            )
+        Result.MIXED ->
+            Triple(
+                Icons.Outlined.Warning,
+                R.string.result_mixed_title,
+                R.string.result_mixed_status
+            )
+        Result.SUCCESSFUL ->
+            Triple(
+                Icons.Outlined.CheckCircleOutline,
+                R.string.result_success_title,
+                R.string.result_success_status
+            )
+        else ->
+            Triple(
+                Icons.Outlined.HelpOutline,
+                R.string.result_unknown_title,
+                R.string.result_unknown_status
+            )
     }
 
-    @Composable
-    fun Result(
-        result: Result?,
-        modifier: Modifier = Modifier
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier.fillMaxWidth()
     ) {
-        // Get result display info
-        val (icon, resultTitle, resultText) = when (result) {
-            Result.FAILED ->
-                Triple(
-                    Icons.Outlined.ErrorOutline,
-                    R.string.result_failed_title,
-                    R.string.result_failed_status
-                )
-            Result.MIXED ->
-                Triple(
-                    Icons.Outlined.Warning,
-                    R.string.result_mixed_title,
-                    R.string.result_mixed_status
-                )
-            Result.SUCCESSFUL ->
-                Triple(
-                    Icons.Outlined.CheckCircleOutline,
-                    R.string.result_success_title,
-                    R.string.result_success_status
-                )
-            else ->
-                Triple(
-                    Icons.Outlined.HelpOutline,
-                    R.string.result_unknown_title,
-                    R.string.result_unknown_status
-                )
-        }
-
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = modifier.fillMaxWidth()
-        ) {
-            Icon(
-                imageVector = icon,
-                contentDescription = null,
-                modifier = Modifier.size(180.dp)
-            )
-            Text(
-                text = stringResource(resultTitle),
-                style = MaterialTheme.typography.h4,
-                textAlign = TextAlign.Center
-            )
-            Text(
-                text = stringResource(resultText),
-                style = MaterialTheme.typography.h5,
-                textAlign = TextAlign.Center
-            )
-        }
+        Icon(
+            imageVector = icon,
+            contentDescription = null,
+            modifier = Modifier.size(180.dp)
+        )
+        Text(
+            text = stringResource(resultTitle),
+            style = MaterialTheme.typography.h4,
+            textAlign = TextAlign.Center
+        )
+        Text(
+            text = stringResource(resultText),
+            style = MaterialTheme.typography.h5,
+            textAlign = TextAlign.Center
+        )
     }
 }

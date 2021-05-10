@@ -46,65 +46,11 @@ class GetStartedFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                GetStartedScreen()
+                GetStartedScreen(
+                    onStartClick = { getStarted() },
+                    onSettingsClick = { navigateToSettings() }
+                )
             }
-        }
-    }
-
-    @Composable
-    @Preview
-    fun GetStartedScreen() {
-        AppTheme {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.fillMaxSize().padding(top = 64.dp, bottom = 64.dp)
-            ) {
-                AppInfo()
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.weight(1f).fillMaxSize()
-                ) {
-                    ExtendedFloatingActionButton(
-                        text = { Text(stringResource(R.string.get_started)) },
-                        icon = { Icon(Icons.Outlined.NavigateNext, null) },
-                        onClick = {
-                            getStarted()
-                        }
-                    )
-                }
-                OutlinedButton(
-                    onClick = { navigateToSettings() },
-                    modifier = Modifier.padding(16.dp)
-                ) {
-                    Icon(Icons.Outlined.Settings, null)
-                    Text(stringResource(R.string.settings_title))
-                }
-            }
-        }
-    }
-
-    @Composable
-    @Preview
-    fun AppInfo() {
-        val context = LocalContext.current
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Image(
-                context.packageManager
-                    .getApplicationIcon(context.packageName).toBitmap().asImageBitmap(),
-                contentDescription = null,
-                modifier = Modifier.size(140.dp)
-            )
-            Text(
-                text = stringResource(R.string.welcome_to),
-                style = MaterialTheme.typography.h5
-            )
-            Text(
-                text = stringResource(R.string.app_name),
-                style = MaterialTheme.typography.h4
-            )
         }
     }
 
@@ -137,4 +83,61 @@ class GetStartedFragment : Fragment() {
             context?.checkSelfPermission(
             Manifest.permission.WRITE_CONTACTS
         ) == PackageManager.PERMISSION_GRANTED
+}
+
+@Composable
+fun GetStartedScreen(
+    onStartClick: () -> Unit,
+    onSettingsClick: () -> Unit
+) {
+    AppTheme {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.fillMaxSize().padding(top = 64.dp, bottom = 64.dp)
+        ) {
+            AppInfo()
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.weight(1f).fillMaxSize()
+            ) {
+                ExtendedFloatingActionButton(
+                    text = { Text(stringResource(R.string.get_started)) },
+                    icon = { Icon(Icons.Outlined.NavigateNext, null) },
+                    onClick = onStartClick
+                )
+            }
+            OutlinedButton(
+                onClick = onSettingsClick,
+                modifier = Modifier.padding(16.dp)
+            ) {
+                Icon(Icons.Outlined.Settings, null)
+                Text(stringResource(R.string.settings_title))
+            }
+        }
+    }
+}
+
+@Composable
+@Preview
+fun AppInfo() {
+    val context = LocalContext.current
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        Image(
+            context.packageManager
+                .getApplicationIcon(context.packageName).toBitmap().asImageBitmap(),
+            contentDescription = null,
+            modifier = Modifier.size(140.dp)
+        )
+        Text(
+            text = stringResource(R.string.welcome_to),
+            style = MaterialTheme.typography.h5
+        )
+        Text(
+            text = stringResource(R.string.app_name),
+            style = MaterialTheme.typography.h4
+        )
+    }
 }

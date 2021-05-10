@@ -34,53 +34,13 @@ class SettingsFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setContent {
                 AppTheme {
-                    SettingsScreen()
+                    SettingsScreen(
+                        onLaunchTtsClick = {
+                            launchTtsSettings()
+                        }
+                    )
                 }
             }
-        }
-    }
-
-    @ExperimentalCoroutinesApi
-    @ExperimentalMaterialApi
-    @Composable
-    fun SettingsScreen() {
-        val viewModel: SettingsViewModel = viewModel()
-        Column {
-            ListItem(
-                text = { Text(stringResource(R.string.launch_tts_settings_title)) },
-                icon = { },
-                modifier = Modifier.clickable { launchTtsSettings() }
-            )
-            SliderPreference(
-                text = stringResource(R.string.volume_boost_title),
-                value = viewModel.volumeBoostValue,
-                valueRange = 0f..3f,
-                trailing = {
-                    val boost = it + 1
-                    Text("%.1fx".format(boost))
-                },
-                onSliderValueChanged = {
-                    viewModel.volumeBoostValue = it
-                },
-                onSliderValueFinished = {
-                    viewModel.updateVolumeBoost()
-                }
-            )
-            CheckboxPreference(
-                text = stringResource(R.string.multithread_title),
-                secondaryText = stringResource(R.string.multithread_summary),
-                isChecked = viewModel.multithreadedGeneration,
-                onCheckChanged = {
-                    viewModel.multithreadedGeneration = it
-                    viewModel.updateMultithreadedGeneration()
-                }
-            )
-            ListItem(
-                text = { Text(stringResource(R.string.reset_ringtones_title)) },
-                secondaryText = { Text(stringResource(R.string.reset_ringtones_summary)) },
-                icon = { },
-                modifier = Modifier.clickable { viewModel.resetContactRingtones() }
-            )
         }
     }
 
@@ -91,5 +51,51 @@ class SettingsFragment : Fragment() {
         }.also {
             startActivity(it)
         }
+    }
+}
+
+@ExperimentalCoroutinesApi
+@ExperimentalMaterialApi
+@Composable
+fun SettingsScreen(
+    onLaunchTtsClick: () -> Unit
+) {
+    val viewModel: SettingsViewModel = viewModel()
+    Column {
+        ListItem(
+            text = { Text(stringResource(R.string.launch_tts_settings_title)) },
+            icon = { },
+            modifier = Modifier.clickable { onLaunchTtsClick() }
+        )
+        SliderPreference(
+            text = stringResource(R.string.volume_boost_title),
+            value = viewModel.volumeBoostValue,
+            valueRange = 0f..3f,
+            trailing = {
+                val boost = it + 1
+                Text("%.1fx".format(boost))
+            },
+            onSliderValueChanged = {
+                viewModel.volumeBoostValue = it
+            },
+            onSliderValueFinished = {
+                viewModel.updateVolumeBoost()
+            }
+        )
+        CheckboxPreference(
+            text = stringResource(R.string.multithread_title),
+            secondaryText = stringResource(R.string.multithread_summary),
+            isChecked = viewModel.multithreadedGeneration,
+            onCheckChanged = {
+                viewModel.multithreadedGeneration = it
+                viewModel.updateMultithreadedGeneration()
+            }
+        )
+        ListItem(
+            text = { Text(stringResource(R.string.reset_ringtones_title)) },
+            secondaryText = { Text(stringResource(R.string.reset_ringtones_summary)) },
+            icon = { },
+            modifier = Modifier.clickable { viewModel.resetContactRingtones() }
+        )
     }
 }

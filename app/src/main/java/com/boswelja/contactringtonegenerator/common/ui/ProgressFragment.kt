@@ -49,36 +49,6 @@ class ProgressFragment : Fragment() {
         }
     }
 
-    @Composable
-    fun ProgressScreen(
-        indeterminate: Boolean,
-        progress: Float,
-        status: String,
-        step: String
-    ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Text(
-                text = status,
-                style = MaterialTheme.typography.h4
-            )
-            Text(
-                text = step,
-                style = MaterialTheme.typography.h5
-            )
-            if (indeterminate) {
-                LinearProgressIndicator()
-            } else {
-                LinearProgressIndicator(
-                    progress = progress
-                )
-            }
-        }
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         wizardViewModel.generatorState.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -97,5 +67,35 @@ class ProgressFragment : Fragment() {
                 wizardViewModel.failCount.value!!
             )
         )
+    }
+}
+
+@Composable
+fun ProgressScreen(
+    indeterminate: Boolean,
+    progress: Float,
+    status: String,
+    step: String
+) {
+    Column(
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Text(
+            text = status,
+            style = MaterialTheme.typography.h4
+        )
+        Text(
+            text = step,
+            style = MaterialTheme.typography.h5
+        )
+        if (indeterminate) {
+            LinearProgressIndicator()
+        } else {
+            LinearProgressIndicator(
+                progress = progress
+            )
+        }
     }
 }
