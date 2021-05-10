@@ -50,6 +50,7 @@ import com.boswelja.contactringtonegenerator.common.ui.AppTheme
 import com.boswelja.contactringtonegenerator.contactpicker.Contact
 import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import timber.log.Timber
 
 class ContactPickerFragment : Fragment() {
 
@@ -73,7 +74,7 @@ class ContactPickerFragment : Fragment() {
                                 icon = { Icon(Icons.Outlined.NavigateNext, null) },
                                 onClick = {
                                     wizardModel.submitSelectedContacts(
-                                        viewModel.selectedContacts.filter { it.value }.keys.toList()
+                                        viewModel.selectedContacts
                                     )
                                     findNavController().navigate(
                                         ContactPickerFragmentDirections.toRingtoneCreatorFragment()
@@ -96,16 +97,28 @@ class ContactPickerFragment : Fragment() {
                                 onAllSelectedChange = {
                                     allSelected = it
                                     contacts?.forEach { contact ->
-                                        viewModel.selectedContacts[contact] = it
+                                        if (
+                                            allSelected &&
+                                            !viewModel.selectedContacts.contains(contact)
+                                        ) {
+                                            viewModel.selectedContacts.add(contact)
+                                        } else if (!allSelected) {
+                                            viewModel.selectedContacts.remove(contact)
+                                        }
                                     }
                                 }
                             )
                             ContactsList(
-                                contacts = contacts?.map { contact ->
-                                    Pair(contact, viewModel.selectedContacts[contact] ?: false)
-                                },
+                                contacts = contacts,
+                                selectedContacts = viewModel.selectedContacts,
                                 onContactSelectionChanged = { contact, isSelected ->
-                                    viewModel.selectedContacts[contact] = isSelected
+                                    Timber.d(
+                                        "Selection changed for %s, is now %s",
+                                        contact,
+                                        isSelected
+                                    )
+                                    if (isSelected) viewModel.selectedContacts.add(contact)
+                                    else viewModel.selectedContacts.remove(contact)
                                 }
                             )
                         }
@@ -174,13 +187,15 @@ fun ListHeader(
 @ExperimentalMaterialApi
 @Composable
 fun ContactsList(
-    contacts: List<Pair<Contact, Boolean>>?,
+    contacts: List<Contact>?,
+    selectedContacts: List<Contact>,
     onContactSelectionChanged: (Contact, Boolean) -> Unit
 ) {
     val context = LocalContext.current
     contacts?.let {
         LazyColumn {
-            items(contacts) { (contact, selected) ->
+            items(contacts) { contact ->
+                val selected = selectedContacts.contains(contact)
                 ListItem(
                     text = { Text(contact.displayName) },
                     icon = {
@@ -194,7 +209,7 @@ fun ContactsList(
                         Checkbox(checked = selected, onCheckedChange = null)
                     },
                     modifier = Modifier.clickable {
-                        onContactSelectionChanged(contact, selected)
+                        onContactSelectionChanged(contact, !selected)
                     }
                 )
             }

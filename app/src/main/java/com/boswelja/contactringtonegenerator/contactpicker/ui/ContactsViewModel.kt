@@ -1,7 +1,7 @@
 package com.boswelja.contactringtonegenerator.contactpicker.ui
 
 import android.app.Application
-import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
@@ -16,6 +16,8 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
 
     val searchQuery = MutableLiveData("")
 
+    val selectedContacts = mutableStateListOf<Contact>()
+
     val adapterContacts = searchQuery.switchMap { query ->
         val formattedQuery = query.trim().let { trimmedQuery ->
             // If we actually have a query, format it as lower case
@@ -29,6 +31,4 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
             formattedQuery
         ).asLiveData(Dispatchers.Default)
     }
-
-    val selectedContacts = mutableStateMapOf<Contact, Boolean>()
 }
