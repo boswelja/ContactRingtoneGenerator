@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.result
+package com.boswelja.contactringtonegenerator.ringtonegen
 
 enum class Result {
     FAILED,

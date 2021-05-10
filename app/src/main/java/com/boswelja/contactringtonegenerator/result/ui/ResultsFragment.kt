@@ -22,8 +22,6 @@ import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.HelpOutline
 import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
@@ -31,18 +29,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.common.ui.AppTheme
-import com.boswelja.contactringtonegenerator.result.Result
+import com.boswelja.contactringtonegenerator.ringtonegen.Result
 
 class ResultsFragment : Fragment() {
 
     private val args: ResultsFragmentArgs by navArgs()
-    private val viewModel: ResultsViewModel by viewModels {
-        ResultViewModelFactory(args.successCount, args.failureCount)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -51,7 +45,7 @@ class ResultsFragment : Fragment() {
     ): View {
         return ComposeView(requireContext()).apply {
             setContent {
-                val result by viewModel.state.observeAsState()
+                val result = args.result
                 AppTheme {
                     ResultScreen(result) { activity?.finish() }
                 }

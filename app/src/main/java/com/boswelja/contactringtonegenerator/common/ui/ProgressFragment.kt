@@ -22,6 +22,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.WizardViewModel
+import com.boswelja.contactringtonegenerator.ringtonegen.Result
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
 
 class ProgressFragment : Fragment() {
@@ -61,11 +62,22 @@ class ProgressFragment : Fragment() {
     }
 
     private fun navigateNext() {
+        val successCount = wizardViewModel.successCount
+        val failCount = wizardViewModel.failCount
+        val result = when {
+            failCount.value!! < 1 && successCount.value!! > 0 -> {
+                Result.SUCCESSFUL
+            }
+            failCount.value!! > 0 && successCount.value!! > 0 -> {
+                Result.MIXED
+            }
+            failCount.value!! > 0 && successCount.value!! < 1 -> {
+                Result.FAILED
+            }
+            else -> Result.UNKNOWN
+        }
         findNavController().navigate(
-            ProgressFragmentDirections.toFinishedFragment(
-                wizardViewModel.successCount.value!!,
-                wizardViewModel.failCount.value!!
-            )
+            ProgressFragmentDirections.toFinishedFragment(result)
         )
     }
 }
