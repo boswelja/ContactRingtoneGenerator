@@ -1,75 +1,39 @@
 package com.boswelja.contactringtonegenerator
 
 import android.app.Application
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import com.boswelja.contactringtonegenerator.contactpicker.Contact
-import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
+import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
 import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapConcat
 
 class WizardViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val generatorProgressListener = object : RingtoneGenerator.ProgressListener {
-        override fun onJobStarted(contact: Contact) {
-            val newValue = _startedJobCount.value!!.plus(1)
-            _startedJobCount.postValue(newValue)
+    val contactsQuery = MutableStateFlow("")
+
+    val selectedContacts = mutableStateListOf<Contact>()
+
+    @FlowPreview
+    @ExperimentalCoroutinesApi
+    val adapterContacts = contactsQuery.flatMapConcat { query ->
+        val formattedQuery = query.trim().let { trimmedQuery ->
+            // If we actually have a query, format it as lower case
+            if (trimmedQuery.isNotEmpty())
+                trimmedQuery
+            else null
         }
-
-        override fun onJobCompleted(success: Boolean, contact: Contact) {
-            if (success) {
-                val newValue = _successCount.value!!.plus(1)
-                _successCount.postValue(newValue)
-            } else {
-                val newValue = _failCount.value!!.plus(1)
-                _failCount.postValue(newValue)
-            }
-        }
+        ContactsHelper.getContacts(
+            application.contentResolver,
+            500,
+            formattedQuery
+        )
     }
 
-    private val ringtoneGenerator: RingtoneGenerator by lazy {
-        RingtoneGenerator(application).apply {
-            progressListener = generatorProgressListener
-        }
-    }
-
-    private val _startedJobCount = MutableLiveData(0)
-    private val _successCount = MutableLiveData(0)
-    private val _failCount = MutableLiveData(0)
-
-    val totalJobCount: Int
-        get() = ringtoneGenerator.totalJobCount
-    val generatorState: LiveData<RingtoneGenerator.State>
-        get() = ringtoneGenerator.state
-    val startedJobCount: LiveData<Int>
-        get() = _startedJobCount
-    val successCount: LiveData<Int>
-        get() = _successCount
-    val failCount: LiveData<Int>
-        get() = _failCount
-
-    fun initialiseGenerator() {
-        ringtoneGenerator.initialise()
-    }
-
-    fun startGenerating() {
-        ringtoneGenerator.start()
-    }
-
-    fun submitSelectedContacts(selectedContacts: List<Contact>) {
-        ringtoneGenerator.contacts = selectedContacts
-    }
-
-    fun getSelectedContacts(): List<Contact> = ringtoneGenerator.contacts
-
-    fun submitRingtoneStructure(ringtoneStructure: List<StructureItem<*>>) {
-        ringtoneGenerator.ringtoneStructure = ringtoneStructure
-    }
-
-    fun getRingtoneStructure(): List<StructureItem<*>> = ringtoneGenerator.ringtoneStructure
-
-    override fun onCleared() {
-        super.onCleared()
-        ringtoneGenerator.destroy()
-    }
+    val ringtoneStructure = mutableStateListOf<StructureItem<*>>()
+    val isRingtoneValid: Boolean
+        get() = ringtoneStructure.isNotEmpty() && ringtoneStructure.all { it.isDataValid }
 }
