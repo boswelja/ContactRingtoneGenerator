@@ -9,10 +9,8 @@ import com.arthenica.ffmpegkit.FFmpegKit
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.mediastore.MediaStoreHelper
-import com.boswelja.contactringtonegenerator.ringtonegen.item.AudioItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.Constants
 import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
 import com.boswelja.contactringtonegenerator.tts.SynthesisJob
 import com.boswelja.contactringtonegenerator.tts.SynthesisResult
 import com.boswelja.contactringtonegenerator.tts.TtsManager
@@ -58,7 +56,7 @@ class RingtoneGenerator(private val context: Context) :
                 checkIsReady()
             }
         }
-    var ringtoneStructure: List<StructureItem> = emptyList()
+    var ringtoneStructure: List<StructureItem<*>> = emptyList()
         set(value) {
             if (_state.value == State.NOT_READY) {
                 field = value
@@ -104,11 +102,14 @@ class RingtoneGenerator(private val context: Context) :
     private suspend fun saveAudioItems() {
         Timber.d("saveAudioItem() called")
         withContext(Dispatchers.IO) {
-            ringtoneStructure.filterIsInstance(AudioItem::class.java).forEach { item ->
-                Timber.i("Found AudioItem with uri ${item.audioUri}")
-                item.audioUri?.let { uri ->
+            ringtoneStructure.filter {
+                it.dataType == StructureItem.DataType.AUDIO_FILE ||
+                    it.dataType == StructureItem.DataType.SYSTEM_RINGTONE
+            }.forEach { item ->
+                Timber.i("Found AudioItem with uri ${item.data}")
+                (item.data as Uri?)?.let { uri ->
                     context.contentResolver.openInputStream(uri).use { inStream ->
-                        val outFile = File(cacheDir, item.displayText!!)
+                        val outFile = File(cacheDir, item.engineRepresentation)
                         Timber.i("Saving $uri to ${outFile.absolutePath}")
                         FileOutputStream(outFile).use { outStream ->
                             val buffer = ByteArray(4 * 1024)
@@ -119,7 +120,7 @@ class RingtoneGenerator(private val context: Context) :
                         }
                         audioItemPaths[uri] = outFile.absolutePath
                     }
-                }
+                } ?: Timber.w("Audio item Uri null")
             }
         }
     }
@@ -176,7 +177,7 @@ class RingtoneGenerator(private val context: Context) :
                 val cacheFiles = ArrayList<File>()
                 var trueFileCount = 0
                 ringtoneStructure.forEach {
-                    if (it !is TextItem && workingString.isNotEmpty()) {
+                    if (it.data !is String && workingString.isNotEmpty()) {
                         Timber.i("End of TTS block, synthesizing")
                         val result = synthesizeString(workingString, contact)
                         cacheFiles.add(result.result)
@@ -187,10 +188,11 @@ class RingtoneGenerator(private val context: Context) :
                         commandInputs += " -i ${result.result.absolutePath}"
                         workingString = ""
                     }
-                    when (it) {
-                        is AudioItem -> {
+                    when (it.dataType) {
+                        StructureItem.DataType.AUDIO_FILE,
+                        StructureItem.DataType.SYSTEM_RINGTONE -> {
                             Timber.i("Got AudioItem")
-                            val uri = it.audioUri!!
+                            val uri = it.data as Uri
                             val path = audioItemPaths[uri]
                             val filter = "[a$trueFileCount]"
                             filterInputs += "[$trueFileCount:0]volume=$volumeMultiplier$filter;"
@@ -198,9 +200,10 @@ class RingtoneGenerator(private val context: Context) :
                             trueFileCount += 1
                             commandInputs += " -i $path"
                         }
-                        is TextItem -> {
+                        StructureItem.DataType.IMMUTABLE,
+                        StructureItem.DataType.CUSTOM_TEXT -> {
                             Timber.i("Got TextItem")
-                            workingString += it.engineString
+                            workingString += it.engineRepresentation
                         }
                     }
                 }
