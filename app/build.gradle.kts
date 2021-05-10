@@ -2,7 +2,6 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
-    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -19,12 +18,13 @@ android {
     }
 
     buildFeatures.compose = true
-    buildFeatures.viewBinding = true
-    buildFeatures.dataBinding = true
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
         }
     }
 
@@ -43,19 +43,12 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
-    implementation(Libraries.constraintLayout)
-    implementation(Libraries.fragment)
-    implementation(Libraries.navigationFragment)
-    implementation(Libraries.navigationUi)
     implementation(Libraries.preference)
     implementation(libs.bundles.lifecycle)
 
     implementation(libs.bundles.compose)
-    implementation(Libraries.googleMaterial)
     implementation(libs.timber)
     implementation(libs.ffmpeg.audio)
-
-    debugImplementation(DebugLibraries.fragment)
 
     testImplementation(libs.androidx.arch.core.test)
     testImplementation(libs.androidx.test.corektx)
@@ -67,7 +60,6 @@ dependencies {
     testImplementation(libs.mockk.core)
     testImplementation(libs.robolectric)
 
-    androidTestImplementation(AndroidTestLibraries.navigation)
     androidTestImplementation(libs.androidx.arch.core.test)
     androidTestImplementation(libs.androidx.test.espresso)
     androidTestImplementation(libs.androidx.test.runner)
