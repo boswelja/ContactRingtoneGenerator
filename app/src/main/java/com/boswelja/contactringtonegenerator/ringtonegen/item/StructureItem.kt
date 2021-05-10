@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 
 abstract class StructureItem(val id: ID) {
 
+    abstract val isDataValid: Boolean
     abstract val icon: ImageVector
     abstract val labelRes: Int
 

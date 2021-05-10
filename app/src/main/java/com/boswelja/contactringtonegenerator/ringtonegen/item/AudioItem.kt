@@ -17,6 +17,8 @@ sealed class AudioItem(id: ID) : StructureItem(id) {
         protected set
 
     override val icon = Icons.Filled.Audiotrack
+    override val isDataValid: Boolean
+        get() = audioUri != null
 
     private fun getDisplayText(context: Context, uri: Uri?): String {
         if (uri != null) {
