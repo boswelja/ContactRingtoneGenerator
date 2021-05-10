@@ -56,38 +56,38 @@ class PermissionSheet : BottomSheetDialogFragment() {
             }
         }
     }
+}
 
-    @Composable
-    @Preview
-    fun PermissionSheetContent(
-        onGrantClick: () -> Unit = { }
+@Composable
+@Preview
+fun PermissionSheetContent(
+    onGrantClick: () -> Unit = { }
+) {
+    val permissionString = StringJoiner("\n")
+    permissionString.add(stringResource(R.string.permission_missing_read_contacts))
+    permissionString.add(stringResource(R.string.permission_missing_write_contacts))
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 32.dp, horizontal = 16.dp)
     ) {
-        val permissionString = StringJoiner("\n")
-        permissionString.add(stringResource(R.string.permission_missing_read_contacts))
-        permissionString.add(stringResource(R.string.permission_missing_write_contacts))
-
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 32.dp, horizontal = 16.dp)
+        Text(
+            text = stringResource(R.string.permission_missing_title),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.h6
+        )
+        Text(
+            permissionString.toString(),
+            textAlign = TextAlign.Center,
+            style = MaterialTheme.typography.body1
+        )
+        Button(
+            onClick = onGrantClick,
+            modifier = Modifier.padding(top = 16.dp)
         ) {
-            Text(
-                text = stringResource(R.string.permission_missing_title),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.h6
-            )
-            Text(
-                permissionString.toString(),
-                textAlign = TextAlign.Center,
-                style = MaterialTheme.typography.body1
-            )
-            Button(
-                onClick = onGrantClick,
-                modifier = Modifier.padding(top = 16.dp)
-            ) {
-                Text(stringResource(R.string.grant))
-            }
+            Text(stringResource(R.string.grant))
         }
     }
 }
