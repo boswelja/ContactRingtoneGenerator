@@ -114,8 +114,12 @@ fun RingtoneBuilderScreen(
                         ).value
                     ) {
                         StructureItem(
-                            item,
-                            {
+                            item = item,
+                            onDataValidityChanged = {
+                                if (!it) onNextVisibleChange(false)
+                                else onNextVisibleChange(viewModel.isRingtoneValid)
+                            },
+                            onActionClicked = {
                                 when (it.dataType) {
                                     StructureItem.DataType.AUDIO_FILE ->
                                         audioPickerLauncher.launch("audio/*")
@@ -138,6 +142,7 @@ fun RingtoneBuilderScreen(
 fun StructureItem(
     item: StructureItem<*>,
     onActionClicked: (StructureItem<*>) -> Unit,
+    onDataValidityChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     ListItem(
@@ -153,6 +158,7 @@ fun StructureItem(
                         onValueChange = {
                             currentText = it
                             item.setData(it)
+                            onDataValidityChanged(item.isDataValid)
                         },
                         singleLine = true
                     )
