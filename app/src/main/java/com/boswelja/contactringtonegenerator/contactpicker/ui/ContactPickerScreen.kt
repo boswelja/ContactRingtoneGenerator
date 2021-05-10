@@ -19,8 +19,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,48 +31,60 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.boswelja.contactringtonegenerator.R
+import com.boswelja.contactringtonegenerator.WizardViewModel
 import com.boswelja.contactringtonegenerator.contactpicker.Contact
 import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import timber.log.Timber
 
+@FlowPreview
 @ExperimentalMaterialApi
 @ExperimentalCoroutinesApi
 @Composable
 fun ContactPickerScreen(
-    onStepStatusChange: (Boolean) -> Unit
+    viewModel: WizardViewModel,
+    onNextVisibleChange: (Boolean) -> Unit
 ) {
-    val viewModel: ContactsViewModel = viewModel()
-    var searchQuery by remember { mutableStateOf("") }
+    val contacts by viewModel.adapterContacts.collectAsState(
+        emptyList(),
+        Dispatchers.IO
+    )
+    val selectedContacts = viewModel.selectedContacts
+    val searchQuery by viewModel.contactsQuery.collectAsState()
+
     var allSelected by remember { mutableStateOf(false) }
-    val contacts by viewModel.adapterContacts.observeAsState()
+    // Keep track of the state separately here, and set it's initial value.
+    // This improves typing response
+    var currentQuery by remember { mutableStateOf(searchQuery) }
+
     Column {
         ListHeader(
-            searchQuery = searchQuery,
+            searchQuery = currentQuery,
             onSearchQueryChanged = {
-                searchQuery = it
-                viewModel.searchQuery.postValue(searchQuery)
+                currentQuery = it
+                viewModel.contactsQuery.tryEmit(it)
             },
             allSelected = allSelected,
             onAllSelectedChange = {
                 allSelected = it
-                contacts?.forEach { contact ->
-                    if (
-                        allSelected &&
-                        !viewModel.selectedContacts.contains(contact)
-                    ) {
+                contacts.forEach { contact ->
+                    if (it) {
                         viewModel.selectedContacts.add(contact)
-                    } else if (!allSelected) {
+                        onNextVisibleChange(true)
+                    } else {
                         viewModel.selectedContacts.remove(contact)
+                        if (viewModel.selectedContacts.isEmpty())
+                            onNextVisibleChange(false)
                     }
                 }
             }
         )
         ContactsList(
             contacts = contacts,
-            selectedContacts = viewModel.selectedContacts,
+            selectedContacts = selectedContacts,
             onContactSelectionChanged = { contact, isSelected ->
                 Timber.d(
                     "Selection changed for %s, is now %s",
@@ -81,16 +93,17 @@ fun ContactPickerScreen(
                 )
                 if (isSelected) {
                     viewModel.selectedContacts.add(contact)
-                    onStepStatusChange(true)
+                    onNextVisibleChange(true)
                 } else {
                     viewModel.selectedContacts.remove(contact)
                     if (viewModel.selectedContacts.isEmpty())
-                        onStepStatusChange(false)
+                        onNextVisibleChange(false)
                 }
             }
         )
     }
 }
+
 @Composable
 fun SearchBar(
     searchQuery: String,
@@ -138,14 +151,14 @@ fun ListHeader(
 @Composable
 fun ContactsList(
     contacts: List<Contact>?,
-    selectedContacts: List<Contact>,
+    selectedContacts: List<Contact>?,
     onContactSelectionChanged: (Contact, Boolean) -> Unit
 ) {
     val context = LocalContext.current
     contacts?.let {
         LazyColumn {
             items(contacts) { contact ->
-                val selected = selectedContacts.contains(contact)
+                val selected = selectedContacts?.contains(contact) ?: false
                 ListItem(
                     text = { Text(contact.displayName) },
                     icon = {

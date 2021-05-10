@@ -1,6 +1,9 @@
 package com.boswelja.contactringtonegenerator.ringtonebuilder
 
+import android.media.RingtoneManager
 import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -42,6 +45,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.boswelja.contactringtonegenerator.R
+import com.boswelja.contactringtonegenerator.WizardViewModel
 import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureChoice
 import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.Utils
@@ -50,64 +54,78 @@ import timber.log.Timber
 @ExperimentalMaterialApi
 @Composable
 fun RingtoneBuilderScreen(
-    structure: List<StructureItem<*>>?,
-    onItemAdded: (StructureItem<*>) -> Unit,
-    onActionClicked: (StructureItem<*>) -> Unit,
-    onItemRemoved: (StructureItem<*>) -> Unit,
-    modifier: Modifier = Modifier
+    viewModel: WizardViewModel,
+    onNextVisibleChange: (Boolean) -> Unit
 ) {
-    Column(modifier = modifier) {
+    val audioPickerLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) {
+    }
+    val ringtonePickerLauncher = rememberLauncherForActivityResult(PickRingtone()) {
+    }
+    val structure = viewModel.ringtoneStructure
+    Column(modifier = Modifier.fillMaxSize()) {
         StructureChoices { choice ->
             Timber.d("Adding %s", choice)
-            onItemAdded(choice.createStructureItem())
+            val item = choice.createStructureItem()
+            viewModel.ringtoneStructure.add(item)
+            onNextVisibleChange(viewModel.isRingtoneValid)
         }
         Divider()
         LazyColumn(Modifier.weight(1f)) {
-            structure?.let { structure ->
-                items(structure) { item ->
-                    val dismissState = rememberDismissState {
-                        if (it != DismissValue.Default) {
-                            onItemRemoved(item)
-                            true
-                        } else false
-                    }
-                    SwipeToDismiss(
-                        state = dismissState,
-                        background = {
-                            val direction =
-                                dismissState.dismissDirection ?: return@SwipeToDismiss
-                            val color = Color.LightGray
-                            val alignment = when (direction) {
-                                DismissDirection.StartToEnd -> Alignment.CenterStart
-                                DismissDirection.EndToStart -> Alignment.CenterEnd
-                            }
-                            val icon = Icons.Outlined.Delete
-
-                            Box(
-                                Modifier
-                                    .fillMaxSize()
-                                    .background(color)
-                                    .padding(horizontal = 32.dp),
-                                contentAlignment = alignment
-                            ) {
-                                Icon(
-                                    icon,
-                                    contentDescription = null,
-                                    modifier = Modifier.size(36.dp)
-                                )
-                            }
+            items(structure) { item ->
+                val dismissState = rememberDismissState {
+                    if (it != DismissValue.Default) {
+                        viewModel.ringtoneStructure.remove(item)
+                        onNextVisibleChange(viewModel.isRingtoneValid)
+                        true
+                    } else false
+                }
+                SwipeToDismiss(
+                    state = dismissState,
+                    background = {
+                        val direction =
+                            dismissState.dismissDirection ?: return@SwipeToDismiss
+                        val color = Color.LightGray
+                        val alignment = when (direction) {
+                            DismissDirection.StartToEnd -> Alignment.CenterStart
+                            DismissDirection.EndToStart -> Alignment.CenterEnd
                         }
-                    ) {
-                        Card(
-                            elevation = animateDpAsState(
-                                if (dismissState.dismissDirection != null) 4.dp else 0.dp
-                            ).value
+                        val icon = Icons.Outlined.Delete
+
+                        Box(
+                            Modifier
+                                .fillMaxSize()
+                                .background(color)
+                                .padding(horizontal = 32.dp),
+                            contentAlignment = alignment
                         ) {
-                            StructureItem(
-                                item,
-                                onActionClicked
+                            Icon(
+                                icon,
+                                contentDescription = null,
+                                modifier = Modifier.size(36.dp)
                             )
                         }
+                    }
+                ) {
+                    Card(
+                        elevation = animateDpAsState(
+                            if (dismissState.dismissDirection != null) 4.dp else 0.dp
+                        ).value
+                    ) {
+                        StructureItem(
+                            item,
+                            {
+                                when (it.dataType) {
+                                    StructureItem.DataType.AUDIO_FILE ->
+                                        audioPickerLauncher.launch("audio/*")
+                                    StructureItem.DataType.SYSTEM_RINGTONE ->
+                                        ringtonePickerLauncher
+                                            .launch(RingtoneManager.TYPE_RINGTONE)
+                                    else -> Timber.w("Unknown action clicked")
+                                }
+                            }
+                        )
                     }
                 }
             }

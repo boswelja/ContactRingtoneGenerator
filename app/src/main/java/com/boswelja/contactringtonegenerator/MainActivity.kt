@@ -1,13 +1,8 @@
 package com.boswelja.contactringtonegenerator
 
-import android.content.Intent
-import android.media.RingtoneManager
 import android.os.Bundle
 import androidx.activity.compose.setContent
-import androidx.activity.result.ActivityResultLauncher
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExtendedFloatingActionButton
@@ -31,25 +26,16 @@ import com.boswelja.contactringtonegenerator.common.ui.ProgressScreen
 import com.boswelja.contactringtonegenerator.contactpicker.ui.ContactPickerScreen
 import com.boswelja.contactringtonegenerator.entry.ui.GetStartedScreen
 import com.boswelja.contactringtonegenerator.result.ui.ResultScreen
-import com.boswelja.contactringtonegenerator.ringtonebuilder.PickRingtone
 import com.boswelja.contactringtonegenerator.ringtonebuilder.RingtoneBuilderScreen
-import com.boswelja.contactringtonegenerator.ringtonebuilder.RingtoneCreatorViewModel
 import com.boswelja.contactringtonegenerator.ringtonegen.Result
-import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
 import com.boswelja.contactringtonegenerator.settings.ui.SettingsScreen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.FlowPreview
 import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
-    private val audioPickerLauncher: ActivityResultLauncher<String> = registerForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) { }
-
-    private val ringtonePickerLauncher: ActivityResultLauncher<Int> = registerForActivityResult(
-        PickRingtone()
-    ) { }
-
+    @FlowPreview
     @ExperimentalCoroutinesApi
     @ExperimentalAnimationApi
     @ExperimentalMaterialApi
@@ -58,88 +44,92 @@ class MainActivity : AppCompatActivity() {
 
         setContent {
             AppTheme {
-                MainScreen()
+                var currentDestination by remember { mutableStateOf(Destination.GET_STARTED) }
+                var nextVisible by remember { mutableStateOf(true) }
+                Scaffold(
+                    floatingActionButtonPosition = FabPosition.End,
+                    floatingActionButton = {
+                        if (nextVisible) {
+                            MainFAB(currentDestination) {
+                                when (currentDestination) {
+                                    Destination.GET_STARTED ->
+                                        currentDestination = Destination.CONTACT_PICKER
+                                    Destination.CONTACT_PICKER ->
+                                        currentDestination = Destination.RINGTONE_BUILDER
+                                    Destination.RINGTONE_BUILDER ->
+                                        currentDestination = Destination.PROGRESS
+                                    Destination.RESULT -> finish()
+                                    else ->
+                                        Timber.w("Tried navigating from unsupported Destination")
+                                }
+                            }
+                        }
+                    }
+                ) {
+                    MainScreen(
+                        currentDestination = currentDestination,
+                        onDestinationChange = { currentDestination = it },
+                        onNextVisibleChange = {
+                            if (nextVisible != it) {
+                                Timber.d("Setting next button visibility to %s", it)
+                                nextVisible = it
+                            }
+                        }
+                    )
+                }
             }
         }
     }
 
+    @FlowPreview
     @ExperimentalCoroutinesApi
     @ExperimentalMaterialApi
     @ExperimentalAnimationApi
     @Composable
-    fun MainScreen() {
-        var currentDestination by remember { mutableStateOf(Destination.GET_STARTED) }
-        var nextVisible by remember { mutableStateOf(true) }
-        Scaffold(
-            floatingActionButtonPosition = FabPosition.End,
-            floatingActionButton = {
-                AnimatedVisibility(visible = nextVisible) {
-                    MainFAB(destination = currentDestination) {
-                        when (currentDestination) {
-                            Destination.GET_STARTED ->
-                                currentDestination = Destination.CONTACT_PICKER
-                            Destination.CONTACT_PICKER ->
-                                currentDestination = Destination.RINGTONE_BUILDER
-                            Destination.RINGTONE_BUILDER ->
-                                currentDestination = Destination.PROGRESS
-                            Destination.RESULT -> finish()
-                            else ->
-                                Timber.w("Tried navigating from unsupported Destination")
+    fun MainScreen(
+        currentDestination: Destination,
+        onNextVisibleChange: (Boolean) -> Unit,
+        onDestinationChange: (Destination) -> Unit
+    ) {
+        val viewModel: WizardViewModel = viewModel()
+        Crossflow(targetState = currentDestination) { destination ->
+            when (destination) {
+                Destination.GET_STARTED -> {
+                    onNextVisibleChange(true)
+                    GetStartedScreen(
+                        onSettingsClick = {
+                            onDestinationChange(Destination.SETTINGS)
                         }
-                    }
+                    )
                 }
-            }
-        ) {
-            Crossflow(targetState = currentDestination) {
-                when (it) {
-                    Destination.GET_STARTED -> {
-                        GetStartedScreen(
-                            onSettingsClick = {
-                                currentDestination = Destination.SETTINGS
-                            }
-                        )
-                    }
-                    Destination.SETTINGS -> {
-                        SettingsScreen {
-                            launchTtsSettings()
-                        }
-                    }
-                    Destination.CONTACT_PICKER -> {
-                        ContactPickerScreen { readyToContinue ->
-                            nextVisible = readyToContinue
-                        }
-                    }
-                    Destination.RINGTONE_BUILDER -> {
-                        val ringtoneCreatorModel: RingtoneCreatorViewModel = viewModel()
-                        val structure = ringtoneCreatorModel.ringtoneStructure
-                        RingtoneBuilderScreen(
-                            structure = structure,
-                            onItemAdded = { item ->
-                                ringtoneCreatorModel.ringtoneStructure.add(item)
-                            },
-                            onItemRemoved = { item ->
-                                ringtoneCreatorModel.ringtoneStructure.remove(item)
-                            },
-                            onActionClicked = { item ->
-                                when (item.dataType) {
-                                    StructureItem.DataType.AUDIO_FILE ->
-                                        audioPickerLauncher.launch("audio/*")
-                                    StructureItem.DataType.SYSTEM_RINGTONE ->
-                                        ringtonePickerLauncher.launch(RingtoneManager.TYPE_RINGTONE)
-                                    else -> Timber.w("Unknown action clicked")
-                                }
-                            }
-                        )
-                    }
-                    Destination.PROGRESS -> {
-                        ProgressScreen(
-                            status = "",
-                            step = "",
-                        )
-                    }
-                    Destination.RESULT -> {
-                        ResultScreen(result = Result.UNKNOWN)
-                    }
+                Destination.SETTINGS -> {
+                    onNextVisibleChange(false)
+                    SettingsScreen()
+                }
+                Destination.CONTACT_PICKER -> {
+                    onNextVisibleChange(viewModel.selectedContacts.isNotEmpty())
+                    ContactPickerScreen(
+                        viewModel = viewModel,
+                        onNextVisibleChange = onNextVisibleChange
+                    )
+                }
+                Destination.RINGTONE_BUILDER -> {
+                    onNextVisibleChange(viewModel.isRingtoneValid)
+                    RingtoneBuilderScreen(
+                        viewModel = viewModel,
+                        onNextVisibleChange = onNextVisibleChange
+                    )
+                }
+                Destination.PROGRESS -> {
+                    onNextVisibleChange(false)
+                    ProgressScreen(
+                        status = "",
+                        step = "",
+                    )
+                }
+                Destination.RESULT -> {
+                    onNextVisibleChange(true)
+                    ResultScreen(result = Result.UNKNOWN)
                 }
             }
         }
@@ -169,14 +159,6 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    private fun launchTtsSettings() {
-        Intent().apply {
-            action = "com.android.settings.TTS_SETTINGS"
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        }.also {
-            startActivity(it)
-        }
-    }
     enum class Destination {
         GET_STARTED,
         SETTINGS,

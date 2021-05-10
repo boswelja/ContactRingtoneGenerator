@@ -53,9 +53,6 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     }
 
     companion object {
-        private const val RESET_RINGTONES_KEY = "reset_ringtones"
-        private const val LAUNCH_TTS_SETTINGS_KEY = "launch_tts_settings"
-
         const val MULTITHREADED_GENERATION_KEY = "multithreaded_generation"
         const val VOLUME_BOOST_KEY = "volume_boost"
     }
