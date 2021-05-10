@@ -38,9 +38,7 @@ class ProgressFragment : Fragment() {
             setContent {
                 AppTheme {
                     val progress by wizardViewModel.successCount.observeAsState()
-                    val generatorState by wizardViewModel.generatorState.observeAsState()
                     ProgressScreen(
-                        indeterminate = generatorState == RingtoneGenerator.State.NOT_READY,
                         progress = ((progress?.toFloat() ?: 0f) / wizardViewModel.totalJobCount),
                         status = stringResource(R.string.progress_title_generating),
                         step = stringResource(R.string.progress_status_generating)
@@ -84,8 +82,7 @@ class ProgressFragment : Fragment() {
 
 @Composable
 fun ProgressScreen(
-    indeterminate: Boolean,
-    progress: Float,
+    progress: Float = 0f,
     status: String,
     step: String
 ) {
@@ -102,12 +99,12 @@ fun ProgressScreen(
             text = step,
             style = MaterialTheme.typography.h5
         )
-        if (indeterminate) {
-            LinearProgressIndicator()
-        } else {
+        if (progress > 0) {
             LinearProgressIndicator(
                 progress = progress
             )
+        } else {
+            LinearProgressIndicator()
         }
     }
 }
