@@ -3,8 +3,9 @@ package com.boswelja.contactringtonegenerator.ringtonegen.item
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Audiotrack
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 
 sealed class AudioItem(id: ID) : StructureItem(id) {
 
@@ -15,10 +16,9 @@ sealed class AudioItem(id: ID) : StructureItem(id) {
     var displayText: String? = null
         protected set
 
-    override val isUserAdjustable: Boolean = true
-    override fun getIconRes(): Int = iconRes
+    override val icon = Icons.Filled.Audiotrack
 
-    protected fun getDisplayText(context: Context, uri: Uri?): String {
+    private fun getDisplayText(context: Context, uri: Uri?): String {
         if (uri != null) {
             val cursor = context.contentResolver.query(uri, null, null, null, null)
             if (cursor != null && cursor.moveToFirst()) {
@@ -36,37 +36,15 @@ sealed class AudioItem(id: ID) : StructureItem(id) {
         displayText = getDisplayText(context, uri)
     }
 
-    companion object {
-        const val iconRes: Int = R.drawable.structure_ic_audio
-    }
-
-    class SystemRingtone() : AudioItem(ID.SYSTEM_RINGTONE) {
-
-        constructor(context: Context) : this() {
-            displayText = getDisplayText(context, null)
-        }
+    class SystemRingtone : AudioItem(ID.SYSTEM_RINGTONE) {
 
         override val fallbackStringRes: Int = R.string.item_ringtone_no_file
-        override val isUserAdjustable: Boolean = true
-        override fun getLabelRes(): Int = labelRes
-
-        companion object {
-            const val labelRes: Int = R.string.label_system_ringtone
-        }
+        override val labelRes = R.string.label_system_ringtone
     }
 
-    class File() : AudioItem(ID.CUSTOM_AUDIO) {
+    class File : AudioItem(ID.CUSTOM_AUDIO) {
 
-        constructor(context: Context) : this() {
-            displayText = getDisplayText(context, null)
-        }
-
-        override val fallbackStringRes: Int = R.string.item_audio_no_file
-        override val isUserAdjustable: Boolean = true
-        override fun getLabelRes(): Int = labelRes
-
-        companion object {
-            const val labelRes: Int = R.string.label_custom_audio
-        }
+        override val fallbackStringRes = R.string.item_audio_no_file
+        override val labelRes = R.string.label_custom_audio
     }
 }

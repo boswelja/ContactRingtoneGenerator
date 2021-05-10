@@ -1,85 +1,46 @@
 package com.boswelja.contactringtonegenerator.ringtonegen.item
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.TextFields
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
 
 sealed class TextItem(id: ID) : StructureItem(id) {
-    abstract fun getEngineText(): String
-    override fun getIconRes(): Int = iconRes
-
-    companion object {
-        const val iconRes: Int = R.drawable.structure_ic_text
-    }
+    abstract val engineString: String
+    override val icon = Icons.Filled.TextFields
 
     class Custom : TextItem(ID.CUSTOM_TEXT) {
-        override val isUserAdjustable: Boolean = true
-        override fun getLabelRes(): Int = labelRes
-        override fun getEngineText(): String = text
-
         var text: String = ""
-
-        companion object {
-            const val labelRes: Int = R.string.label_custom_text
-        }
+        override val labelRes: Int = R.string.label_custom_text
+        override val engineString = text
     }
 
     class NamePrefix : TextItem(ID.PREFIX) {
-        override val isUserAdjustable: Boolean = false
-        override fun getLabelRes(): Int = labelRes
-        override fun getEngineText(): String = Constants.NAME_PREFIX_PLACEHOLDER
-
-        companion object {
-            const val labelRes: Int = R.string.label_name_prefix
-        }
+        override val labelRes: Int = R.string.label_name_prefix
+        override val engineString = Constants.NAME_PREFIX_PLACEHOLDER
     }
 
     class FirstName : TextItem(ID.FIRST_NAME) {
-        override val isUserAdjustable: Boolean = false
-        override fun getLabelRes(): Int = labelRes
-        override fun getEngineText(): String = Constants.FIRST_NAME_PLACEHOLDER
-
-        companion object {
-            const val labelRes: Int = R.string.label_first_name
-        }
+        override val labelRes: Int = R.string.label_first_name
+        override val engineString = Constants.FIRST_NAME_PLACEHOLDER
     }
 
     class MiddleName : TextItem(ID.MIDDLE_NAME) {
-        override val isUserAdjustable: Boolean = false
-        override fun getLabelRes(): Int = labelRes
-        override fun getEngineText(): String = Constants.MIDDLE_NAME_PLACEHOLDER
-
-        companion object {
-            const val labelRes: Int = R.string.label_middle_name
-        }
+        override val labelRes: Int = R.string.label_middle_name
+        override val engineString = Constants.MIDDLE_NAME_PLACEHOLDER
     }
 
     class LastName : TextItem(ID.LAST_NAME) {
-        override val isUserAdjustable: Boolean = false
-        override fun getLabelRes(): Int = labelRes
-        override fun getEngineText(): String = Constants.LAST_NAME_PLACEHOLDER
-
-        companion object {
-            const val labelRes: Int = R.string.label_last_name
-        }
+        override val labelRes: Int = R.string.label_last_name
+        override val engineString = Constants.LAST_NAME_PLACEHOLDER
     }
 
     class NameSuffix : TextItem(ID.SUFFIX) {
-        override val isUserAdjustable: Boolean = false
-        override fun getLabelRes(): Int = labelRes
-        override fun getEngineText(): String = Constants.NAME_SUFFIX_PLACEHOLDER
-
-        companion object {
-            const val labelRes: Int = R.string.label_name_suffix
-        }
+        override val labelRes: Int = R.string.label_name_suffix
+        override val engineString = Constants.NAME_SUFFIX_PLACEHOLDER
     }
 
     class Nickname : TextItem(ID.PREFIX) {
-        override val isUserAdjustable: Boolean = false
-        override fun getLabelRes(): Int = labelRes
-        override fun getEngineText(): String = Constants.NAME_PREFIX_PLACEHOLDER
-
-        companion object {
-            const val labelRes: Int = R.string.label_nickname
-        }
+        override val labelRes = R.string.label_nickname
+        override val engineString = Constants.NAME_PREFIX_PLACEHOLDER
     }
 }
