@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/getStartedFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.entry.GetStartedFragment">
+        android:name="com.boswelja.contactringtonegenerator.entry.ui.GetStartedFragment">
         <action
             android:id="@+id/to_contactPickerFragment"
             app:destination="@id/contactPickerFragment"
@@ -25,7 +25,7 @@
     </fragment>
     <fragment
         android:id="@+id/contactPickerFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.contactpicker.ContactPickerFragment"
+        android:name="com.boswelja.contactringtonegenerator.contactpicker.ui.ContactPickerFragment"
         android:label="@string/contact_picker_title">
         <action
             android:id="@+id/to_ringtoneCreatorFragment"
@@ -38,7 +38,7 @@
     <fragment
         android:id="@+id/ringtoneCreatorFragment"
         android:label="Build a Ringtone"
-        android:name="com.boswelja.contactringtonegenerator.ui.ringtonecreator.RingtoneCreatorFragment">
+        android:name="com.boswelja.contactringtonegenerator.ringtonebuilder.RingtoneCreatorFragment">
         <action
             android:id="@+id/to_loadingFragment"
             app:destination="@id/loadingFragment"
@@ -51,7 +51,7 @@
     </fragment>
     <fragment
         android:id="@+id/loadingFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.progress.ProgressFragment">
+        android:name="com.boswelja.contactringtonegenerator.common.ui.ProgressFragment">
         <action
             android:id="@+id/to_finishedFragment"
             app:destination="@id/resultsFragment"
@@ -64,11 +64,11 @@
     </fragment>
     <fragment
         android:id="@+id/settingsFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.settings.SettingsFragment"
+        android:name="com.boswelja.contactringtonegenerator.settings.ui.SettingsFragment"
         android:label="@string/settings_title" />
     <fragment
         android:id="@+id/resultsFragment"
-        android:name="com.boswelja.contactringtonegenerator.ui.results.ResultsFragment">
+        android:name="com.boswelja.contactringtonegenerator.result.ui.ResultsFragment">
         <argument
             android:name="success_count"
             app:argType="integer" />

@@ -6,14 +6,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import com.arthenica.ffmpegkit.FFmpegKit
-import com.boswelja.contactringtonegenerator.contacts.Contact
-import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
-import com.boswelja.contactringtonegenerator.mediastore.MediaStoreHelper
+import com.boswelja.contactringtonegenerator.common.MediaStoreHelper
+import com.boswelja.contactringtonegenerator.contactpicker.Contact
+import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
 import com.boswelja.contactringtonegenerator.ringtonegen.item.Constants
 import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
-import com.boswelja.contactringtonegenerator.tts.SynthesisJob
-import com.boswelja.contactringtonegenerator.tts.SynthesisResult
-import com.boswelja.contactringtonegenerator.tts.TtsManager
+import com.boswelja.contactringtonegenerator.ringtonegen.tts.SynthesisJob
+import com.boswelja.contactringtonegenerator.ringtonegen.tts.SynthesisResult
+import com.boswelja.contactringtonegenerator.ringtonegen.tts.TtsManager
+import java.io.File
+import java.io.FileOutputStream
+import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -22,9 +25,6 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
-import java.io.FileOutputStream
-import java.util.concurrent.atomic.AtomicInteger
 
 class RingtoneGenerator(private val context: Context) :
     TtsManager.EngineEventListener {
@@ -36,7 +36,8 @@ class RingtoneGenerator(private val context: Context) :
 
     private val generatorJob = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.Default + generatorJob)
-    private val semaphore = Semaphore(if (multithreaded) Runtime.getRuntime().availableProcessors() else 1)
+    private val semaphore =
+        Semaphore(if (multithreaded) Runtime.getRuntime().availableProcessors() else 1)
 
     private val cacheDir: File = context.cacheDir
     private val audioItemPaths = HashMap<Uri, String>()
@@ -226,7 +227,9 @@ class RingtoneGenerator(private val context: Context) :
                 Timber.i("ffmpeg $command")
                 val result = FFmpegKit.execute(command)
                 val generateSuccess = result.returnCode.isSuccess
-                val success = if (generateSuccess) handleGenerateCompleted(contact, output) else false
+                val success = if (generateSuccess)
+                    handleGenerateCompleted(contact, output)
+                else false
                 withContext(Dispatchers.Main) {
                     progressListener?.onJobCompleted(success, contact)
                 }
