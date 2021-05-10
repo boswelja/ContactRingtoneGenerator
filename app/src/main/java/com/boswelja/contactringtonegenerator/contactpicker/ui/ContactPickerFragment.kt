@@ -28,7 +28,6 @@ import androidx.compose.material.icons.outlined.Search
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,9 +55,6 @@ class ContactPickerFragment : Fragment() {
 
     private val wizardModel: WizardViewModel by activityViewModels()
 
-    // TODO move this to ViewModel
-    private val selectedContacts = mutableStateMapOf<Contact, Boolean>()
-
     @ExperimentalCoroutinesApi
     @ExperimentalMaterialApi
     override fun onCreateView(
@@ -77,7 +73,7 @@ class ContactPickerFragment : Fragment() {
                                 icon = { Icon(Icons.Outlined.NavigateNext, null) },
                                 onClick = {
                                     wizardModel.submitSelectedContacts(
-                                        selectedContacts.filter { it.value }.keys.toList()
+                                        viewModel.selectedContacts.filter { it.value }.keys.toList()
                                     )
                                     findNavController().navigate(
                                         ContactPickerFragmentDirections.toRingtoneCreatorFragment()
@@ -100,16 +96,16 @@ class ContactPickerFragment : Fragment() {
                                 onAllSelectedChange = {
                                     allSelected = it
                                     contacts?.forEach { contact ->
-                                        selectedContacts[contact] = it
+                                        viewModel.selectedContacts[contact] = it
                                     }
                                 }
                             )
                             ContactsList(
                                 contacts = contacts?.map { contact ->
-                                    Pair(contact, selectedContacts[contact] ?: false)
+                                    Pair(contact, viewModel.selectedContacts[contact] ?: false)
                                 },
                                 onContactSelectionChanged = { contact, isSelected ->
-                                    if (isSelected) selectedContacts[contact] = isSelected
+                                    viewModel.selectedContacts[contact] = isSelected
                                 }
                             )
                         }

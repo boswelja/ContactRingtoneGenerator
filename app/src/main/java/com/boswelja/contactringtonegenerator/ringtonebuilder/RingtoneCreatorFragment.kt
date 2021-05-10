@@ -229,6 +229,7 @@ fun StructureItem(
                 }
             }
         },
+        // TODO re-enable drag to reorder
 //            trailing = {
 //                Icon(Icons.Filled.DragHandle, null)
 //            },

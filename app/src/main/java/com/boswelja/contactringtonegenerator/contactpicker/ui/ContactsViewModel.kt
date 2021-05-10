@@ -1,10 +1,12 @@
 package com.boswelja.contactringtonegenerator.contactpicker.ui
 
 import android.app.Application
+import androidx.compose.runtime.mutableStateMapOf
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.asLiveData
 import androidx.lifecycle.switchMap
+import com.boswelja.contactringtonegenerator.contactpicker.Contact
 import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,4 +29,6 @@ class ContactsViewModel(application: Application) : AndroidViewModel(application
             formattedQuery
         ).asLiveData(Dispatchers.Default)
     }
+
+    val selectedContacts = mutableStateMapOf<Contact, Boolean>()
 }
