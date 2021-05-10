@@ -39,7 +39,7 @@ sealed class StructureItem<out T> {
         override val engineRepresentation
             get() = data
         override val isDataValid: Boolean
-            get() = data.isBlank()
+            get() = data.isNotBlank()
 
         override val labelRes: Int = R.string.label_custom_text
         override val icon = Icons.Default.TextFields
