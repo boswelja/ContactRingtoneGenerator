@@ -12,8 +12,10 @@ import androidx.core.database.getStringOrNull
 import java.io.InputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
@@ -66,7 +68,7 @@ object ContactsHelper {
             val lookupKeyColumn = cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)
             val displayNameColumn =
                 cursor.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME_PRIMARY)
-            while (cursor.moveToNext()) {
+            while (cursor.moveToNext() && currentCoroutineContext().isActive) {
                 val id = cursor.getLong(idColumn)
                 // Only continue if this contact is unique
                 if (!contacts.any { it.id == id }) {
