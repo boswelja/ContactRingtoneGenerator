@@ -6,7 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.boswelja.contactringtonegenerator.contacts.Contact
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGenerator
-import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
 
 class WizardViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -62,11 +62,11 @@ class WizardViewModel(application: Application) : AndroidViewModel(application) 
 
     fun getSelectedContacts(): List<Contact> = ringtoneGenerator.contacts
 
-    fun submitRingtoneStructure(ringtoneStructure: List<StructureItem>) {
+    fun submitRingtoneStructure(ringtoneStructure: List<StructureItem<*>>) {
         ringtoneGenerator.ringtoneStructure = ringtoneStructure
     }
 
-    fun getRingtoneStructure(): List<StructureItem> = ringtoneGenerator.ringtoneStructure
+    fun getRingtoneStructure(): List<StructureItem<*>> = ringtoneGenerator.ringtoneStructure
 
     override fun onCleared() {
         super.onCleared()

@@ -1,34 +1,17 @@
 package com.boswelja.contactringtonegenerator.ui.ringtonecreator
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
+import androidx.compose.runtime.mutableStateListOf
 import androidx.lifecycle.ViewModel
-import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
 
 class RingtoneCreatorViewModel : ViewModel() {
 
-    private val _ringtoneStructure = ArrayList<StructureItem>()
-    val ringtoneStructure: List<StructureItem>
-        get() = _ringtoneStructure
-
-    val isDataValid = MutableLiveData(_ringtoneStructure.isNotEmpty())
-
-    private val _isDataEmpty = MutableLiveData(true)
-    val isDataEmpty: LiveData<Boolean>
-        get() = _isDataEmpty
-
-    fun addItem(item: StructureItem) {
-        _ringtoneStructure.add(item)
-        _isDataEmpty.postValue(false)
-    }
-
-    fun removeItemAtPosition(position: Int) {
-        _ringtoneStructure.removeAt(position)
-        _isDataEmpty.postValue(_ringtoneStructure.isEmpty())
-    }
+    val ringtoneStructure = mutableStateListOf<StructureItem<*>>()
+    val isDataValid: Boolean
+        get() = ringtoneStructure.all { it.isDataValid }
 
     fun moveItem(fromPosition: Int, toPosition: Int) {
-        val item = _ringtoneStructure.removeAt(fromPosition)
-        _ringtoneStructure.add(toPosition, item)
+        val item = ringtoneStructure.removeAt(fromPosition)
+        ringtoneStructure.add(toPosition, item)
     }
 }

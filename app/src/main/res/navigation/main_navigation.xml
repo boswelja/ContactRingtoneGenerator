@@ -2,7 +2,6 @@
 <navigation
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main_navigation"
     app:startDestination="@id/getStartedFragment">
 
@@ -39,8 +38,7 @@
     <fragment
         android:id="@+id/ringtoneCreatorFragment"
         android:label="Build a Ringtone"
-        android:name="com.boswelja.contactringtonegenerator.ui.ringtonecreator.RingtoneCreatorFragment"
-        tools:layout="@layout/fragment_ringtone_creator" >
+        android:name="com.boswelja.contactringtonegenerator.ui.ringtonecreator.RingtoneCreatorFragment">
         <action
             android:id="@+id/to_loadingFragment"
             app:destination="@id/loadingFragment"
