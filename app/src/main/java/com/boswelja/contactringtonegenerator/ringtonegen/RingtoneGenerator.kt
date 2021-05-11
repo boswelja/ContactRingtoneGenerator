@@ -6,16 +6,17 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.preference.PreferenceManager
 import com.arthenica.ffmpegkit.FFmpegKit
-import com.boswelja.contactringtonegenerator.contacts.Contact
-import com.boswelja.contactringtonegenerator.contacts.ContactsHelper
-import com.boswelja.contactringtonegenerator.mediastore.MediaStoreHelper
-import com.boswelja.contactringtonegenerator.ringtonegen.item.AudioItem
+import com.boswelja.contactringtonegenerator.common.MediaStoreHelper
+import com.boswelja.contactringtonegenerator.contactpicker.Contact
+import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
 import com.boswelja.contactringtonegenerator.ringtonegen.item.Constants
-import com.boswelja.contactringtonegenerator.ringtonegen.item.TextItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.common.StructureItem
-import com.boswelja.contactringtonegenerator.tts.SynthesisJob
-import com.boswelja.contactringtonegenerator.tts.SynthesisResult
-import com.boswelja.contactringtonegenerator.tts.TtsManager
+import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
+import com.boswelja.contactringtonegenerator.ringtonegen.tts.SynthesisJob
+import com.boswelja.contactringtonegenerator.ringtonegen.tts.SynthesisResult
+import com.boswelja.contactringtonegenerator.ringtonegen.tts.TtsManager
+import java.io.File
+import java.io.FileOutputStream
+import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -24,9 +25,6 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.File
-import java.io.FileOutputStream
-import java.util.concurrent.atomic.AtomicInteger
 
 class RingtoneGenerator(private val context: Context) :
     TtsManager.EngineEventListener {
@@ -38,7 +36,8 @@ class RingtoneGenerator(private val context: Context) :
 
     private val generatorJob = Job()
     private val coroutineScope = CoroutineScope(Dispatchers.Default + generatorJob)
-    private val semaphore = Semaphore(if (multithreaded) Runtime.getRuntime().availableProcessors() else 1)
+    private val semaphore =
+        Semaphore(if (multithreaded) Runtime.getRuntime().availableProcessors() else 1)
 
     private val cacheDir: File = context.cacheDir
     private val audioItemPaths = HashMap<Uri, String>()
@@ -58,7 +57,7 @@ class RingtoneGenerator(private val context: Context) :
                 checkIsReady()
             }
         }
-    var ringtoneStructure: List<StructureItem> = emptyList()
+    var ringtoneStructure: List<StructureItem<*>> = emptyList()
         set(value) {
             if (_state.value == State.NOT_READY) {
                 field = value
@@ -104,11 +103,14 @@ class RingtoneGenerator(private val context: Context) :
     private suspend fun saveAudioItems() {
         Timber.d("saveAudioItem() called")
         withContext(Dispatchers.IO) {
-            ringtoneStructure.filterIsInstance(AudioItem::class.java).forEach { item ->
-                Timber.i("Found AudioItem with uri ${item.audioUri}")
-                item.audioUri?.let { uri ->
+            ringtoneStructure.filter {
+                it.dataType == StructureItem.DataType.AUDIO_FILE ||
+                    it.dataType == StructureItem.DataType.SYSTEM_RINGTONE
+            }.forEach { item ->
+                Timber.i("Found AudioItem with uri ${item.data}")
+                (item.data as Uri?)?.let { uri ->
                     context.contentResolver.openInputStream(uri).use { inStream ->
-                        val outFile = File(cacheDir, item.displayText!!)
+                        val outFile = File(cacheDir, item.engineRepresentation)
                         Timber.i("Saving $uri to ${outFile.absolutePath}")
                         FileOutputStream(outFile).use { outStream ->
                             val buffer = ByteArray(4 * 1024)
@@ -119,7 +121,7 @@ class RingtoneGenerator(private val context: Context) :
                         }
                         audioItemPaths[uri] = outFile.absolutePath
                     }
-                }
+                } ?: Timber.w("Audio item Uri null")
             }
         }
     }
@@ -127,13 +129,21 @@ class RingtoneGenerator(private val context: Context) :
     private suspend fun synthesizeString(workingString: String, contact: Contact): SynthesisResult {
         return withContext(Dispatchers.IO) {
             val id = counter.incrementAndGet().toString()
+            val structuredName = ContactsHelper.getContactStructuredName(
+                context.contentResolver,
+                contact.lookupKey
+            )
+            val nickname = ContactsHelper.getContactNickname(
+                context.contentResolver,
+                contact.lookupKey
+            )
             val message = workingString
-                .replace(Constants.FIRST_NAME_PLACEHOLDER, contact.firstName)
-                .replace(Constants.MIDDLE_NAME_PLACEHOLDER, contact.middleName ?: "")
-                .replace(Constants.LAST_NAME_PLACEHOLDER, contact.lastName ?: "")
-                .replace(Constants.NAME_PREFIX_PLACEHOLDER, contact.prefix ?: "")
-                .replace(Constants.NAME_SUFFIX_PLACEHOLDER, contact.suffix ?: "")
-                .replace(Constants.NICKNAME_PLACEHOLDER, contact.nickname ?: "")
+                .replace(Constants.FIRST_NAME_PLACEHOLDER, structuredName?.firstName ?: "")
+                .replace(Constants.MIDDLE_NAME_PLACEHOLDER, structuredName?.middleName ?: "")
+                .replace(Constants.LAST_NAME_PLACEHOLDER, structuredName?.lastName ?: "")
+                .replace(Constants.NAME_PREFIX_PLACEHOLDER, structuredName?.prefix ?: "")
+                .replace(Constants.NAME_SUFFIX_PLACEHOLDER, structuredName?.suffix ?: "")
+                .replace(Constants.NICKNAME_PLACEHOLDER, nickname ?: "")
             return@withContext ttsManager.synthesizeToFile(SynthesisJob(id, message))
         }
     }
@@ -168,7 +178,7 @@ class RingtoneGenerator(private val context: Context) :
                 val cacheFiles = ArrayList<File>()
                 var trueFileCount = 0
                 ringtoneStructure.forEach {
-                    if (it !is TextItem && workingString.isNotEmpty()) {
+                    if (it.data !is String && workingString.isNotEmpty()) {
                         Timber.i("End of TTS block, synthesizing")
                         val result = synthesizeString(workingString, contact)
                         cacheFiles.add(result.result)
@@ -179,10 +189,11 @@ class RingtoneGenerator(private val context: Context) :
                         commandInputs += " -i ${result.result.absolutePath}"
                         workingString = ""
                     }
-                    when (it) {
-                        is AudioItem -> {
+                    when (it.dataType) {
+                        StructureItem.DataType.AUDIO_FILE,
+                        StructureItem.DataType.SYSTEM_RINGTONE -> {
                             Timber.i("Got AudioItem")
-                            val uri = it.audioUri!!
+                            val uri = it.data as Uri
                             val path = audioItemPaths[uri]
                             val filter = "[a$trueFileCount]"
                             filterInputs += "[$trueFileCount:0]volume=$volumeMultiplier$filter;"
@@ -190,9 +201,10 @@ class RingtoneGenerator(private val context: Context) :
                             trueFileCount += 1
                             commandInputs += " -i $path"
                         }
-                        is TextItem -> {
+                        StructureItem.DataType.IMMUTABLE,
+                        StructureItem.DataType.CUSTOM_TEXT -> {
                             Timber.i("Got TextItem")
-                            workingString += it.getEngineText()
+                            workingString += it.engineRepresentation
                         }
                     }
                 }
@@ -215,7 +227,9 @@ class RingtoneGenerator(private val context: Context) :
                 Timber.i("ffmpeg $command")
                 val result = FFmpegKit.execute(command)
                 val generateSuccess = result.returnCode.isSuccess
-                val success = if (generateSuccess) handleGenerateCompleted(contact, output) else false
+                val success = if (generateSuccess)
+                    handleGenerateCompleted(contact, output)
+                else false
                 withContext(Dispatchers.Main) {
                     progressListener?.onJobCompleted(success, contact)
                 }

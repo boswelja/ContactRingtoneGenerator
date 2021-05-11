@@ -1,5 +1,6 @@
 package com.boswelja.contactringtonegenerator.contacts
 
+import com.boswelja.contactringtonegenerator.contactpicker.Contact
 import org.junit.Assert.* // ktlint-disable
 import org.junit.Test
 
