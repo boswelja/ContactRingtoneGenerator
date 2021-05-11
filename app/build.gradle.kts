@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(libs.timber)
     implementation(libs.ffmpeg.audio)
+    implementation(libs.tts.ktx)
 
     testImplementation(libs.androidx.arch.core.test)
     testImplementation(libs.androidx.test.corektx)
