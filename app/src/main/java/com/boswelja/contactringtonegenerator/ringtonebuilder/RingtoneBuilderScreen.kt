@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Card
 import androidx.compose.material.DismissDirection
 import androidx.compose.material.DismissValue
@@ -37,6 +38,7 @@ import androidx.compose.material.rememberDismissState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -57,13 +59,27 @@ fun RingtoneBuilderScreen(
     viewModel: WizardViewModel,
     onNextVisibleChange: (Boolean) -> Unit
 ) {
+    var editingItemIndex: Int = remember { -1 }
     val audioPickerLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) {
+        if (it == null || editingItemIndex < 0) return@rememberLauncherForActivityResult
+        Timber.d("Setting %s data to %s", editingItemIndex, it)
+        val item = viewModel.ringtoneStructure.removeAt(editingItemIndex)
+        item.setData(it)
+        viewModel.ringtoneStructure.add(editingItemIndex, item)
+        editingItemIndex = -1
+        onNextVisibleChange(viewModel.isRingtoneValid)
     }
     val ringtonePickerLauncher = rememberLauncherForActivityResult(PickRingtone()) {
+        if (it == null || editingItemIndex < 0) return@rememberLauncherForActivityResult
+        Timber.d("Setting %s data to %s", editingItemIndex, it)
+        val item = viewModel.ringtoneStructure.removeAt(editingItemIndex)
+        item.setData(it)
+        viewModel.ringtoneStructure.add(editingItemIndex, item)
+        editingItemIndex = -1
+        onNextVisibleChange(viewModel.isRingtoneValid)
     }
-    val structure = viewModel.ringtoneStructure
     Column(modifier = Modifier.fillMaxSize()) {
         StructureChoices { choice ->
             Timber.d("Adding %s", choice)
@@ -73,10 +89,10 @@ fun RingtoneBuilderScreen(
         }
         Divider()
         LazyColumn(Modifier.weight(1f)) {
-            items(structure) { item ->
+            itemsIndexed(viewModel.ringtoneStructure) { index, item ->
                 val dismissState = rememberDismissState {
                     if (it != DismissValue.Default) {
-                        viewModel.ringtoneStructure.remove(item)
+                        viewModel.ringtoneStructure.removeAt(index)
                         onNextVisibleChange(viewModel.isRingtoneValid)
                         true
                     } else false
@@ -120,6 +136,7 @@ fun RingtoneBuilderScreen(
                                 else onNextVisibleChange(viewModel.isRingtoneValid)
                             },
                             onActionClicked = {
+                                editingItemIndex = index
                                 when (it.dataType) {
                                     StructureItem.DataType.AUDIO_FILE ->
                                         audioPickerLauncher.launch("audio/*")
