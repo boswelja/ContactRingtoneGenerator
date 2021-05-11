@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ringtonegen.item
+package com.boswelja.contactringtonegenerator.ringtonebuilder
 
 import android.content.Context
 import android.net.Uri

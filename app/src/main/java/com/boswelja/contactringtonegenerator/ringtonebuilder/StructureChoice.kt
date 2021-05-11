@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ringtonegen.item
+package com.boswelja.contactringtonegenerator.ringtonebuilder
 
 import androidx.annotation.StringRes
 import androidx.compose.material.icons.Icons
@@ -6,6 +6,7 @@ import androidx.compose.material.icons.outlined.Audiotrack
 import androidx.compose.material.icons.outlined.TextFields
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.boswelja.contactringtonegenerator.R
+import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
 
 sealed class StructureChoice(
     val icon: ImageVector,

@@ -48,9 +48,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.WizardViewModel
-import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureChoice
 import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.Utils
 import timber.log.Timber
 
 @ExperimentalMaterialApi
