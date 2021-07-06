@@ -89,50 +89,48 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+}
 
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    @ExperimentalMaterialApi
-    @ExperimentalAnimationApi
-    @Composable
-    fun MainScreen() {
-        var currentDestination by remember { mutableStateOf(Destination.GET_STARTED) }
-        val viewModel: WizardViewModel = viewModel()
-        Crossflow(targetState = currentDestination) { destination ->
-            when (destination) {
-                Destination.GET_STARTED -> {
-                    GetStartedScreen { }
-                }
-                Destination.CONTACT_PICKER -> {
-                    ContactPickerScreen(
-                        viewModel = viewModel,
-                        onNextVisibleChange = { }
-                    )
-                }
-                Destination.RINGTONE_BUILDER -> {
-                    RingtoneBuilderScreen(
-                        viewModel = viewModel,
-                        onNextVisibleChange = { }
-                    )
-                }
-                Destination.PROGRESS -> {
-                    ProgressScreen(
-                        status = "",
-                        step = "",
-                    )
-                }
-                Destination.RESULT -> {
-                    ResultScreen(result = Result.UNKNOWN)
-                }
+enum class Destination {
+    GET_STARTED,
+    CONTACT_PICKER,
+    RINGTONE_BUILDER,
+    PROGRESS,
+    RESULT
+}
+
+@ExperimentalAnimationApi
+@ExperimentalMaterialApi
+@Composable
+fun MainScreen() {
+    var currentDestination by remember { mutableStateOf(Destination.GET_STARTED) }
+    val viewModel: WizardViewModel = viewModel()
+    Crossflow(targetState = currentDestination) { destination ->
+        when (destination) {
+            Destination.GET_STARTED -> {
+                GetStartedScreen { }
+            }
+            Destination.CONTACT_PICKER -> {
+                ContactPickerScreen(
+                    viewModel = viewModel,
+                    onNextVisibleChange = { }
+                )
+            }
+            Destination.RINGTONE_BUILDER -> {
+                RingtoneBuilderScreen(
+                    viewModel = viewModel,
+                    onNextVisibleChange = { }
+                )
+            }
+            Destination.PROGRESS -> {
+                ProgressScreen(
+                    status = "",
+                    step = "",
+                )
+            }
+            Destination.RESULT -> {
+                ResultScreen(result = Result.UNKNOWN)
             }
         }
-    }
-
-    enum class Destination {
-        GET_STARTED,
-        CONTACT_PICKER,
-        RINGTONE_BUILDER,
-        PROGRESS,
-        RESULT
     }
 }
