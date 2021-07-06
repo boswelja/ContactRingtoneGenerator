@@ -46,6 +46,7 @@ dependencies {
     implementation(libs.androidx.work.ktx)
     implementation(Libraries.preference)
     implementation(libs.bundles.lifecycle)
+    implementation(libs.androidx.datastore.proto)
 
     implementation(libs.bundles.compose)
     implementation(libs.timber)
