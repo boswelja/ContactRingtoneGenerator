@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropValue
 import androidx.compose.material.ExperimentalMaterialApi
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -105,7 +107,9 @@ fun MainScreen() {
 
     NavHost(navController = navController, startDestination = Destination.GET_STARTED.name) {
         composable(Destination.GET_STARTED.name) {
-            GetStartedScreen { }
+            GetStartedScreen(
+                Modifier.fillMaxSize()
+            )
         }
         composable(Destination.CONTACT_PICKER.name) {
             ContactPickerScreen(viewModel = viewModel) { }
