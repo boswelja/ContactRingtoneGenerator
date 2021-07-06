@@ -28,10 +28,6 @@ object ContactsHelper {
         ContactsContract.Contacts.DISPLAY_NAME_PRIMARY
     )
 
-    private val CONTACTS_ID_PROJECTION = arrayOf(
-        ContactsContract.Contacts._ID
-    )
-
     private val CONTACT_NAME_PROJECTION = arrayOf(
         ContactsContract.CommonDataKinds.StructuredName._ID,
         ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
