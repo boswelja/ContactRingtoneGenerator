@@ -64,7 +64,7 @@ fun RingtoneBuilderScreen(
         if (it == null || editingItemIndex < 0) return@rememberLauncherForActivityResult
         Timber.d("Setting %s data to %s", editingItemIndex, it)
         val item = viewModel.ringtoneStructure.removeAt(editingItemIndex)
-        item.setData(it)
+        // item.setData(it)
         viewModel.ringtoneStructure.add(editingItemIndex, item)
         editingItemIndex = -1
         onNextVisibleChange(viewModel.isRingtoneValid)
@@ -73,7 +73,7 @@ fun RingtoneBuilderScreen(
         if (it == null || editingItemIndex < 0) return@rememberLauncherForActivityResult
         Timber.d("Setting %s data to %s", editingItemIndex, it)
         val item = viewModel.ringtoneStructure.removeAt(editingItemIndex)
-        item.setData(it)
+        // item.setData(it)
         viewModel.ringtoneStructure.add(editingItemIndex, item)
         editingItemIndex = -1
         onNextVisibleChange(viewModel.isRingtoneValid)
@@ -172,7 +172,7 @@ fun StructureItem(
                         value = currentText,
                         onValueChange = {
                             currentText = it
-                            item.setData(it)
+                            // item.setData(it)
                             onDataValidityChanged(item.isDataValid)
                         },
                         singleLine = true
