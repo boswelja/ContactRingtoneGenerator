@@ -18,63 +18,63 @@ sealed class StructureChoice(
         Icons.Outlined.TextFields,
         R.string.label_custom_text
     ) {
-        override fun createStructureItem() = StructureItem.CustomText()
+        override fun createStructureItem() = StructureItem.Text.CustomText()
     }
 
     class NamePrefix : StructureChoice(
         Icons.Outlined.TextFields,
         R.string.label_name_prefix
     ) {
-        override fun createStructureItem() = StructureItem.NamePrefix()
+        override fun createStructureItem() = StructureItem.Text.NamePrefix()
     }
 
     class FirstName : StructureChoice(
         Icons.Outlined.TextFields,
         R.string.label_first_name
     ) {
-        override fun createStructureItem() = StructureItem.FirstName()
+        override fun createStructureItem() = StructureItem.Text.FirstName()
     }
 
     class MiddleName : StructureChoice(
         Icons.Outlined.TextFields,
         R.string.label_middle_name
     ) {
-        override fun createStructureItem() = StructureItem.MiddleName()
+        override fun createStructureItem() = StructureItem.Text.MiddleName()
     }
 
     class LastName : StructureChoice(
         Icons.Outlined.TextFields,
         R.string.label_last_name
     ) {
-        override fun createStructureItem() = StructureItem.LastName()
+        override fun createStructureItem() = StructureItem.Text.LastName()
     }
 
     class NameSuffix : StructureChoice(
         Icons.Outlined.TextFields,
         R.string.label_name_suffix
     ) {
-        override fun createStructureItem() = StructureItem.NameSuffix()
+        override fun createStructureItem() = StructureItem.Text.NameSuffix()
     }
 
     class Nickname : StructureChoice(
         Icons.Outlined.TextFields,
         R.string.label_nickname
     ) {
-        override fun createStructureItem() = StructureItem.Nickname()
+        override fun createStructureItem() = StructureItem.Text.Nickname()
     }
 
     class CustomAudio : StructureChoice(
         Icons.Outlined.Audiotrack,
         R.string.label_custom_audio
     ) {
-        override fun createStructureItem() = StructureItem.AudioFile()
+        override fun createStructureItem() = StructureItem.Audio.AudioFile()
     }
 
     class SystemRingtone : StructureChoice(
         Icons.Outlined.Audiotrack,
         R.string.label_system_ringtone
     ) {
-        override fun createStructureItem() = StructureItem.SystemRingtone()
+        override fun createStructureItem() = StructureItem.Audio.SystemRingtone()
     }
 
     companion object {

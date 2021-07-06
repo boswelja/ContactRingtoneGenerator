@@ -164,7 +164,7 @@ fun StructureItem(
         icon = { Icon(item.icon, null) },
         text = {
             when (item.dataType) {
-                StructureItem.DataType.IMMUTABLE ->
+                StructureItem.DataType.DYNAMIC ->
                     Text(stringResource(item.labelRes))
                 StructureItem.DataType.CUSTOM_TEXT -> {
                     var currentText by mutableStateOf(item.data?.toString() ?: "")

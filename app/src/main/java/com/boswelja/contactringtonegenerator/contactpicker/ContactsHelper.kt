@@ -28,6 +28,10 @@ object ContactsHelper {
         ContactsContract.Contacts.DISPLAY_NAME_PRIMARY
     )
 
+    private val CONTACTS_ID_PROJECTION = arrayOf(
+        ContactsContract.Contacts._ID
+    )
+
     private val CONTACT_NAME_PROJECTION = arrayOf(
         ContactsContract.CommonDataKinds.StructuredName._ID,
         ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME,
@@ -157,13 +161,27 @@ object ContactsHelper {
         }
     }
 
-    suspend fun setContactRingtone(context: Context, contact: Contact, ringtoneUri: Uri) {
+    suspend fun setContactRingtone(
+        context: Context,
+        contactUri: Uri,
+        ringtoneUri: Uri
+    ) {
         withContext(Dispatchers.IO) {
-            val contactUri = ContactsContract.Contacts.getLookupUri(contact.id, contact.lookupKey)
             val values = ContentValues()
             values.put(ContactsContract.Contacts.CUSTOM_RINGTONE, ringtoneUri.toString())
             context.contentResolver.update(contactUri, values, null, null)
         }
+    }
+
+    suspend fun getContactUri(
+        context: Context,
+        contactLookupKey: String
+    ): Uri? {
+        val lookupUri = Uri.withAppendedPath(
+            ContactsContract.Contacts.CONTENT_LOOKUP_URI, contactLookupKey
+        )
+
+        return ContactsContract.Contacts.lookupContact(context.contentResolver, lookupUri)
     }
 
     suspend fun removeContactRingtone(context: Context, contact: Contact) {
