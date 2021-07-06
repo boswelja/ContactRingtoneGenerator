@@ -5,6 +5,7 @@ import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropValue
 import androidx.compose.material.ExperimentalMaterialApi
@@ -79,7 +80,7 @@ class MainActivity : AppCompatActivity() {
                         )
                     },
                     backLayerContent = {
-                        SettingsScreen()
+                        SettingsScreen(Modifier.fillMaxWidth())
                     },
                     frontLayerContent = {
                         MainScreen()
