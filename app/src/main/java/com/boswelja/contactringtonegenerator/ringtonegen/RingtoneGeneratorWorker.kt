@@ -161,7 +161,9 @@ class RingtoneGeneratorWorker(
             }
         }
 
-        val contactName = "" // TODO
+        val contactName = ContactsHelper.getContactStructuredName(
+            applicationContext.contentResolver, contactLookupKey
+        )!!.let { "${it.firstName} ${it.middleName} ${it.lastName}" }
         var commandInputs = ""
         var filterInputs = ""
         var filters = ""
