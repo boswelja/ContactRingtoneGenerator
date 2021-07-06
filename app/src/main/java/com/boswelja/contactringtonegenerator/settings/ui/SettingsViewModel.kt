@@ -1,30 +1,22 @@
 package com.boswelja.contactringtonegenerator.settings.ui
 
 import android.app.Application
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.core.content.edit
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.preference.PreferenceManager
 import com.boswelja.contactringtonegenerator.common.MediaStoreHelper
 import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
+import com.boswelja.contactringtonegenerator.settings.settingsDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val sharedPreferences = PreferenceManager.getDefaultSharedPreferences(application)
+    private val dataStore = application.settingsDataStore
 
-    var volumeBoostValue by mutableStateOf(
-        sharedPreferences.getInt(VOLUME_BOOST_KEY, 0) / 10f
-    )
-    var multithreadedGeneration by mutableStateOf(
-        sharedPreferences.getBoolean("multithreaded_generation", true)
-    )
+    val volumeMultiplier = dataStore.data.map { it.volumeMultiplier }
 
     @ExperimentalCoroutinesApi
     fun resetContactRingtones() {
@@ -40,20 +32,9 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun updateVolumeBoost() {
-        sharedPreferences.edit {
-            putInt(VOLUME_BOOST_KEY, (volumeBoostValue * 10).toInt())
+    fun setVolumeMultiplier(newMultiplier: Float) {
+        viewModelScope.launch {
+            dataStore.updateData { it.copy(volumeMultiplier = newMultiplier) }
         }
-    }
-
-    fun updateMultithreadedGeneration() {
-        sharedPreferences.edit {
-            putBoolean(MULTITHREADED_GENERATION_KEY, multithreadedGeneration)
-        }
-    }
-
-    companion object {
-        const val MULTITHREADED_GENERATION_KEY = "multithreaded_generation"
-        const val VOLUME_BOOST_KEY = "volume_boost"
     }
 }

@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
+    id("com.squareup.wire")
 }
 
 android {
@@ -44,8 +45,8 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.work.ktx)
-    implementation(Libraries.preference)
     implementation(libs.bundles.lifecycle)
+    implementation(libs.androidx.datastore.proto)
 
     implementation(libs.bundles.compose)
     implementation(libs.timber)
@@ -71,4 +72,10 @@ dependencies {
     androidTestImplementation(libs.strikt.mockk)
     androidTestImplementation(libs.androidx.compose.ui.test)
     androidTestImplementation(libs.mockk.android)
+}
+
+wire {
+    kotlin {
+        android = true
+    }
 }
