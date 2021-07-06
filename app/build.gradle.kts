@@ -43,12 +43,14 @@ android {
 dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.work.ktx)
     implementation(Libraries.preference)
     implementation(libs.bundles.lifecycle)
 
     implementation(libs.bundles.compose)
     implementation(libs.timber)
     implementation(libs.ffmpeg.audio)
+    implementation(libs.tts.ktx)
 
     testImplementation(libs.androidx.arch.core.test)
     testImplementation(libs.androidx.test.corektx)
