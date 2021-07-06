@@ -16,8 +16,8 @@ val Context.settingsDataStore: DataStore<Settings> by dataStore(
 object SettingsSerializer : Serializer<Settings> {
 
     override val defaultValue: Settings = Settings(
-        1.0f,
-        true
+        volumeMultiplier = 1.0f,
+        loudnessEqualization = true
     )
 
     override suspend fun readFrom(input: InputStream): Settings {

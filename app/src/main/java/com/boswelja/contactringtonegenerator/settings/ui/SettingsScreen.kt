@@ -8,14 +8,19 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ListItem
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.ui.common.CheckboxPreference
 import com.boswelja.contactringtonegenerator.ui.common.SliderPreference
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 
 @ExperimentalCoroutinesApi
 @ExperimentalMaterialApi
@@ -23,6 +28,12 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 fun SettingsScreen() {
     val viewModel: SettingsViewModel = viewModel()
     val context = LocalContext.current
+    var volumeMultiplier by remember {
+        mutableStateOf(1.0f)
+    }
+    LaunchedEffect("initialVolumeMultiplierValue") {
+        volumeMultiplier = viewModel.volumeMultiplier.first()
+    }
     Column {
         ListItem(
             text = { Text(stringResource(R.string.launch_tts_settings_title)) },
@@ -31,26 +42,17 @@ fun SettingsScreen() {
         )
         SliderPreference(
             text = stringResource(R.string.volume_boost_title),
-            value = viewModel.volumeBoostValue,
+            value = volumeMultiplier,
             valueRange = 0f..3f,
             trailing = {
                 val boost = it + 1
                 Text("%.1fx".format(boost))
             },
             onSliderValueChanged = {
-                viewModel.volumeBoostValue = it
+                volumeMultiplier = it
             },
             onSliderValueFinished = {
-                viewModel.updateVolumeBoost()
-            }
-        )
-        CheckboxPreference(
-            text = stringResource(R.string.multithread_title),
-            secondaryText = stringResource(R.string.multithread_summary),
-            isChecked = viewModel.multithreadedGeneration,
-            onCheckChanged = {
-                viewModel.multithreadedGeneration = it
-                viewModel.updateMultithreadedGeneration()
+                viewModel.setVolumeMultiplier(volumeMultiplier)
             }
         )
         ListItem(
