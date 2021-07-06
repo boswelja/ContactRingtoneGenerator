@@ -15,23 +15,20 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import com.boswelja.contactringtonegenerator.common.ui.AppTheme
-import com.boswelja.contactringtonegenerator.common.ui.Crossflow
 import com.boswelja.contactringtonegenerator.common.ui.ProgressScreen
 import com.boswelja.contactringtonegenerator.contactpicker.ui.ContactPickerScreen
 import com.boswelja.contactringtonegenerator.entry.ui.GetStartedScreen
 import com.boswelja.contactringtonegenerator.result.ui.ResultScreen
 import com.boswelja.contactringtonegenerator.ringtonebuilder.RingtoneBuilderScreen
-import com.boswelja.contactringtonegenerator.ringtonegen.Result
 import com.boswelja.contactringtonegenerator.settings.ui.SettingsScreen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -103,34 +100,24 @@ enum class Destination {
 @ExperimentalMaterialApi
 @Composable
 fun MainScreen() {
-    var currentDestination by remember { mutableStateOf(Destination.GET_STARTED) }
+    val navController = rememberNavController()
     val viewModel: WizardViewModel = viewModel()
-    Crossflow(targetState = currentDestination) { destination ->
-        when (destination) {
-            Destination.GET_STARTED -> {
-                GetStartedScreen { }
-            }
-            Destination.CONTACT_PICKER -> {
-                ContactPickerScreen(
-                    viewModel = viewModel,
-                    onNextVisibleChange = { }
-                )
-            }
-            Destination.RINGTONE_BUILDER -> {
-                RingtoneBuilderScreen(
-                    viewModel = viewModel,
-                    onNextVisibleChange = { }
-                )
-            }
-            Destination.PROGRESS -> {
-                ProgressScreen(
-                    status = "",
-                    step = "",
-                )
-            }
-            Destination.RESULT -> {
-                ResultScreen(result = Result.UNKNOWN)
-            }
+
+    NavHost(navController = navController, startDestination = Destination.GET_STARTED.name) {
+        composable(Destination.GET_STARTED.name) {
+            GetStartedScreen { }
+        }
+        composable(Destination.CONTACT_PICKER.name) {
+            ContactPickerScreen(viewModel = viewModel) { }
+        }
+        composable(Destination.RINGTONE_BUILDER.name) {
+            RingtoneBuilderScreen(viewModel = viewModel) { }
+        }
+        composable(Destination.PROGRESS.name) {
+            ProgressScreen(status = "", step = "")
+        }
+        composable(Destination.RESULT.name) {
+            ResultScreen(result = null)
         }
     }
 }

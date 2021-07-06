@@ -8,22 +8,15 @@ import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.core.updateTransition
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalView
-import androidx.compose.ui.tooling.preview.Preview
 
 /**
  * [Crossflow] allows switching between two layouts with a slide in/out transition.
@@ -89,26 +82,6 @@ fun <T> Crossflow(
             key(it.key) {
                 it.content()
             }
-        }
-    }
-}
-
-@ExperimentalAnimationApi
-@Preview(showBackground = true)
-@Composable
-fun CrossflowPreview() {
-    var state by remember {
-        mutableStateOf(false)
-    }
-    Crossflow(
-        targetState = state,
-        animationSpec = tween(1000, easing = FastOutSlowInEasing),
-        modifier = Modifier.clickable { state = !state }
-    ) {
-        if (it) {
-            Box(Modifier.fillMaxSize().background(Color.Blue))
-        } else {
-            Box(Modifier.fillMaxSize().background(Color.Red))
         }
     }
 }
