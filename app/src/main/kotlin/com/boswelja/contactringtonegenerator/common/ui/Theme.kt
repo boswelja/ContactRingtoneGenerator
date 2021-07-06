@@ -10,8 +10,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-private val Green200 = Color(0xff66bb6a)
-private val Green500 = Color(0xff43a047)
+private val Green200 = Color(0xffa5d6a7)
+private val Green500 = Color(0xff4caf50)
 
 private val DarkColors = darkColors(
     primary = Green200,

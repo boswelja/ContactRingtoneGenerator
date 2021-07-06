@@ -1,14 +1,10 @@
 <resources>
 
-    <style name="BaseTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
         <item name="colorPrimary">@color/primaryColor</item>
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/primaryColor</item>
-        <item name="android:windowBackground">@color/windowBackground</item>
-        <item name="android:windowLightStatusBar">@bool/lightSystemBars</item>
-        <item name="android:statusBarColor">@color/windowBackground</item>
+        <item name="android:windowLightStatusBar">@bool/lightStatusBar</item>
     </style>
-
-    <style name="AppTheme" parent="BaseTheme" />
 
 </resources>
