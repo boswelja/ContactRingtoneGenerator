@@ -110,7 +110,9 @@ fun MainScreen() {
         composable(Destination.GET_STARTED.name) {
             GetStartedScreen(
                 Modifier.fillMaxSize()
-            )
+            ) {
+                navController.navigate(Destination.CONTACT_PICKER.name)
+            }
         }
         composable(Destination.CONTACT_PICKER.name) {
             ContactPickerScreen(viewModel = viewModel) { }

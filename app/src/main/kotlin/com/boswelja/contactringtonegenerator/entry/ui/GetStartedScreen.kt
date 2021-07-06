@@ -1,5 +1,10 @@
 package com.boswelja.contactringtonegenerator.entry.ui
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,16 +25,25 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
-import androidx.navigation.compose.rememberNavController
-import com.boswelja.contactringtonegenerator.Destination
 import com.boswelja.contactringtonegenerator.R
+import timber.log.Timber
 
 @Composable
 fun GetStartedScreen(
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onNavigateNext: () -> Unit
 ) {
-    val navController = rememberNavController()
+    val permissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { grantResults ->
+        if (grantResults.all { it.value }) {
+            onNavigateNext()
+        } else {
+            Timber.w("Permission denied")
+        }
+    }
     val context = LocalContext.current
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -60,8 +74,32 @@ fun GetStartedScreen(
                 Icon(Icons.Default.NavigateNext, stringResource(R.string.next))
             },
             onClick = {
-                navController.navigate(Destination.CONTACT_PICKER.name)
+                if (hasContactsPermission(context)) {
+                    onNavigateNext()
+                } else {
+                    permissionLauncher.launch(
+                        arrayOf(
+                            Manifest.permission.WRITE_CONTACTS,
+                            Manifest.permission.READ_CONTACTS
+                        )
+                    )
+                }
             }
         )
     }
+}
+
+private fun hasContactsPermission(context: Context): Boolean {
+    return hasPermission(
+        context, Manifest.permission.WRITE_CONTACTS
+    ) && hasPermission(context, Manifest.permission.READ_CONTACTS)
+}
+
+private fun hasPermission(
+    context: Context,
+    permission: String
+): Boolean {
+    return ContextCompat.checkSelfPermission(
+        context, permission
+    ) == PackageManager.PERMISSION_GRANTED
 }
