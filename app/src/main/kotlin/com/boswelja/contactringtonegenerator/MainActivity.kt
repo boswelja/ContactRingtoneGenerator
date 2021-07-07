@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropValue
+import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
@@ -245,6 +246,7 @@ fun BackdropContent(
     Column(modifier) {
         SettingsScreen(Modifier.fillMaxWidth())
         if (isSearchVisible) {
+            Divider()
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = onSearchQueryChanged,
