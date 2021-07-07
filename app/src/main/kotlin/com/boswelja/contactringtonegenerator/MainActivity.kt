@@ -78,6 +78,7 @@ class MainActivity : AppCompatActivity() {
 
             AppTheme {
                 BackdropScaffold(
+                    gesturesEnabled = isSearchVisible || isSettingsVisible,
                     scaffoldState = scaffoldState,
                     appBar = {
                         TopAppBar(
