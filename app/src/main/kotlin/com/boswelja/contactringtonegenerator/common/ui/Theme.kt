@@ -17,13 +17,20 @@ private val DarkColors = darkColors(
     primary = Green200,
     primaryVariant = Green200,
     secondary = Green200,
-    secondaryVariant = Green200
+    secondaryVariant = Green200,
+    background = Color.Black,
+    onBackground = Color.White,
+    surface = Color(0xFF212121),
+    onSurface = Color.White
 )
 private val LightColors = lightColors(
     primary = Green500,
     primaryVariant = Green500,
     secondary = Green500,
-    secondaryVariant = Green500
+    secondaryVariant = Green500,
+    background = Color.Black,
+    onBackground = Color.White,
+    surface = Color.White
 )
 
 private val shapes = Shapes(

@@ -10,12 +10,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ButtonDefaults.outlinedButtonColors
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Slider
-import androidx.compose.material.SliderDefaults
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -57,7 +57,7 @@ fun SettingsScreen(
             onSliderValueFinished = { viewModel.setVolumeMultiplier(it) }
         )
         Divider(
-            color = MaterialTheme.colors.onPrimary.copy(alpha = 0.12f)
+            color = MaterialTheme.colors.onBackground.copy(alpha = 0.12f)
         )
         ButtonSettings(
             modifier = Modifier
@@ -76,13 +76,14 @@ fun ButtonSettings(
 ) {
     val context = LocalContext.current
     val colors = outlinedButtonColors(
-        backgroundColor = MaterialTheme.colors.primary,
-        contentColor = MaterialTheme.colors.onPrimary,
-        disabledContentColor = MaterialTheme.colors.onPrimary
+        backgroundColor = MaterialTheme.colors.background,
+        contentColor = MaterialTheme.colors.primary,
+        disabledContentColor = MaterialTheme.colors.onBackground
+            .copy(alpha = ContentAlpha.disabled)
     )
     val border = BorderStroke(
         ButtonDefaults.OutlinedBorderSize,
-        MaterialTheme.colors.onPrimary.copy(alpha = ButtonDefaults.OutlinedBorderOpacity)
+        MaterialTheme.colors.onBackground.copy(alpha = ButtonDefaults.OutlinedBorderOpacity)
     )
     Row(
         modifier = modifier,
@@ -118,10 +119,6 @@ fun VolumeMultiplierSetting(
     onSliderValueChanged: (Float) -> Unit,
     onSliderValueFinished: (Float) -> Unit
 ) {
-    val colors = SliderDefaults.colors(
-        thumbColor = MaterialTheme.colors.onPrimary,
-        activeTrackColor = MaterialTheme.colors.onPrimary
-    )
     Column(modifier) {
         Row(
             verticalAlignment = Alignment.CenterVertically
@@ -141,8 +138,7 @@ fun VolumeMultiplierSetting(
             valueRange = 0.5f..2f,
             onValueChange = onSliderValueChanged,
             onValueChangeFinished = { onSliderValueFinished(value) },
-            steps = 15,
-            colors = colors
+            steps = 15
         )
     }
 }

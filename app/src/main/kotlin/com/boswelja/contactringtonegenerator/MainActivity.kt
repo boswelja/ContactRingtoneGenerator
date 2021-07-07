@@ -10,11 +10,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropValue
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
+import androidx.compose.material.LocalContentColor
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
@@ -30,7 +33,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -42,6 +48,7 @@ import androidx.navigation.compose.rememberNavController
 import com.boswelja.contactringtonegenerator.common.LocalSearchComposition
 import com.boswelja.contactringtonegenerator.common.ui.AppTheme
 import com.boswelja.contactringtonegenerator.common.ui.ProgressScreen
+import com.boswelja.contactringtonegenerator.common.ui.outlinedTextFieldColors
 import com.boswelja.contactringtonegenerator.contactpicker.ui.ContactPickerScreen
 import com.boswelja.contactringtonegenerator.entry.ui.GetStartedScreen
 import com.boswelja.contactringtonegenerator.result.ui.ResultScreen
@@ -65,20 +72,17 @@ class MainActivity : AppCompatActivity() {
             val coroutineScope = rememberCoroutineScope()
             val navController = rememberNavController()
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
+            val focusManager = LocalFocusManager.current
 
             var searchQuery by remember {
                 mutableStateOf("")
             }
             val isSearchVisible = currentBackStackEntry?.destination?.route ==
                 Destination.CONTACT_PICKER.name
-
-            var isSettingsVisible by remember {
-                mutableStateOf(false)
-            }
+            val searchFocusRequester = FocusRequester()
 
             AppTheme {
                 BackdropScaffold(
-                    gesturesEnabled = isSearchVisible || isSettingsVisible,
                     scaffoldState = scaffoldState,
                     appBar = {
                         TopAppBar(
@@ -92,26 +96,34 @@ class MainActivity : AppCompatActivity() {
                                         scaffoldState.conceal()
                                     } else {
                                         scaffoldState.reveal()
+                                        searchFocusRequester.requestFocus()
                                     }
                                 }
                             },
                             onShowSettings = {
                                 coroutineScope.launch {
-                                    isSettingsVisible = !isSettingsVisible
-                                    if (isSettingsVisible) {
+                                    if (scaffoldState.isConcealed) {
                                         scaffoldState.reveal()
-                                    } else if (!isSearchVisible) {
+                                    } else {
                                         scaffoldState.conceal()
                                     }
                                 }
                             }
                         )
                     },
+                    backLayerBackgroundColor = MaterialTheme.colors.background,
                     backLayerContent = {
                         BackdropContent(
+                            modifier = Modifier.fillMaxWidth(),
+                            searchModifier = Modifier.focusRequester(searchFocusRequester),
                             searchQuery = searchQuery,
                             onSearchQueryChanged = { searchQuery = it },
-                            isSettingsVisible = isSettingsVisible,
+                            onSearchQuerySubmitted = {
+                                coroutineScope.launch {
+                                    focusManager.clearFocus()
+                                    scaffoldState.conceal()
+                                }
+                            },
                             isSearchVisible = isSearchVisible
                         )
                     },
@@ -171,6 +183,7 @@ fun TopAppBar(
             }
         },
         backgroundColor = Color.Transparent,
+        contentColor = LocalContentColor.current,
         elevation = 0.dp
     )
 }
@@ -223,13 +236,15 @@ fun MainScreen(
 @Composable
 fun BackdropContent(
     modifier: Modifier = Modifier,
+    searchModifier: Modifier = Modifier,
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit,
-    isSettingsVisible: Boolean,
+    onSearchQuerySubmitted: () -> Unit,
     isSearchVisible: Boolean
 ) {
     Column(modifier) {
-        AnimatedVisibility(isSearchVisible) {
+        SettingsScreen(Modifier.fillMaxWidth())
+        if (isSearchVisible) {
             OutlinedTextField(
                 value = searchQuery,
                 onValueChange = onSearchQueryChanged,
@@ -242,12 +257,15 @@ fun BackdropContent(
                         stringResource(R.string.search_hint)
                     )
                 },
-                maxLines = 1,
-                modifier = Modifier.fillMaxWidth().padding(16.dp)
+                keyboardActions = KeyboardActions {
+                    onSearchQuerySubmitted()
+                },
+                singleLine = true,
+                modifier = searchModifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = outlinedTextFieldColors()
             )
-        }
-        AnimatedVisibility(isSettingsVisible) {
-            SettingsScreen()
         }
     }
 }
