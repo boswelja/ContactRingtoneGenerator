@@ -18,11 +18,6 @@ import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.boswelja.contactringtonegenerator.R
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.first
 
 @ExperimentalCoroutinesApi
 @ExperimentalMaterialApi
@@ -40,21 +34,15 @@ fun SettingsScreen(
     modifier: Modifier = Modifier
 ) {
     val viewModel: SettingsViewModel = viewModel()
-    var volumeMultiplier by remember {
-        mutableStateOf(1.0f)
-    }
-    LaunchedEffect("initialVolumeMultiplierValue") {
-        volumeMultiplier = viewModel.volumeMultiplier.first()
-    }
 
     Column(modifier) {
         VolumeMultiplierSetting(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            value = volumeMultiplier,
-            onSliderValueChanged = { volumeMultiplier = it },
-            onSliderValueFinished = { viewModel.setVolumeMultiplier(it) }
+            value = viewModel.volumeMultiplier,
+            onSliderValueChanged = { viewModel.volumeMultiplier = it },
+            onSliderValueFinished = { viewModel.saveVolumeMultiplier(it) }
         )
         Divider(
             color = MaterialTheme.colors.onBackground.copy(alpha = 0.12f)
