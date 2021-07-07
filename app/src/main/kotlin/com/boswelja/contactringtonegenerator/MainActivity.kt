@@ -53,7 +53,7 @@ import com.boswelja.contactringtonegenerator.common.ui.outlinedTextFieldColors
 import com.boswelja.contactringtonegenerator.contactpicker.ui.ContactPickerScreen
 import com.boswelja.contactringtonegenerator.entry.ui.GetStartedScreen
 import com.boswelja.contactringtonegenerator.result.ui.ResultScreen
-import com.boswelja.contactringtonegenerator.ringtonebuilder.RingtoneBuilderScreen
+import com.boswelja.contactringtonegenerator.ringtonebuilder.ui.RingtoneBuilderScreen
 import com.boswelja.contactringtonegenerator.settings.ui.SettingsScreen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -220,7 +220,9 @@ fun MainScreen(
             }
         }
         composable(Destination.RINGTONE_BUILDER.name) {
-            RingtoneBuilderScreen(viewModel = viewModel) { }
+            RingtoneBuilderScreen(viewModel = viewModel) {
+                navController.navigate(Destination.PROGRESS.name)
+            }
         }
         composable(Destination.PROGRESS.name) {
             ProgressScreen(status = "", step = "")

@@ -53,4 +53,8 @@
 
     <string name="item_audio_no_file">No audio selected</string>
     <string name="item_ringtone_no_file">No ringtone selected</string>
+
+    <string name="choice_category_contact_data">Contact Info</string>
+    <string name="choice_category_custom_text">Text</string>
+    <string name="choice_category_custom_audio">Audio</string>
 </resources>

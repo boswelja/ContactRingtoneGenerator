@@ -1,38 +1,39 @@
-package com.boswelja.contactringtonegenerator.ringtonebuilder
+package com.boswelja.contactringtonegenerator.ringtonebuilder.ui
 
-import android.media.RingtoneManager
 import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.Card
 import androidx.compose.material.DismissDirection
 import androidx.compose.material.DismissValue
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Surface
 import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.rememberDismissState
 import androidx.compose.runtime.Composable
@@ -45,107 +46,123 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.WizardViewModel
+import com.boswelja.contactringtonegenerator.common.ui.ChoiceChip
+import com.boswelja.contactringtonegenerator.ringtonebuilder.AllCategories
+import com.boswelja.contactringtonegenerator.ringtonebuilder.Choice
+import com.boswelja.contactringtonegenerator.ringtonebuilder.ChoiceCategory
+import com.boswelja.contactringtonegenerator.ringtonebuilder.Utils
 import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
-import timber.log.Timber
 
+@ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
 fun RingtoneBuilderScreen(
     viewModel: WizardViewModel,
-    onNextVisibleChange: (Boolean) -> Unit
+    onNavigateNext: () -> Unit
 ) {
-    var editingItemIndex: Int = remember { -1 }
-    val audioPickerLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.GetContent()
-    ) {
-        if (it == null || editingItemIndex < 0) return@rememberLauncherForActivityResult
-        Timber.d("Setting %s data to %s", editingItemIndex, it)
-        val item = viewModel.ringtoneStructure.removeAt(editingItemIndex)
-        // item.setData(it)
-        viewModel.ringtoneStructure.add(editingItemIndex, item)
-        editingItemIndex = -1
-        onNextVisibleChange(viewModel.isRingtoneValid)
+    var nextButtonVisible by remember {
+        mutableStateOf(viewModel.isRingtoneValid)
     }
-    val ringtonePickerLauncher = rememberLauncherForActivityResult(PickRingtone()) {
-        if (it == null || editingItemIndex < 0) return@rememberLauncherForActivityResult
-        Timber.d("Setting %s data to %s", editingItemIndex, it)
-        val item = viewModel.ringtoneStructure.removeAt(editingItemIndex)
-        // item.setData(it)
-        viewModel.ringtoneStructure.add(editingItemIndex, item)
-        editingItemIndex = -1
-        onNextVisibleChange(viewModel.isRingtoneValid)
-    }
-    Column(modifier = Modifier.fillMaxSize()) {
-        StructureChoices { choice ->
-            Timber.d("Adding %s", choice)
-            val item = choice.createStructureItem()
-            viewModel.ringtoneStructure.add(item)
-            onNextVisibleChange(viewModel.isRingtoneValid)
-        }
-        Divider()
-        LazyColumn(Modifier.weight(1f)) {
-            itemsIndexed(viewModel.ringtoneStructure) { index, item ->
-                val dismissState = rememberDismissState {
-                    if (it != DismissValue.Default) {
-                        viewModel.ringtoneStructure.removeAt(index)
-                        onNextVisibleChange(viewModel.isRingtoneValid)
-                        true
-                    } else false
-                }
-                SwipeToDismiss(
-                    state = dismissState,
-                    background = {
-                        val direction =
-                            dismissState.dismissDirection ?: return@SwipeToDismiss
-                        val color = Color.LightGray
-                        val alignment = when (direction) {
-                            DismissDirection.StartToEnd -> Alignment.CenterStart
-                            DismissDirection.EndToStart -> Alignment.CenterEnd
-                        }
-                        val icon = Icons.Outlined.Delete
 
-                        Box(
-                            Modifier
-                                .fillMaxSize()
-                                .background(color)
-                                .padding(horizontal = 32.dp),
-                            contentAlignment = alignment
-                        ) {
-                            Icon(
-                                icon,
-                                contentDescription = null,
-                                modifier = Modifier.size(36.dp)
-                            )
-                        }
+    Box {
+        Column(modifier = Modifier.fillMaxSize()) {
+            RingtoneStructureList(
+                modifier = Modifier.weight(1f),
+                structure = viewModel.ringtoneStructure,
+                onActionClicked = { },
+                onItemRemoved = {
+                    viewModel.ringtoneStructure.remove(it)
+                    nextButtonVisible = viewModel.isRingtoneValid
+                },
+                onDataValidityChanged = {
+                    nextButtonVisible = viewModel.isRingtoneValid
+                }
+            )
+            Divider()
+            ChoicePicker(Modifier.fillMaxWidth()) {
+                viewModel.ringtoneStructure.add(it.createStructureItem())
+                nextButtonVisible = viewModel.isRingtoneValid
+            }
+        }
+        AnimatedVisibility(
+            modifier = Modifier
+                .padding(16.dp)
+                .align(Alignment.BottomEnd),
+            visible = nextButtonVisible
+        ) {
+            ExtendedFloatingActionButton(
+                text = {
+                    Text(stringResource(R.string.next))
+                },
+                icon = {
+                    Icon(Icons.Default.NavigateNext, null)
+                },
+                onClick = onNavigateNext
+            )
+        }
+    }
+}
+
+@ExperimentalMaterialApi
+@Composable
+fun RingtoneStructureList(
+    modifier: Modifier = Modifier,
+    structure: List<StructureItem<*>>,
+    onActionClicked: (StructureItem<*>) -> Unit,
+    onItemRemoved: (StructureItem<*>) -> Unit,
+    onDataValidityChanged: (Boolean) -> Unit
+) {
+    LazyColumn(modifier) {
+        items(
+            items = structure,
+            key = { item -> item.toString() } // TODO Give this a stable key to avoid issues
+        ) { item ->
+            val dismissState = rememberDismissState {
+                if (it != DismissValue.Default) {
+                    onItemRemoved(item)
+                    true
+                } else false
+            }
+            SwipeToDismiss(
+                state = dismissState,
+                background = {
+                    val direction =
+                        dismissState.dismissDirection ?: return@SwipeToDismiss
+                    val color = Color.LightGray
+                    val alignment = when (direction) {
+                        DismissDirection.StartToEnd -> Alignment.CenterStart
+                        DismissDirection.EndToStart -> Alignment.CenterEnd
                     }
-                ) {
-                    Card(
-                        elevation = animateDpAsState(
-                            if (dismissState.dismissDirection != null) 4.dp else 0.dp
-                        ).value
+
+                    Box(
+                        Modifier
+                            .fillMaxSize()
+                            .background(color)
+                            .padding(horizontal = 32.dp),
+                        contentAlignment = alignment
                     ) {
-                        StructureItem(
-                            item = item,
-                            onDataValidityChanged = {
-                                if (!it) onNextVisibleChange(false)
-                                else onNextVisibleChange(viewModel.isRingtoneValid)
-                            },
-                            onActionClicked = {
-                                editingItemIndex = index
-                                when (it.dataType) {
-                                    StructureItem.DataType.AUDIO_FILE ->
-                                        audioPickerLauncher.launch("audio/*")
-                                    StructureItem.DataType.SYSTEM_RINGTONE ->
-                                        ringtonePickerLauncher
-                                            .launch(RingtoneManager.TYPE_RINGTONE)
-                                    else -> Timber.w("Unknown action clicked")
-                                }
-                            }
+                        Icon(
+                            Icons.Outlined.Delete,
+                            contentDescription = null,
+                            modifier = Modifier.size(36.dp)
                         )
                     }
+                }
+            ) {
+                val elevation by animateDpAsState(
+                    if (dismissState.dismissDirection != null) 4.dp else 0.dp
+                )
+                Card(elevation = elevation) {
+                    StructureItem(
+                        item = item,
+                        onDataValidityChanged = onDataValidityChanged,
+                        onActionClicked = onActionClicked
+                    )
                 }
             }
         }
@@ -203,35 +220,62 @@ fun StructureItem(
 }
 
 @Composable
-fun StructureChoices(
-    onItemClick: (StructureChoice) -> Unit
+fun ChoicePicker(
+    modifier: Modifier = Modifier,
+    onChoiceClicked: (Choice) -> Unit
 ) {
-    LazyRow(
-        contentPadding = PaddingValues(16.dp),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
+    Column(
+        modifier = modifier.padding(top = 16.dp, bottom = 72.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(StructureChoice.ALL) { choice ->
-            ItemChip(choice, onItemClick)
+        AllCategories.forEach {
+            ChoiceCategoryItem(category = it, onItemClick = onChoiceClicked)
         }
     }
 }
 
 @Composable
-fun ItemChip(
-    item: StructureChoice,
-    onClick: (StructureChoice) -> Unit
+fun ChoiceCategoryItem(
+    modifier: Modifier = Modifier,
+    category: ChoiceCategory,
+    onItemClick: (Choice) -> Unit
 ) {
-    Surface(
-        color = Color.LightGray,
-        shape = MaterialTheme.shapes.small
-    ) {
+    val categoryName = stringResource(category.textRes)
+    Column(modifier) {
         Row(
             Modifier
-                .clickable { onClick(item) }
-                .padding(horizontal = 8.dp, vertical = 4.dp)
+                .semantics(mergeDescendants = true) { contentDescription = categoryName }
+                .padding(horizontal = 16.dp)
         ) {
-            Icon(item.icon, null)
-            Text(stringResource(item.textRes))
+            Icon(category.icon, null)
+            Spacer(Modifier.width(4.dp))
+            Text(categoryName)
         }
+        Spacer(Modifier.height(8.dp))
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            items(category.choices) { choice ->
+                ChoiceItem(
+                    item = choice,
+                    onClick = onItemClick
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ChoiceItem(
+    modifier: Modifier = Modifier,
+    item: Choice,
+    onClick: (Choice) -> Unit
+) {
+    ChoiceChip(
+        modifier = modifier,
+        onClick = { onClick(item) }
+    ) {
+        Text(stringResource(item.textRes))
     }
 }
