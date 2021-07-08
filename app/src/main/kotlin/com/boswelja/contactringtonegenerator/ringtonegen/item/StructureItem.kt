@@ -18,9 +18,8 @@ sealed class StructureItem<T> {
     abstract var data: T
 
     enum class DataType {
-        DYNAMIC,
-        AUDIO_FILE,
-        SYSTEM_RINGTONE,
+        CONTACT_DATA,
+        CUSTOM_AUDIO,
         CUSTOM_TEXT
     }
 
@@ -41,7 +40,7 @@ sealed class StructureItem<T> {
         }
 
         class NamePrefix : Text() {
-            override val dataType = DataType.DYNAMIC
+            override val dataType = DataType.CONTACT_DATA
             override val engineRepresentation = Constants.NAME_PREFIX_PLACEHOLDER
 
             override val labelRes: Int = R.string.label_name_prefix
@@ -49,7 +48,7 @@ sealed class StructureItem<T> {
         }
 
         class FirstName : Text() {
-            override val dataType = DataType.DYNAMIC
+            override val dataType = DataType.CONTACT_DATA
             override val engineRepresentation = Constants.FIRST_NAME_PLACEHOLDER
 
             override val labelRes: Int = R.string.label_first_name
@@ -57,7 +56,7 @@ sealed class StructureItem<T> {
         }
 
         class MiddleName : Text() {
-            override val dataType = DataType.DYNAMIC
+            override val dataType = DataType.CONTACT_DATA
             override val engineRepresentation = Constants.MIDDLE_NAME_PLACEHOLDER
 
             override val labelRes: Int = R.string.label_middle_name
@@ -65,7 +64,7 @@ sealed class StructureItem<T> {
         }
 
         class LastName : Text() {
-            override val dataType = DataType.DYNAMIC
+            override val dataType = DataType.CONTACT_DATA
             override val engineRepresentation = Constants.LAST_NAME_PLACEHOLDER
 
             override val labelRes: Int = R.string.label_last_name
@@ -73,7 +72,7 @@ sealed class StructureItem<T> {
         }
 
         class NameSuffix : Text() {
-            override val dataType = DataType.DYNAMIC
+            override val dataType = DataType.CONTACT_DATA
             override val engineRepresentation = Constants.NAME_SUFFIX_PLACEHOLDER
 
             override val labelRes: Int = R.string.label_name_suffix
@@ -81,7 +80,7 @@ sealed class StructureItem<T> {
         }
 
         class Nickname : Text() {
-            override val dataType = DataType.DYNAMIC
+            override val dataType = DataType.CONTACT_DATA
             override val engineRepresentation = Constants.NICKNAME_PLACEHOLDER
 
             override val labelRes: Int = R.string.label_nickname
@@ -98,13 +97,13 @@ sealed class StructureItem<T> {
             get() = data?.toString() ?: ""
 
         class SystemRingtone : Audio() {
-            override val dataType = DataType.SYSTEM_RINGTONE
+            override val dataType = DataType.CUSTOM_AUDIO
             override val icon = Icons.Default.Audiotrack
             override val labelRes = R.string.label_system_ringtone
         }
 
         class AudioFile : Audio() {
-            override val dataType = DataType.AUDIO_FILE
+            override val dataType = DataType.CUSTOM_AUDIO
             override val icon = Icons.Default.Audiotrack
             override val labelRes = R.string.label_custom_audio
         }

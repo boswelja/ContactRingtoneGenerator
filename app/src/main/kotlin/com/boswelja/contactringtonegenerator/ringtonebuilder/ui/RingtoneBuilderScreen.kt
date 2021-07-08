@@ -181,7 +181,7 @@ fun StructureItem(
         icon = { Icon(item.icon, null) },
         text = {
             when (item.dataType) {
-                StructureItem.DataType.DYNAMIC ->
+                StructureItem.DataType.CONTACT_DATA ->
                     Text(stringResource(item.labelRes))
                 StructureItem.DataType.CUSTOM_TEXT -> {
                     var currentText by mutableStateOf(item.data?.toString() ?: "")
@@ -195,7 +195,7 @@ fun StructureItem(
                         singleLine = true
                     )
                 }
-                StructureItem.DataType.AUDIO_FILE,
+                StructureItem.DataType.CUSTOM_AUDIO,
                 StructureItem.DataType.SYSTEM_RINGTONE -> {
                     val context = LocalContext.current
                     Row(verticalAlignment = Alignment.CenterVertically) {

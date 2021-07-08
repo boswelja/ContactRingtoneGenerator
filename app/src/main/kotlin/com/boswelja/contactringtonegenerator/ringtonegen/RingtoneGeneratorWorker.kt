@@ -61,8 +61,7 @@ class RingtoneGeneratorWorker(
         applicationContext.withTextToSpeech {
             ringtoneStructure.forEach { (type, text) ->
                 when (type) {
-                    StructureItem.DataType.AUDIO_FILE,
-                    StructureItem.DataType.SYSTEM_RINGTONE -> {
+                    StructureItem.DataType.CUSTOM_AUDIO -> {
                         val uri = Uri.parse(text!!)
                     }
                     StructureItem.DataType.CUSTOM_TEXT -> {
@@ -144,11 +143,10 @@ class RingtoneGeneratorWorker(
         applicationContext.withTextToSpeech {
             structure.forEach { (type, text) ->
                 val file = when (type) {
-                    StructureItem.DataType.DYNAMIC -> {
+                    StructureItem.DataType.CONTACT_DATA -> {
                         synthesizeContactName(contactLookupKey, text!!)
                     }
-                    StructureItem.DataType.AUDIO_FILE,
-                    StructureItem.DataType.SYSTEM_RINGTONE,
+                    StructureItem.DataType.CUSTOM_AUDIO,
                     StructureItem.DataType.CUSTOM_TEXT -> {
                         getPartFileFor(applicationContext, text!!)
                     }
