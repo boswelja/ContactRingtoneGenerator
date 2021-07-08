@@ -1,9 +1,11 @@
 package com.boswelja.contactringtonegenerator.ringtonegen.item
 
 import android.net.Uri
+import androidx.annotation.StringRes
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.boswelja.contactringtonegenerator.R
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.serialization.Serializable
 
@@ -45,15 +47,34 @@ sealed class CustomTextItem : StructureItem() {
 }
 
 sealed class ContactDataItem(
-    final override var data: String?
+    final override var data: String?,
+    @StringRes val textRes: Int
 ) : StructureItem() {
 
     final override val isDataValid: Boolean = true
 
-    class NamePrefix : ContactDataItem(Constants.NAME_PREFIX_PLACEHOLDER)
-    class FirstName : ContactDataItem(Constants.FIRST_NAME_PLACEHOLDER)
-    class MiddleName : ContactDataItem(Constants.MIDDLE_NAME_PLACEHOLDER)
-    class LastName : ContactDataItem(Constants.LAST_NAME_PLACEHOLDER)
-    class NameSuffix : ContactDataItem(Constants.NAME_SUFFIX_PLACEHOLDER)
-    class Nickname : ContactDataItem(Constants.NICKNAME_PLACEHOLDER)
+    class NamePrefix : ContactDataItem(
+        Constants.NAME_PREFIX_PLACEHOLDER,
+        R.string.label_name_prefix
+    )
+    class FirstName : ContactDataItem(
+        Constants.FIRST_NAME_PLACEHOLDER,
+        R.string.label_first_name
+    )
+    class MiddleName : ContactDataItem(
+        Constants.MIDDLE_NAME_PLACEHOLDER,
+        R.string.label_middle_name
+    )
+    class LastName : ContactDataItem(
+        Constants.LAST_NAME_PLACEHOLDER,
+        R.string.label_last_name
+    )
+    class NameSuffix : ContactDataItem(
+        Constants.NAME_SUFFIX_PLACEHOLDER,
+        R.string.label_name_suffix
+    )
+    class Nickname : ContactDataItem(
+        Constants.NICKNAME_PLACEHOLDER,
+        R.string.label_nickname
+    )
 }

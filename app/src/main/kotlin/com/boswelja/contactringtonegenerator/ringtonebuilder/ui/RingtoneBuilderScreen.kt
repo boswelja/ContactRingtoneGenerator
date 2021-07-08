@@ -183,7 +183,7 @@ fun StructureItem(
         text = {
             when (item) {
                 is ContactDataItem ->
-                    Text(item.data!!)
+                    Text(stringResource(item.textRes))
                 is CustomTextItem -> {
                     OutlinedTextField(
                         value = item.data!!,
