@@ -21,6 +21,7 @@ ffmpeg = "4.4"
 junit = "4.13.2"
 mockk = "1.11.0"
 robolectric = "4.5.1"
+serialization = "1.2.1"
 strikt = "0.31.0"
 timber = "4.7.1"
 tts-ktx = "1.0.0"
@@ -58,6 +59,7 @@ androidx-compose-navigation = { module = "androidx.navigation:navigation-compose
 ffmpeg-audio = { module = "com.arthenica:ffmpeg-kit-audio", version.ref = "ffmpeg" }
 junit = { module = "junit:junit", version.ref = "junit" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
+kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 mockk-core = { module = "io.mockk:mockk", version.ref = "mockk" }
 mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }

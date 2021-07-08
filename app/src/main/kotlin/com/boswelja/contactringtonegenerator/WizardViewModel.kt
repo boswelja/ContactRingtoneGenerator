@@ -23,7 +23,7 @@ class WizardViewModel(application: Application) : AndroidViewModel(application) 
         500
     )
 
-    val ringtoneStructure = mutableStateListOf<StructureItem<*>>()
+    val ringtoneStructure = mutableStateListOf<StructureItem>()
     val isRingtoneValid: Boolean
         get() = ringtoneStructure.isNotEmpty() && ringtoneStructure.all { it.isDataValid }
 

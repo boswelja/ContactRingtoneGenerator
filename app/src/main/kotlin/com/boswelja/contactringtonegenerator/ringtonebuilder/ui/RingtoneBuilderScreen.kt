@@ -1,6 +1,5 @@
 package com.boswelja.contactringtonegenerator.ringtonebuilder.ui
 
-import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
@@ -56,6 +55,9 @@ import com.boswelja.contactringtonegenerator.ringtonebuilder.AllCategories
 import com.boswelja.contactringtonegenerator.ringtonebuilder.Choice
 import com.boswelja.contactringtonegenerator.ringtonebuilder.ChoiceCategory
 import com.boswelja.contactringtonegenerator.ringtonebuilder.Utils
+import com.boswelja.contactringtonegenerator.ringtonegen.item.ContactDataItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomAudioItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomTextItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
 
 @ExperimentalAnimationApi
@@ -112,15 +114,15 @@ fun RingtoneBuilderScreen(
 @Composable
 fun RingtoneStructureList(
     modifier: Modifier = Modifier,
-    structure: List<StructureItem<*>>,
-    onActionClicked: (StructureItem<*>) -> Unit,
-    onItemRemoved: (StructureItem<*>) -> Unit,
+    structure: List<StructureItem>,
+    onActionClicked: (StructureItem) -> Unit,
+    onItemRemoved: (StructureItem) -> Unit,
     onDataValidityChanged: (Boolean) -> Unit
 ) {
     LazyColumn(modifier) {
         items(
             items = structure,
-            key = { item -> item.toString() } // TODO Give this a stable key to avoid issues
+            key = { item -> item.id }
         ) { item ->
             val dismissState = rememberDismissState {
                 if (it != DismissValue.Default) {
@@ -172,36 +174,33 @@ fun RingtoneStructureList(
 @ExperimentalMaterialApi
 @Composable
 fun StructureItem(
-    item: StructureItem<*>,
-    onActionClicked: (StructureItem<*>) -> Unit,
+    item: StructureItem,
+    onActionClicked: (StructureItem) -> Unit,
     onDataValidityChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
     ListItem(
-        icon = { Icon(item.icon, null) },
         text = {
-            when (item.dataType) {
-                StructureItem.DataType.CONTACT_DATA ->
-                    Text(stringResource(item.labelRes))
-                StructureItem.DataType.CUSTOM_TEXT -> {
-                    var currentText by mutableStateOf(item.data?.toString() ?: "")
+            when (item) {
+                is ContactDataItem ->
+                    Text(item.data!!)
+                is CustomTextItem -> {
                     OutlinedTextField(
-                        value = currentText,
+                        value = item.data!!,
                         onValueChange = {
-                            currentText = it
+                            item.data = it
                             // item.setData(it)
                             onDataValidityChanged(item.isDataValid)
                         },
                         singleLine = true
                     )
                 }
-                StructureItem.DataType.CUSTOM_AUDIO,
-                StructureItem.DataType.SYSTEM_RINGTONE -> {
+                is CustomAudioItem -> {
                     val context = LocalContext.current
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = Utils.getDisplayText(context, item.data as Uri?)
-                                ?: stringResource(item.labelRes),
+                            text = Utils.getDisplayText(context, item.audioUri)
+                                ?: "",
                             modifier = Modifier.weight(1f)
                         )
                         TextButton(onClick = { onActionClicked(item) }) {
