@@ -1,14 +1,11 @@
 package com.boswelja.contactringtonegenerator.common.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Shapes
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 
 private val Green200 = Color(0xffa5d6a7)
 private val Green500 = Color(0xff4caf50)
@@ -33,12 +30,6 @@ private val LightColors = lightColors(
     surface = Color.White
 )
 
-private val shapes = Shapes(
-    small = RoundedCornerShape(50),
-    medium = RoundedCornerShape(16.dp),
-    large = RoundedCornerShape(32.dp)
-)
-
 @Composable
 fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
@@ -46,7 +37,6 @@ fun AppTheme(
 ) {
     MaterialTheme(
         colors = if (darkTheme) DarkColors else LightColors,
-        shapes = shapes,
         content = content
     )
 }
