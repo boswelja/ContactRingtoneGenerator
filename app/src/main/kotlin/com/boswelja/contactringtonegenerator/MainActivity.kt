@@ -7,6 +7,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -50,6 +51,7 @@ import com.boswelja.contactringtonegenerator.common.LocalSearchComposition
 import com.boswelja.contactringtonegenerator.common.ui.AppTheme
 import com.boswelja.contactringtonegenerator.common.ui.ProgressScreen
 import com.boswelja.contactringtonegenerator.common.ui.outlinedTextFieldColors
+import com.boswelja.contactringtonegenerator.confirmation.ui.ConfirmationScreen
 import com.boswelja.contactringtonegenerator.contactpicker.ui.ContactPickerScreen
 import com.boswelja.contactringtonegenerator.entry.ui.GetStartedScreen
 import com.boswelja.contactringtonegenerator.result.ui.ResultScreen
@@ -147,6 +149,7 @@ enum class Destination {
     GET_STARTED,
     CONTACT_PICKER,
     RINGTONE_BUILDER,
+    CONFIRMATION,
     PROGRESS,
     RESULT
 }
@@ -221,12 +224,28 @@ fun MainScreen(
         }
         composable(Destination.RINGTONE_BUILDER.name) {
             RingtoneBuilderScreen(viewModel = viewModel) {
-                navController.navigate(Destination.PROGRESS.name) {
-                    popUpTo(Destination.GET_STARTED.name) {
-                        inclusive = true
-                    }
-                }
+                navController.navigate(Destination.CONFIRMATION.name)
             }
+        }
+        composable(Destination.CONFIRMATION.name) {
+            ConfirmationScreen(
+                modifier = Modifier.fillMaxSize(),
+                contentPaddingValues = PaddingValues(16.dp),
+                selectedContactCount = viewModel.selectedContacts.count(),
+                onStartClicked = {
+                    navController.navigate(Destination.PROGRESS.name) {
+                        popUpTo(Destination.GET_STARTED.name) {
+                            inclusive = true
+                        }
+                    }
+                },
+                onReturnToContactSelected = {
+                    navController.popBackStack(Destination.CONTACT_PICKER.name, false)
+                },
+                onReturnToRingtoneSelected = {
+                    navController.popBackStack(Destination.RINGTONE_BUILDER.name, false)
+                }
+            )
         }
         composable(Destination.PROGRESS.name) {
             ProgressScreen(status = "", step = "")

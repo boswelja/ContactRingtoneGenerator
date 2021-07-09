@@ -54,6 +54,11 @@
     <string name="item_audio_no_file">No audio selected</string>
     <string name="item_ringtone_no_file">No ringtone selected</string>
 
+    <string name="confirmation_title">Ready to start?</string>
+    <string name="confirmation_generator_info">This might take a while. You can keep using your phone while we work in the background.</string>
+    <string name="confirmation_contact_picker_return">Return to Contact Picker</string>
+    <string name="confirmation_ringtone_builder_return">Return to Ringtone Builder</string>
+
     <string name="choice_category_contact_data">Contact Info</string>
     <string name="choice_category_custom_text">Text</string>
     <string name="choice_category_custom_audio">Audio</string>

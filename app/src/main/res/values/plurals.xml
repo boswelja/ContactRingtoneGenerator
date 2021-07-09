@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <plurals name="selected_contacts_summary">
-        <item quantity="one">%d contact selected</item>
-        <item quantity="other">%d contacts selected</item>
+    <plurals name="confirmation_selected_contacts">
+        <item quantity="one">You\'ve selected %d contact</item>
+        <item quantity="other">You\'ve selected %d contacts</item>
     </plurals>
 </resources>
