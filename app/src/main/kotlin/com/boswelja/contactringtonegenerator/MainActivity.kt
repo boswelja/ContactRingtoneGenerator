@@ -221,7 +221,11 @@ fun MainScreen(
         }
         composable(Destination.RINGTONE_BUILDER.name) {
             RingtoneBuilderScreen(viewModel = viewModel) {
-                navController.navigate(Destination.PROGRESS.name)
+                navController.navigate(Destination.PROGRESS.name) {
+                    popUpTo(Destination.GET_STARTED.name) {
+                        inclusive = true
+                    }
+                }
             }
         }
         composable(Destination.PROGRESS.name) {
