@@ -75,6 +75,7 @@ fun RingtoneBuilderScreen(
         Column(modifier = Modifier.fillMaxSize()) {
             RingtoneStructureList(
                 modifier = Modifier.weight(1f),
+                contentPaddingValues = PaddingValues(vertical = 8.dp),
                 structure = viewModel.ringtoneStructure,
                 onActionClicked = { },
                 onItemRemoved = {
@@ -114,12 +115,16 @@ fun RingtoneBuilderScreen(
 @Composable
 fun RingtoneStructureList(
     modifier: Modifier = Modifier,
+    contentPaddingValues: PaddingValues = PaddingValues(),
     structure: List<StructureItem>,
     onActionClicked: (StructureItem) -> Unit,
     onItemRemoved: (StructureItem) -> Unit,
     onDataValidityChanged: (Boolean) -> Unit
 ) {
-    LazyColumn(modifier) {
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = contentPaddingValues
+    ) {
         items(
             items = structure,
             key = { item -> item.id }
