@@ -96,7 +96,7 @@ fun ReadyUpSummary(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(R.string.confirmation_title),
+            text = stringResource(R.string.ready_title),
             style = MaterialTheme.typography.h6,
             textAlign = TextAlign.Center
         )

@@ -18,6 +18,10 @@
     <string name="multithread_summary">Can significantly speed up ringtone generation.\nDisable this if you have reliability issues.</string>
 
     <string name="contact_picker_title">Select Contacts</string>
+    <string name="ringtone_builder_title">Ringtone Builder</string>
+    <string name="confirmation_title">Summary</string>
+    <string name="working_title">Creating your Ringtones</string>
+    <string name="result_title">All Done</string>
 
     <string name="progress_title_getting_ready">Getting Ready</string>
     <string name="progress_title_generating">Generating</string>
@@ -54,7 +58,7 @@
     <string name="item_audio_no_file">No audio selected</string>
     <string name="item_ringtone_no_file">No ringtone selected</string>
 
-    <string name="confirmation_title">Ready to start?</string>
+    <string name="ready_title">Ready to start?</string>
     <string name="confirmation_generator_info">This might take a while. You can keep using your phone while we work in the background.</string>
     <string name="confirmation_contact_picker_return">Return to Contact Picker</string>
     <string name="confirmation_ringtone_builder_return">Return to Ringtone Builder</string>

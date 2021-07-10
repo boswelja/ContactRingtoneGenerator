@@ -89,9 +89,7 @@ class MainActivity : AppCompatActivity() {
                     scaffoldState = scaffoldState,
                     appBar = {
                         TopAppBar(
-                            title = when (currentBackStackEntry?.destination?.route) {
-                                else -> stringResource(R.string.app_name)
-                            },
+                            title = destinationTitle(currentBackStackEntry?.destination?.route),
                             isSearchVisible = isSearchVisible,
                             onShowSearch = {
                                 coroutineScope.launch {
@@ -152,6 +150,19 @@ enum class Destination {
     CONFIRMATION,
     PROGRESS,
     RESULT
+}
+
+@Composable
+fun destinationTitle(destinationRoute: String?): String {
+    return when (destinationRoute) {
+        Destination.CONTACT_PICKER.name ->
+            stringResource(R.string.contact_picker_title)
+        Destination.RINGTONE_BUILDER.name -> stringResource(R.string.ringtone_builder_title)
+        Destination.CONFIRMATION.name -> stringResource(R.string.confirmation_title)
+        Destination.PROGRESS.name -> stringResource(R.string.working_title)
+        Destination.RESULT.name -> stringResource(R.string.result_title)
+        else -> stringResource(R.string.app_name)
+    }
 }
 
 @ExperimentalAnimationApi
