@@ -6,27 +6,18 @@
 
     <string name="grant">Grant</string>
     <string name="next">Next</string>
-    <string name="finish">Finish</string>
     <string name="browse">Browse</string>
 
     <string name="settings_title">Settings</string>
     <string name="reset_ringtones_title">Reset Contact Ringtones</string>
-    <string name="reset_ringtones_summary">This will clear all custom ringtones for all your contacts</string>
     <string name="launch_tts_settings_title">Open Text to Speech Settings</string>
     <string name="volume_boost_title">Boost Ringtone Volume</string>
-    <string name="multithread_title">Multithreaded Generation</string>
-    <string name="multithread_summary">Can significantly speed up ringtone generation.\nDisable this if you have reliability issues.</string>
 
     <string name="contact_picker_title">Select Contacts</string>
     <string name="ringtone_builder_title">Ringtone Builder</string>
     <string name="confirmation_title">Summary</string>
     <string name="working_title">Creating your Ringtones</string>
     <string name="result_title">All Done</string>
-
-    <string name="progress_title_getting_ready">Getting Ready</string>
-    <string name="progress_title_generating">Generating</string>
-    <string name="progress_status_getting_ready">Preparing to create your Ringtones</string>
-    <string name="progress_status_generating">Creating your new ringtones</string>
 
     <string name="result_success_title">Success</string>
     <string name="result_success_status">All ringtones successfully created &amp; applied</string>
@@ -36,8 +27,6 @@
     <string name="result_failed_status">Failed to create all ringtones</string>
     <string name="result_unknown_title">Unknown</string>
     <string name="result_unknown_status">Status unknown</string>
-
-    <string name="ringtone_creator_no_content">Choose an item below to start building your ringtone</string>
 
     <string name="search_hint">Search</string>
 
@@ -54,9 +43,6 @@
     <string name="label_custom_text">Custom Text</string>
     <string name="label_custom_audio">Audio File</string>
     <string name="label_system_ringtone">System Ringtone</string>
-
-    <string name="item_audio_no_file">No audio selected</string>
-    <string name="item_ringtone_no_file">No ringtone selected</string>
 
     <string name="ready_title">Ready to start?</string>
     <string name="confirmation_generator_info">This might take a while. You can keep using your phone while we work in the background.</string>

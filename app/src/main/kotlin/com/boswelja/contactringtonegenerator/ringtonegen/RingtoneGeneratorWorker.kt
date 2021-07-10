@@ -57,7 +57,7 @@ class RingtoneGeneratorWorker(
 
     /**
      * Synthesize all static text elements of the ringtone. Currently, this is only
-     * [StructureItem.Text.CustomText].
+     * [CustomTextItem.CustomText].
      * @param ringtoneStructure The structure of the ringtone.
      */
     private suspend fun synthesizeStaticParts(
