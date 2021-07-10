@@ -232,9 +232,9 @@ fun MainScreen(
                 selectedContacts = viewModel.selectedContacts,
                 onContactSelectionChanged = { contact, isSelected ->
                     if (isSelected) {
-                        viewModel.selectContacts(listOf(contact.lookupKey))
+                        viewModel.selectContact(contact)
                     } else {
-                        viewModel.deselectContacts(listOf(contact.lookupKey))
+                        viewModel.deselectContact(contact)
                     }
                 }
             ) {

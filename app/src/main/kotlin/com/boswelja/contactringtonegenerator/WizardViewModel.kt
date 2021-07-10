@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
+import com.boswelja.contactringtonegenerator.contactpicker.Contact
 import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
 
 class WizardViewModel(application: Application) : AndroidViewModel(application) {
@@ -17,13 +18,13 @@ class WizardViewModel(application: Application) : AndroidViewModel(application) 
     val isRingtoneValid: Boolean
         get() = ringtoneStructure.isNotEmpty() && ringtoneStructure.all { it.isDataValid }
 
-    fun selectContacts(newContactKeys: List<String>) {
-        val newList = selectedContacts + newContactKeys
+    fun selectContact(contact: Contact) {
+        val newList = selectedContacts + contact.lookupKey
         selectedContacts = newList.toHashSet()
     }
 
-    fun deselectContacts(newContactKeys: List<String>) {
-        val newList = selectedContacts - newContactKeys
+    fun deselectContact(contact: Contact) {
+        val newList = selectedContacts - contact.lookupKey
         selectedContacts = newList.toHashSet()
     }
 }
