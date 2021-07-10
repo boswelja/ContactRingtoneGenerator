@@ -1,8 +1,3 @@
 <resources>
-
-    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
-        <item name="android:statusBarColor">#F5F5F5</item>
-        <item name="android:windowLightStatusBar">@bool/hasLightStatusBar</item>
-    </style>
-
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar" />
 </resources>
