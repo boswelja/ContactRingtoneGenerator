@@ -1,7 +1,7 @@
 package com.boswelja.contactringtonegenerator.ringtonebuilder.ui
 
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.background
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -11,11 +11,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.Card
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -108,16 +108,24 @@ fun RingtoneStructureList(
             items = structure,
             key = { item -> item.id }
         ) { item ->
+            var isActive by remember {
+                mutableStateOf(false)
+            }
+            val elevation by animateDpAsState(
+                if (isActive) 4.dp else 0.dp
+            )
             SwipeDismissItem(
                 item = item,
                 onItemDismissed = onItemRemoved,
+                onStateChanged = { isActive = it },
                 content = {
-                    StructureItem(
-                        modifier = Modifier.background(MaterialTheme.colors.surface),
-                        item = item,
-                        onDataValidityChanged = onDataValidityChanged,
-                        onActionClicked = onActionClicked
-                    )
+                    Card(elevation = elevation) {
+                        StructureItem(
+                            item = item,
+                            onDataValidityChanged = onDataValidityChanged,
+                            onActionClicked = onActionClicked
+                        )
+                    }
                 }
             )
         }
