@@ -32,8 +32,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         val context = getApplication<Application>()
         viewModelScope.launch(Dispatchers.IO) {
             ContactsHelper.getContacts(
-                context.contentResolver,
-                Int.MAX_VALUE // Collect all contacts
+                context.contentResolver
             ).first().forEach { contact ->
                 ContactsHelper.removeContactRingtone(context, contact)
             }
