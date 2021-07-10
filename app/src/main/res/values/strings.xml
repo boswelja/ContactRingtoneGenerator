@@ -46,7 +46,7 @@
     <string name="label_custom_audio">Audio File</string>
     <string name="label_system_ringtone">System Ringtone</string>
 
-    <string name="ready_title">Ready to start?</string>
+    <string name="confirmation_start">Start</string>
     <string name="confirmation_generator_info">This might take a while. You can keep using your phone while we work in the background.</string>
     <string name="confirmation_contact_picker_return">Return to Contact Picker</string>
     <string name="confirmation_ringtone_builder_return">Return to Ringtone Builder</string>
