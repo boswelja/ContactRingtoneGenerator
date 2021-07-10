@@ -1,17 +1,20 @@
 package com.boswelja.contactringtonegenerator.contactpicker.ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Checkbox
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.ExtendedFloatingActionButton
@@ -56,7 +59,7 @@ fun ContactPickerScreen(
 ) {
     val viewModel: ContactPickerViewModel = viewModel()
     val allContacts by viewModel.allContacts.collectAsState(
-        emptyList(),
+        null,
         Dispatchers.IO
     )
 
@@ -64,17 +67,32 @@ fun ContactPickerScreen(
 
     val visibleContacts by remember(allContacts, currentQuery) {
         derivedStateOf {
-            allContacts.filter { it.second.displayName.contains(currentQuery, ignoreCase = true) }
+            allContacts?.filter { it.second.displayName.contains(currentQuery, ignoreCase = true) }
         }
     }
 
     Box(modifier) {
-        ContactsList(
-            contentPaddingValues = PaddingValues(top = 8.dp, bottom = 72.dp),
-            contacts = visibleContacts,
-            selectedContacts = selectedContacts,
-            onContactSelectionChanged = onContactSelectionChanged
-        )
+        Crossfade(
+            modifier = Modifier.fillMaxSize(),
+            targetState = visibleContacts != null
+        ) {
+            if (it) {
+                ContactsList(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPaddingValues = PaddingValues(top = 8.dp, bottom = 72.dp),
+                    contacts = visibleContacts!!,
+                    selectedContacts = selectedContacts,
+                    onContactSelectionChanged = onContactSelectionChanged
+                )
+            } else {
+                Box(Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            }
+        }
+
         AnimatedVisibility(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
