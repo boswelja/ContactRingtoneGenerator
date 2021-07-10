@@ -26,11 +26,11 @@ class RingtoneGeneratorWorker(
 
     override suspend fun doWork(): Result {
         // Get input structure
-        val structure = inputData.getStringArray(DATA_RINGTONE_STRUCTURE)?.map {
+        val structure = inputData.getStringArray(RingtoneStructure)?.map {
             Json.decodeFromString<StructureItem>(it)
         } ?: return Result.failure()
         // Get input contacts
-        val contacts = inputData.getStringArray(DATA_CONTACT_LOOKUP_KEYS)
+        val contacts = inputData.getStringArray(ContactLookupKeys)
             ?: return Result.failure()
 
         // Fail if creating static parts fails
@@ -203,8 +203,8 @@ class RingtoneGeneratorWorker(
     }
 
     companion object {
-        const val DATA_RINGTONE_STRUCTURE = "ringtone-structure"
-        const val DATA_CONTACT_LOOKUP_KEYS = "contact-keys"
+        const val RingtoneStructure = "ringtone-structure"
+        const val ContactLookupKeys = "contact-keys"
 
         fun getPartFileFor(context: Context, engineRepresentation: String): File {
             val fileName = engineRepresentation.replace(" ", "_") + ".ogg"

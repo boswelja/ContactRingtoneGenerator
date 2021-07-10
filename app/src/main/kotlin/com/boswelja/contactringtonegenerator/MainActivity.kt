@@ -47,6 +47,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.work.ExperimentalExpeditedWork
 import com.boswelja.contactringtonegenerator.common.LocalSearchComposition
 import com.boswelja.contactringtonegenerator.common.ui.AppTheme
 import com.boswelja.contactringtonegenerator.common.ui.outlinedTextFieldColors
@@ -58,15 +59,14 @@ import com.boswelja.contactringtonegenerator.result.ui.ResultScreen
 import com.boswelja.contactringtonegenerator.ringtonebuilder.ui.RingtoneBuilderScreen
 import com.boswelja.contactringtonegenerator.settings.ui.SettingsScreen
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
-    @FlowPreview
     @ExperimentalCoroutinesApi
     @ExperimentalAnimationApi
     @ExperimentalMaterialApi
+    @ExperimentalExpeditedWork
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -203,8 +203,8 @@ fun TopAppBar(
     )
 }
 
+@ExperimentalExpeditedWork
 @ExperimentalCoroutinesApi
-@FlowPreview
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
@@ -252,6 +252,7 @@ fun MainScreen(
                 contentPaddingValues = PaddingValues(16.dp),
                 selectedContactCount = viewModel.selectedContacts.count(),
                 onStartClicked = {
+                    viewModel.startWorker()
                     navController.navigate(Destination.PROGRESS.name) {
                         popUpTo(Destination.GET_STARTED.name) {
                             inclusive = true
