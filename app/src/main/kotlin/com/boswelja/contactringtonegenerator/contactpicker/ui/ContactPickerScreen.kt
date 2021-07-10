@@ -72,7 +72,7 @@ fun ContactPickerScreen(
             if (it) {
                 ContactsList(
                     modifier = Modifier.fillMaxSize(),
-                    contentPaddingValues = PaddingValues(top = 8.dp, bottom = 72.dp),
+                    contentPaddingValues = PaddingValues(top = 16.dp, bottom = 72.dp),
                     contacts = visibleContacts!!,
                     selectedContacts = selectedContacts,
                     onContactSelectionChanged = onContactSelectionChanged

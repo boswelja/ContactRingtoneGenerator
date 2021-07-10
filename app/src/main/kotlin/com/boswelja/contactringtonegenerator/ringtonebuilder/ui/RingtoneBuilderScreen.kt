@@ -59,7 +59,7 @@ fun RingtoneBuilderScreen(
     Box(modifier) {
         RingtoneStructureList(
             modifier = Modifier.fillMaxSize(),
-            contentPaddingValues = PaddingValues(top = 8.dp, bottom = 72.dp),
+            contentPaddingValues = PaddingValues(top = 16.dp, bottom = 72.dp),
             structure = viewModel.ringtoneStructure,
             onActionClicked = { },
             onItemRemoved = {
