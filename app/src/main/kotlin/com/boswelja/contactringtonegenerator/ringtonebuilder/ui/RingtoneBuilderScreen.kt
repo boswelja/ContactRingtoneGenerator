@@ -1,6 +1,5 @@
 package com.boswelja.contactringtonegenerator.ringtonebuilder.ui
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
@@ -24,7 +23,6 @@ import androidx.compose.material.DismissDirection
 import androidx.compose.material.DismissValue
 import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
 import androidx.compose.material.OutlinedTextField
@@ -32,7 +30,6 @@ import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.rememberDismissState
 import androidx.compose.runtime.Composable
@@ -51,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.WizardViewModel
 import com.boswelja.contactringtonegenerator.common.ui.ChoiceChip
+import com.boswelja.contactringtonegenerator.common.ui.NextButton
 import com.boswelja.contactringtonegenerator.ringtonebuilder.AllCategories
 import com.boswelja.contactringtonegenerator.ringtonebuilder.Choice
 import com.boswelja.contactringtonegenerator.ringtonebuilder.ChoiceCategory
@@ -92,22 +90,10 @@ fun RingtoneBuilderScreen(
                 nextButtonVisible = viewModel.isRingtoneValid
             }
         }
-        AnimatedVisibility(
-            modifier = Modifier
-                .padding(16.dp)
-                .align(Alignment.BottomEnd),
-            visible = nextButtonVisible
-        ) {
-            ExtendedFloatingActionButton(
-                text = {
-                    Text(stringResource(R.string.next))
-                },
-                icon = {
-                    Icon(Icons.Default.NavigateNext, null)
-                },
-                onClick = onNavigateNext
-            )
-        }
+        NextButton(
+            enabled = nextButtonVisible,
+            onClick = onNavigateNext
+        )
     }
 }
 
