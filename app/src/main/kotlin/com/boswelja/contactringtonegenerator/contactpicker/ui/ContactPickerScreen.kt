@@ -70,7 +70,7 @@ fun ContactPickerScreen(
 
     Box(modifier) {
         ContactsList(
-            contentPaddingValues = PaddingValues(bottom = 72.dp),
+            contentPaddingValues = PaddingValues(top = 8.dp, bottom = 72.dp),
             contacts = visibleContacts,
             selectedContacts = selectedContacts,
             onContactSelectionChanged = onContactSelectionChanged
