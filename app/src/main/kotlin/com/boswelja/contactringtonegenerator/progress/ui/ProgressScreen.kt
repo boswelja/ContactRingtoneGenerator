@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.common.ui
+package com.boswelja.contactringtonegenerator.progress.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column

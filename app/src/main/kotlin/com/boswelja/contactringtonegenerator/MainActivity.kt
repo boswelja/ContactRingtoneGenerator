@@ -49,11 +49,11 @@ import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import com.boswelja.contactringtonegenerator.common.LocalSearchComposition
 import com.boswelja.contactringtonegenerator.common.ui.AppTheme
-import com.boswelja.contactringtonegenerator.common.ui.ProgressScreen
 import com.boswelja.contactringtonegenerator.common.ui.outlinedTextFieldColors
 import com.boswelja.contactringtonegenerator.confirmation.ui.ConfirmationScreen
 import com.boswelja.contactringtonegenerator.contactpicker.ui.ContactPickerScreen
 import com.boswelja.contactringtonegenerator.entry.ui.GetStartedScreen
+import com.boswelja.contactringtonegenerator.progress.ui.ProgressScreen
 import com.boswelja.contactringtonegenerator.result.ui.ResultScreen
 import com.boswelja.contactringtonegenerator.ringtonebuilder.ui.RingtoneBuilderScreen
 import com.boswelja.contactringtonegenerator.settings.ui.SettingsScreen
