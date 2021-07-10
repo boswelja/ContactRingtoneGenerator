@@ -44,10 +44,8 @@ import com.boswelja.contactringtonegenerator.common.LocalSearchComposition
 import com.boswelja.contactringtonegenerator.contactpicker.Contact
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 
 @ExperimentalCoroutinesApi
-@FlowPreview
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
