@@ -7,6 +7,8 @@
     <string name="grant">Grant</string>
     <string name="next">Next</string>
     <string name="browse">Browse</string>
+    <string name="cancel">Cancel</string>
+    <string name="add">Add</string>
 
     <string name="settings_title">Settings</string>
     <string name="reset_ringtones_title">Reset Contact Ringtones</string>

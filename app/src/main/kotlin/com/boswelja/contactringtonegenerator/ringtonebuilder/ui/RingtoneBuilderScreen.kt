@@ -3,20 +3,16 @@ package com.boswelja.contactringtonegenerator.ringtonebuilder.ui
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Card
 import androidx.compose.material.DismissDirection
@@ -30,6 +26,7 @@ import androidx.compose.material.SwipeToDismiss
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.rememberDismissState
 import androidx.compose.runtime.Composable
@@ -42,16 +39,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.contentDescription
-import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.WizardViewModel
-import com.boswelja.contactringtonegenerator.common.ui.ChoiceChip
 import com.boswelja.contactringtonegenerator.common.ui.NextButton
-import com.boswelja.contactringtonegenerator.ringtonebuilder.AllCategories
-import com.boswelja.contactringtonegenerator.ringtonebuilder.Choice
-import com.boswelja.contactringtonegenerator.ringtonebuilder.ChoiceCategory
 import com.boswelja.contactringtonegenerator.ringtonebuilder.Utils
 import com.boswelja.contactringtonegenerator.ringtonegen.item.ContactDataItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomAudioItem
@@ -62,38 +53,46 @@ import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
 @ExperimentalMaterialApi
 @Composable
 fun RingtoneBuilderScreen(
+    modifier: Modifier = Modifier,
     viewModel: WizardViewModel,
     onNavigateNext: () -> Unit
 ) {
     var nextButtonVisible by remember {
         mutableStateOf(viewModel.isRingtoneValid)
     }
+    var choicePickerVisible by remember {
+        mutableStateOf(false)
+    }
 
-    Box {
-        Column(modifier = Modifier.fillMaxSize()) {
-            RingtoneStructureList(
-                modifier = Modifier.weight(1f),
-                contentPaddingValues = PaddingValues(vertical = 8.dp),
-                structure = viewModel.ringtoneStructure,
-                onActionClicked = { },
-                onItemRemoved = {
-                    viewModel.ringtoneStructure.remove(it)
-                    nextButtonVisible = viewModel.isRingtoneValid
-                },
-                onDataValidityChanged = {
-                    nextButtonVisible = viewModel.isRingtoneValid
-                }
-            )
-            Divider()
-            ChoicePicker(Modifier.fillMaxWidth()) {
-                viewModel.ringtoneStructure.add(it.createStructureItem())
+    Box(modifier) {
+        RingtoneStructureList(
+            modifier = Modifier.fillMaxSize(),
+            contentPaddingValues = PaddingValues(top = 8.dp, bottom = 72.dp),
+            structure = viewModel.ringtoneStructure,
+            onActionClicked = { },
+            onItemRemoved = {
+                viewModel.ringtoneStructure.remove(it)
                 nextButtonVisible = viewModel.isRingtoneValid
+            },
+            onDataValidityChanged = {
+                nextButtonVisible = viewModel.isRingtoneValid
+            },
+            onShowPicker = {
+                choicePickerVisible = true
             }
-        }
+        )
         NextButton(
             enabled = nextButtonVisible,
             onClick = onNavigateNext
         )
+    }
+
+    StructureChoicePicker(
+        visible = choicePickerVisible,
+        onDismissPicker = { choicePickerVisible = false }
+    ) {
+        viewModel.ringtoneStructure.add(it.createStructureItem())
+        nextButtonVisible = viewModel.isRingtoneValid
     }
 }
 
@@ -105,7 +104,8 @@ fun RingtoneStructureList(
     structure: List<StructureItem>,
     onActionClicked: (StructureItem) -> Unit,
     onItemRemoved: (StructureItem) -> Unit,
-    onDataValidityChanged: (Boolean) -> Unit
+    onDataValidityChanged: (Boolean) -> Unit,
+    onShowPicker: () -> Unit
 ) {
     LazyColumn(
         modifier = modifier,
@@ -159,6 +159,21 @@ fun RingtoneStructureList(
                 }
             }
         }
+        item {
+            if (structure.isNotEmpty()) {
+                Spacer(Modifier.height(8.dp))
+                Divider()
+            }
+            ListItem(
+                modifier = Modifier.clickable(onClick = onShowPicker),
+                icon = {
+                    Icon(Icons.Default.Add, null)
+                },
+                text = {
+                    Text(stringResource(R.string.add))
+                }
+            )
+        }
     }
 }
 
@@ -207,65 +222,4 @@ fun StructureItem(
 //            },
         modifier = modifier
     )
-}
-
-@Composable
-fun ChoicePicker(
-    modifier: Modifier = Modifier,
-    onChoiceClicked: (Choice) -> Unit
-) {
-    Column(
-        modifier = modifier.padding(top = 16.dp, bottom = 72.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        AllCategories.forEach {
-            ChoiceCategoryItem(category = it, onItemClick = onChoiceClicked)
-        }
-    }
-}
-
-@Composable
-fun ChoiceCategoryItem(
-    modifier: Modifier = Modifier,
-    category: ChoiceCategory,
-    onItemClick: (Choice) -> Unit
-) {
-    val categoryName = stringResource(category.textRes)
-    Column(modifier) {
-        Row(
-            Modifier
-                .semantics(mergeDescendants = true) { contentDescription = categoryName }
-                .padding(horizontal = 16.dp)
-        ) {
-            Icon(category.icon, null)
-            Spacer(Modifier.width(4.dp))
-            Text(categoryName)
-        }
-        Spacer(Modifier.height(8.dp))
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(category.choices) { choice ->
-                ChoiceItem(
-                    item = choice,
-                    onClick = onItemClick
-                )
-            }
-        }
-    }
-}
-
-@Composable
-fun ChoiceItem(
-    modifier: Modifier = Modifier,
-    item: Choice,
-    onClick: (Choice) -> Unit
-) {
-    ChoiceChip(
-        modifier = modifier,
-        onClick = { onClick(item) }
-    ) {
-        Text(stringResource(item.textRes))
-    }
 }
