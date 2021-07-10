@@ -1,6 +1,5 @@
 package com.boswelja.contactringtonegenerator.contactpicker.ui
 
-import android.graphics.BitmapFactory
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
@@ -24,41 +23,38 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.NavigateNext
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.produceState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.WizardViewModel
 import com.boswelja.contactringtonegenerator.common.LocalSearchComposition
 import com.boswelja.contactringtonegenerator.contactpicker.Contact
-import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.withContext
-import timber.log.Timber
 
+@ExperimentalCoroutinesApi
 @FlowPreview
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
 fun ContactPickerScreen(
     modifier: Modifier = Modifier,
-    viewModel: WizardViewModel,
+    selectedContacts: Collection<String>,
+    onContactSelectionChanged: (Contact, Boolean) -> Unit,
     onNavigateNext: () -> Unit
 ) {
+    val viewModel: ContactPickerViewModel = viewModel()
     val allContacts by viewModel.allContacts.collectAsState(
         emptyList(),
         Dispatchers.IO
@@ -68,7 +64,7 @@ fun ContactPickerScreen(
 
     val visibleContacts by remember(allContacts, currentQuery) {
         derivedStateOf {
-            allContacts.filter { it.displayName.contains(currentQuery, ignoreCase = true) }
+            allContacts.filter { it.second.displayName.contains(currentQuery, ignoreCase = true) }
         }
     }
 
@@ -76,25 +72,14 @@ fun ContactPickerScreen(
         ContactsList(
             contentPaddingValues = PaddingValues(bottom = 72.dp),
             contacts = visibleContacts,
-            selectedContacts = viewModel.selectedContacts,
-            onContactSelectionChanged = { contact, isSelected ->
-                Timber.d(
-                    "Selection changed for %s, is now %s",
-                    contact,
-                    isSelected
-                )
-                if (isSelected) {
-                    viewModel.selectContacts(listOf(contact.lookupKey))
-                } else {
-                    viewModel.deselectContacts(listOf(contact.lookupKey))
-                }
-            }
+            selectedContacts = selectedContacts,
+            onContactSelectionChanged = onContactSelectionChanged
         )
         AnimatedVisibility(
             modifier = Modifier
                 .align(Alignment.BottomEnd)
                 .padding(16.dp),
-            visible = viewModel.selectedContacts.isNotEmpty()
+            visible = selectedContacts.isNotEmpty()
         ) {
             ExtendedFloatingActionButton(
                 text = {
@@ -117,7 +102,7 @@ fun ContactPickerScreen(
 fun ContactsList(
     modifier: Modifier = Modifier,
     contentPaddingValues: PaddingValues = PaddingValues(),
-    contacts: List<Contact>,
+    contacts: List<Pair<ImageBitmap?, Contact>>,
     selectedContacts: Collection<String>,
     onContactSelectionChanged: (Contact, Boolean) -> Unit
 ) {
@@ -127,12 +112,11 @@ fun ContactsList(
     ) {
         items(
             items = contacts,
-            key = { it.lookupKey }
-        ) { contact ->
+            key = { it.second.lookupKey }
+        ) { (image, contact) ->
             val iconModifier = Modifier.size(48.dp)
             val iconTint = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
 
-            val icon by loadContactPhoto(contact)
             var selected by remember {
                 mutableStateOf(selectedContacts.contains(contact.lookupKey))
             }
@@ -140,9 +124,9 @@ fun ContactsList(
             ListItem(
                 text = { Text(contact.displayName) },
                 icon = {
-                    if (icon != null) {
+                    if (image != null) {
                         Image(
-                            bitmap = icon!!,
+                            bitmap = image,
                             contentDescription = null,
                             modifier = iconModifier.clip(CircleShape)
                         )
@@ -163,22 +147,6 @@ fun ContactsList(
                     onContactSelectionChanged(contact, selected)
                 }
             )
-        }
-    }
-}
-
-@Composable
-fun loadContactPhoto(
-    contact: Contact
-): State<ImageBitmap?> {
-    val context = LocalContext.current
-    return produceState<ImageBitmap?>(initialValue = null, contact) {
-        withContext(Dispatchers.IO) {
-            val stream = ContactsHelper.openContactPhotoStream(context, contact)
-            val imageBitmap = stream?.let {
-                BitmapFactory.decodeStream(it).asImageBitmap()
-            }
-            value = imageBitmap
         }
     }
 }

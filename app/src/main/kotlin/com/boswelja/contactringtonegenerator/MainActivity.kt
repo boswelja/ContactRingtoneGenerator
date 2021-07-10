@@ -203,6 +203,7 @@ fun TopAppBar(
     )
 }
 
+@ExperimentalCoroutinesApi
 @FlowPreview
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
@@ -228,7 +229,14 @@ fun MainScreen(
         composable(Destination.CONTACT_PICKER.name) {
             ContactPickerScreen(
                 modifier = Modifier.fillMaxSize(),
-                viewModel = viewModel
+                selectedContacts = viewModel.selectedContacts,
+                onContactSelectionChanged = { contact, isSelected ->
+                    if (isSelected) {
+                        viewModel.selectContacts(listOf(contact.lookupKey))
+                    } else {
+                        viewModel.deselectContacts(listOf(contact.lookupKey))
+                    }
+                }
             ) {
                 navController.navigate(Destination.RINGTONE_BUILDER.name)
             }

@@ -6,22 +6,12 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
-import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
 import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
-import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
 
 class WizardViewModel(application: Application) : AndroidViewModel(application) {
 
     var selectedContacts by mutableStateOf(hashSetOf<String>())
         private set
-
-    @FlowPreview
-    @ExperimentalCoroutinesApi
-    val allContacts = ContactsHelper.getContacts(
-        application.contentResolver,
-        500
-    )
 
     val ringtoneStructure = mutableStateListOf<StructureItem>()
     val isRingtoneValid: Boolean
