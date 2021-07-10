@@ -25,8 +25,8 @@ private val LightColors = lightColors(
     primaryVariant = Green500,
     secondary = Green500,
     secondaryVariant = Green500,
-    background = Color.Black,
-    onBackground = Color.White,
+    background = Color(0xFFF5F5F5),
+    onBackground = Color.Black,
     surface = Color.White
 )
 
