@@ -4,4 +4,9 @@
         <item quantity="one">You\'ve selected %d contact</item>
         <item quantity="other">You\'ve selected %d contacts</item>
     </plurals>
+
+    <plurals name="progress_fail_count">
+        <item quantity="one">We had trouble creating your ringtone for %s contact</item>
+        <item quantity="other">We had trouble creating your ringtone for %s contacts</item>
+    </plurals>
 </resources>

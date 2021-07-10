@@ -2,39 +2,74 @@ package com.boswelja.contactringtonegenerator.progress.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.work.Data
+import androidx.work.WorkInfo
+import com.boswelja.contactringtonegenerator.R
+import com.boswelja.contactringtonegenerator.ringtonegen.Result
+import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGeneratorWorker
 
 @Composable
 fun ProgressScreen(
-    progress: Float = 0f,
-    status: String,
-    step: String
+    modifier: Modifier = Modifier,
+    workInfo: WorkInfo?,
+    onFinished: (Result) -> Unit
 ) {
+    val progressData = workInfo?.progress ?: Data.EMPTY
+    val progress = progressData.getFloat(RingtoneGeneratorWorker.Outputs.Progress, 0f)
+    val failCount = progressData.getStringArray(
+        RingtoneGeneratorWorker.Outputs.FailedContactLookupKeys
+    )?.size ?: 0
+
+    if (workInfo != null && workInfo.outputData != Data.EMPTY) {
+        // TODO Add support for outright failures
+        val result = if (failCount > 0) {
+            Result.MIXED
+        } else {
+            Result.SUCCESSFUL
+        }
+        onFinished(result)
+    }
+
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.fillMaxSize()
+        modifier = modifier
     ) {
-        Text(
-            text = status,
-            style = MaterialTheme.typography.h4
-        )
-        Text(
-            text = step,
-            style = MaterialTheme.typography.h5
-        )
         if (progress > 0) {
             LinearProgressIndicator(
                 progress = progress
             )
         } else {
             LinearProgressIndicator()
+        }
+        Spacer(Modifier.height(8.dp))
+        if (failCount > 0) {
+            val failCountText = LocalContext.current.resources.getQuantityString(
+                R.plurals.progress_fail_count, failCount, failCount
+            )
+            Text(
+                text = failCountText,
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.subtitle1
+            )
+        } else {
+            Text(
+                text = stringResource(R.string.progress_status_ok),
+                textAlign = TextAlign.Center,
+                style = MaterialTheme.typography.subtitle1
+            )
         }
     }
 }

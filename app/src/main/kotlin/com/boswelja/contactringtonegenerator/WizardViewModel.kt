@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.asFlow
+import androidx.lifecycle.LiveData
 import androidx.work.ExperimentalExpeditedWork
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
@@ -15,11 +15,10 @@ import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.boswelja.contactringtonegenerator.contactpicker.Contact
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGeneratorWorker
-import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGeneratorWorker.Companion.ContactLookupKeys
-import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGeneratorWorker.Companion.RingtoneStructure
+import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGeneratorWorker.Inputs.ContactLookupKeys
+import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGeneratorWorker.Inputs.RingtoneStructure
 import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
 import java.util.UUID
-import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
@@ -64,10 +63,10 @@ class WizardViewModel(application: Application) : AndroidViewModel(application) 
         WorkManager.getInstance(getApplication()).enqueue(request)
     }
 
-    fun getWorkInfo(): Flow<WorkInfo> {
+    fun getWorkInfo(): LiveData<WorkInfo> {
         checkNotNull(workRequestId)
 
         return WorkManager.getInstance(getApplication())
-            .getWorkInfoByIdLiveData(workRequestId!!).asFlow()
+            .getWorkInfoByIdLiveData(workRequestId!!)
     }
 }

@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.boswelja.contactringtonegenerator.common.MediaStoreHelper
 import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
@@ -25,12 +26,18 @@ class RingtoneGeneratorWorker(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
+        setProgress(
+            workDataOf(
+                Outputs.Progress to 0f,
+                Outputs.FailedContactLookupKeys to emptyArray<String>()
+            )
+        )
         // Get input structure
-        val structure = inputData.getStringArray(RingtoneStructure)?.map {
+        val structure = inputData.getStringArray(Inputs.RingtoneStructure)?.map {
             Json.decodeFromString<StructureItem>(it)
         } ?: return Result.failure()
         // Get input contacts
-        val contacts = inputData.getStringArray(ContactLookupKeys)
+        val contacts = inputData.getStringArray(Inputs.ContactLookupKeys)
             ?: return Result.failure()
 
         // Fail if creating static parts fails
@@ -203,9 +210,6 @@ class RingtoneGeneratorWorker(
     }
 
     companion object {
-        const val RingtoneStructure = "ringtone-structure"
-        const val ContactLookupKeys = "contact-keys"
-
         fun getPartFileFor(context: Context, engineRepresentation: String): File {
             val fileName = engineRepresentation.replace(" ", "_") + ".ogg"
             return File(context.cacheDir, fileName)
@@ -215,5 +219,15 @@ class RingtoneGeneratorWorker(
             val fileName = contactName.replace(" ", "_") + ".ogg"
             return File(context.cacheDir, fileName)
         }
+    }
+
+    object Inputs {
+        const val RingtoneStructure = "ringtone-structure"
+        const val ContactLookupKeys = "contact-keys"
+    }
+
+    object Outputs {
+        const val Progress = "progress"
+        const val FailedContactLookupKeys = "failed-keys"
     }
 }

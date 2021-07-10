@@ -30,6 +30,7 @@ import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -268,7 +269,18 @@ fun MainScreen(
             )
         }
         composable(Destination.PROGRESS.name) {
-            ProgressScreen(status = "", step = "")
+            val workInfo by viewModel.getWorkInfo().observeAsState()
+            ProgressScreen(
+                modifier = Modifier.fillMaxSize(),
+                workInfo = workInfo,
+                onFinished = { result ->
+                    navController.navigate(Destination.RESULT.name) {
+                        popUpTo(Destination.PROGRESS.name) {
+                            inclusive = true
+                        }
+                    }
+                }
+            )
         }
         composable(Destination.RESULT.name) {
             ResultScreen(result = null)

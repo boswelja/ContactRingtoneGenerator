@@ -51,6 +51,8 @@
     <string name="confirmation_contact_picker_return">Return to Contact Picker</string>
     <string name="confirmation_ringtone_builder_return">Return to Ringtone Builder</string>
 
+    <string name="progress_status_ok">Looks good so far! We\'ll let you know when we're done</string>
+
     <string name="choice_category_contact_data">Contact Info</string>
     <string name="choice_category_custom_text">Text</string>
     <string name="choice_category_custom_audio">Audio</string>
