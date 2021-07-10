@@ -14,10 +14,7 @@ class ContactPickerViewModel(
 ) : AndroidViewModel(application) {
     @FlowPreview
     @ExperimentalCoroutinesApi
-    val allContacts = ContactsHelper.getContacts(
-        application.contentResolver,
-        500
-    ).mapLatest {
+    val allContacts = ContactsHelper.getContacts(application.contentResolver).mapLatest {
         it.map { contact ->
             val stream = ContactsHelper.openContactPhotoStream(getApplication(), contact)
             val imageBitmap = stream?.let {
