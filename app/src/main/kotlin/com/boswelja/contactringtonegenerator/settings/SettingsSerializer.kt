@@ -17,7 +17,9 @@ object SettingsSerializer : Serializer<Settings> {
 
     override val defaultValue: Settings = Settings(
         volumeMultiplier = 1.0f,
-        loudnessEqualization = true
+        loudnessEqualization = true,
+        ttsPitch = 1.0f,
+        ttsSpeechRate = 1.0f
     )
 
     override suspend fun readFrom(input: InputStream): Settings {

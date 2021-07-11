@@ -6,4 +6,6 @@ option java_multiple_files = true;
 message Settings {
     float volumeMultiplier = 1;
     bool loudnessEqualization = 2;
+    float ttsPitch = 3;
+    float ttsSpeechRate = 4;
 }
