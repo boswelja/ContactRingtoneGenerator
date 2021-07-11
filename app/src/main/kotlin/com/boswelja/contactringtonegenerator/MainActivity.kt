@@ -274,6 +274,7 @@ fun MainScreen(
                 modifier = Modifier.fillMaxSize(),
                 workInfo = workInfo,
                 onFinished = { result ->
+                    viewModel.generatorResult = result
                     navController.navigate(Destination.RESULT.name) {
                         popUpTo(Destination.PROGRESS.name) {
                             inclusive = true
@@ -283,7 +284,7 @@ fun MainScreen(
             )
         }
         composable(Destination.RESULT.name) {
-            ResultScreen(result = null)
+            ResultScreen(result = viewModel.generatorResult)
         }
     }
 }
