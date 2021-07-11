@@ -1,7 +1,5 @@
 package com.boswelja.contactringtonegenerator.settings.ui
 
-import android.content.Context
-import android.content.Intent
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -15,16 +13,14 @@ import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.boswelja.contactringtonegenerator.R
+import com.boswelja.contactringtonegenerator.common.ui.SliderSetting
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
@@ -47,6 +43,14 @@ fun SettingsScreen(
         Divider(
             color = MaterialTheme.colors.onBackground.copy(alpha = 0.12f)
         )
+        TtsSettings(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        )
+        Divider(
+            color = MaterialTheme.colors.onBackground.copy(alpha = 0.12f)
+        )
         ButtonSettings(
             modifier = Modifier
                 .fillMaxWidth()
@@ -62,7 +66,6 @@ fun ButtonSettings(
     modifier: Modifier = Modifier,
     viewModel: SettingsViewModel
 ) {
-    val context = LocalContext.current
     val colors = outlinedButtonColors(
         backgroundColor = MaterialTheme.colors.background,
         contentColor = MaterialTheme.colors.primary,
@@ -77,16 +80,6 @@ fun ButtonSettings(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        OutlinedButton(
-            modifier = Modifier.weight(1f),
-            colors = colors,
-            border = border,
-            onClick = {
-                launchTtsSettings(context)
-            }
-        ) {
-            Text(stringResource(R.string.launch_tts_settings_title))
-        }
         OutlinedButton(
             modifier = Modifier.weight(1f),
             colors = colors,
@@ -107,35 +100,81 @@ fun VolumeMultiplierSetting(
     onSliderValueChanged: (Float) -> Unit,
     onSliderValueFinished: (Float) -> Unit
 ) {
+    SliderSetting(
+        modifier = modifier,
+        value = value,
+        valueRange = 1f..2f,
+        text = {
+            Text(stringResource(R.string.volume_boost_title))
+        },
+        valueText = {
+            Text("%.1fx".format(value))
+        },
+        onValueChanged = onSliderValueChanged,
+        onValueChangeFinished = onSliderValueFinished
+    )
+}
+
+@Composable
+fun TtsSettings(
+    modifier: Modifier = Modifier
+) {
+    val viewModel: SettingsViewModel = viewModel()
+
     Column(modifier) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = stringResource(R.string.volume_boost_title),
-                style = MaterialTheme.typography.subtitle1
-            )
-            Text(
-                text = "%.1fx".format(value),
-                style = MaterialTheme.typography.body2
-            )
-        }
-        Slider(
-            value = value,
-            valueRange = 0.5f..2f,
-            onValueChange = onSliderValueChanged,
-            onValueChangeFinished = { onSliderValueFinished(value) },
-            steps = 15
+        TtsVoicePitchSetting(
+            value = viewModel.ttsVoicePitch,
+            onSliderValueChanged = { viewModel.ttsVoicePitch = it },
+            onSliderValueFinished = { viewModel.saveTtsVoicePitch(it) }
+        )
+        TtsSpeechRateSetting(
+            value = viewModel.ttsSpeechRate,
+            onSliderValueChanged = { viewModel.ttsSpeechRate = it },
+            onSliderValueFinished = { viewModel.saveTtsSpeechRate(it) }
         )
     }
 }
 
-private fun launchTtsSettings(context: Context) {
-    Intent().apply {
-        action = "com.android.settings.TTS_SETTINGS"
-        flags = Intent.FLAG_ACTIVITY_NEW_TASK
-    }.also {
-        context.startActivity(it)
-    }
+@Composable
+fun TtsVoicePitchSetting(
+    modifier: Modifier = Modifier,
+    value: Float,
+    onSliderValueChanged: (Float) -> Unit,
+    onSliderValueFinished: (Float) -> Unit
+) {
+    SliderSetting(
+        modifier = modifier,
+        value = value,
+        valueRange = 0.5f..2f,
+        text = {
+            Text(stringResource(R.string.tts_setting_pitch))
+        },
+        valueText = {
+            Text("%.1fx".format(value))
+        },
+        onValueChanged = onSliderValueChanged,
+        onValueChangeFinished = onSliderValueFinished
+    )
+}
+
+@Composable
+fun TtsSpeechRateSetting(
+    modifier: Modifier = Modifier,
+    value: Float,
+    onSliderValueChanged: (Float) -> Unit,
+    onSliderValueFinished: (Float) -> Unit
+) {
+    SliderSetting(
+        modifier = modifier,
+        value = value,
+        valueRange = 0.5f..2f,
+        text = {
+            Text(stringResource(R.string.tts_setting_rate))
+        },
+        valueText = {
+            Text("%.1fx".format(value))
+        },
+        onValueChanged = onSliderValueChanged,
+        onValueChangeFinished = onSliderValueFinished
+    )
 }
