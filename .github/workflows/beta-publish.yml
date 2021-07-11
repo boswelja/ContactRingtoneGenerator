@@ -1,0 +1,120 @@
+name: Tag & Publish Beta
+
+on:
+  workflow_dispatch
+
+jobs:
+  build-sign:
+    name: Build, Sign and Save Bundles
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2.3.4
+        with:
+          ref: ${{ github.head_ref }}   # checkout the correct branch name
+          fetch-depth: 0                # fetch the whole repo history
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: 11
+      - name: Git Version
+        uses: codacy/git-version@2.5.2
+        id: version
+        with:
+          release-branch: main
+      - name: Cache Gradle Packages
+        uses: actions/cache@v2.1.6
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-cache-${{ hashFiles('gradle/libs.versions.toml') }}
+      - name: Cache Gradle Wrapper
+        uses: actions/cache@v2.1.6
+        with:
+          path: ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-wrapper-${{ hashFiles('gradle/wrapper/gradle-wrapper.properties') }}
+      - name: Cache Build
+        uses: actions/cache@v2.1.6
+        with:
+          path: ./**/build/
+          key: ${{ runner.os }}-build-${{ github.sha }}
+      - name: Build Release Artifacts
+        run: ./gradlew :mobile:bundleRelease
+        env:
+          VERSION_NAME: ${{ steps.version.outputs.version }}
+      - name: Sign Release
+        id: sign-mobile-release
+        uses: r0adkll/sign-android-release@v1.0.4
+        with:
+          releaseDirectory: mobile/build/outputs/bundle/release/
+          signingKeyBase64: ${{ secrets.KEYSTORE_FILE }}
+          alias: ${{ secrets.KEYSTORE_ALIAS }}
+          keyStorePassword: ${{ secrets.KEYSTORE_PASS }}
+          keyPassword: ${{ secrets.KEYSTORE_ALIAS_PASS }}
+      - name: Save Signed Bundle
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: mobile-release.aab
+          path: ${{ steps.sign-mobile-release.outputs.signedReleaseFile }}
+
+  upload:
+    name: Upload to Google Play & Create Release
+    runs-on: ubuntu-latest
+    needs: build-sign
+    steps:
+      - uses: actions/checkout@v2.3.4
+        with:
+          ref: ${{ github.head_ref }}   # checkout the correct branch name
+          fetch-depth: 0                # fetch the whole repo history
+      - uses: actions/setup-java@v2
+        with:
+          distribution: 'adopt'
+          java-version: 11
+      - name: Git Version
+        uses: codacy/git-version@2.5.2
+        id: version
+        with:
+          release-branch: main
+      - name: Download mobile-release.aab
+        uses: actions/download-artifact@v2.0.10
+        with:
+          name: mobile-release.aab
+          path: release/
+      - name: Download wearos-release.aab
+        uses: actions/download-artifact@v2.0.10
+        with:
+          name: wearos-release.aab
+          path: release/
+      - name: Create Release Tag
+        uses: actions/create-release@v1.1.4
+        id: create_release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          release_name: ${{ steps.version.outputs.version }}
+          body_path: changelogs/whatsnew-en-GB
+          draft: false
+          prerelease: true
+      - name: Upload Release Bundle
+        uses: actions/upload-release-asset@v1.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: release/mobile-release.aab
+          asset_name: mobile-release.aab
+          asset_content_type: application/zip
+      - name: Calculate update priority
+        uses: boswelja/update-priority-action@main
+        id: update_priority
+        with:
+          old-version: ${{ steps.version.outputs.previous-version }}
+          new-version: ${{ steps.version.outputs.version }}
+      - name: Upload to Google Play
+        uses: r0adkll/upload-google-play@v1.0.15
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: "com.boswelja.contactringtonegenerator"
+          releaseFiles: "release/mobile-release.aab"
+          whatsNewDirectory: changelogs/
+          inAppUpdatePriority: ${{ steps.update_priority.outputs.update-priority }}
+          track: beta
