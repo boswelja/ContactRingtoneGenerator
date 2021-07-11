@@ -26,12 +26,14 @@ fun ProgressScreen(
     workInfo: WorkInfo?,
     onFinished: (GeneratorResult) -> Unit
 ) {
+    // Get most recent progress data
     val progressData = workInfo?.progress ?: Data.EMPTY
     val progress = progressData.getFloat(RingtoneGeneratorWorker.Outputs.Progress, 0f)
     val failCount = progressData.getStringArray(
         RingtoneGeneratorWorker.Outputs.FailedContactLookupKeys
     )?.size ?: 0
 
+    // TODO This probably shouldn't be checked here
     if (workInfo != null && workInfo.outputData != Data.EMPTY) {
         val result = GeneratorResult.valueOf(
             workInfo.outputData.getString(RingtoneGeneratorWorker.Outputs.Result)!!

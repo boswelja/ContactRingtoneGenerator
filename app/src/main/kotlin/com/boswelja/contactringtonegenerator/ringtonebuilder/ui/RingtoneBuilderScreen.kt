@@ -126,7 +126,7 @@ fun RingtoneStructureList(
                 SwipeDismissItem(
                     item = item,
                     onItemDismissed = { remove = true },
-                    onStateChanged = { isActive = it },
+                    onDismissingChanged = { isActive = it },
                     content = {
                         Card(elevation = elevation) {
                             StructureItem(

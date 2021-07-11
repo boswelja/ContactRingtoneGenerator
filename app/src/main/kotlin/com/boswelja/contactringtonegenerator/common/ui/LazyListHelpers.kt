@@ -36,6 +36,19 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
+/**
+ * A Composable for simplifying SwipeToDismiss. A background and icon will be drawn automatically,
+ * and logic for dismiss state changes are handled.
+ * @param modifier The [Modifier] to apply to the [SwipeToDismiss] wrapping your content.
+ * @param item Your item of type [T].
+ * @param icon The [ImageVector] to be shown on the background.
+ * @param backgroundColor The [Color] to be shown under your content.
+ * @param directions The set of directions in which the component can be dismissed.
+ * @param dismissThresholds The thresholds the item needs to be swiped in order to be dismissed.
+ * @param onDismissingChanged Called when the user starts or stops swiping your item.
+ * @param onItemDismissed Called when your item has been dismissed.
+ * @param content Your Composable content.
+ */
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
 @Composable
@@ -47,7 +60,7 @@ fun <T> LazyItemScope.SwipeDismissItem(
     directions: Set<DismissDirection> =
         setOf(DismissDirection.StartToEnd, DismissDirection.EndToStart),
     dismissThresholds: (DismissDirection) -> ThresholdConfig = { FractionalThreshold(0.5f) },
-    onStateChanged: ((isDismissing: Boolean) -> Unit)? = null,
+    onDismissingChanged: ((isDismissing: Boolean) -> Unit)? = null,
     onItemDismissed: (T) -> Unit,
     content: @Composable (LazyItemScope.(T) -> Unit)
 ) {
@@ -67,10 +80,10 @@ fun <T> LazyItemScope.SwipeDismissItem(
             val direction = dismissState.dismissDirection
 
             if (direction == null) {
-                onStateChanged?.invoke(false)
+                onDismissingChanged?.invoke(false)
                 return@SwipeToDismiss
             }
-            onStateChanged?.invoke(true)
+            onDismissingChanged?.invoke(true)
 
             val iconAlignment = when (direction) {
                 DismissDirection.StartToEnd -> Alignment.CenterStart
