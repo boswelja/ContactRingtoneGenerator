@@ -11,8 +11,9 @@ import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
 import com.boswelja.contactringtonegenerator.settings.settingsDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 
 class SettingsViewModel(application: Application) : AndroidViewModel(application) {
@@ -20,10 +21,16 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     private val dataStore = application.settingsDataStore
 
     var volumeMultiplier by mutableStateOf(1.0f)
+    var ttsVoicePitch by mutableStateOf(1.0f)
+    var ttsSpeechRate by mutableStateOf(1.0f)
 
     init {
         viewModelScope.launch {
-            volumeMultiplier = dataStore.data.map { it.volumeMultiplier }.first()
+            dataStore.data.take(1).collect {
+                volumeMultiplier = it.volumeMultiplier
+                ttsVoicePitch = it.ttsPitch
+                ttsSpeechRate = it.ttsSpeechRate
+            }
         }
     }
 
@@ -43,6 +50,18 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun saveVolumeMultiplier(newMultiplier: Float) {
         viewModelScope.launch {
             dataStore.updateData { it.copy(volumeMultiplier = newMultiplier) }
+        }
+    }
+
+    fun saveTtsVoicePitch(newPitch: Float) {
+        viewModelScope.launch {
+            dataStore.updateData { it.copy(ttsPitch = newPitch) }
+        }
+    }
+
+    fun saveTtsSpeechRate(newRate: Float) {
+        viewModelScope.launch {
+            dataStore.updateData { it.copy(ttsSpeechRate = newRate) }
         }
     }
 }

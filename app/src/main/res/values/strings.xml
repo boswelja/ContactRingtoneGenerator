@@ -13,8 +13,9 @@
 
     <string name="settings_title">Settings</string>
     <string name="reset_ringtones_title">Reset Contact Ringtones</string>
-    <string name="launch_tts_settings_title">Open Text to Speech Settings</string>
     <string name="volume_boost_title">Boost Ringtone Volume</string>
+    <string name="tts_setting_pitch">TTS Voice Pitch</string>
+    <string name="tts_setting_rate">TTS Speech Rate</string>
 
     <string name="contact_picker_title">Select Contacts</string>
     <string name="ringtone_builder_title">Ringtone Builder</string>
