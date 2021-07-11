@@ -26,6 +26,7 @@ sealed class StructureItem {
     override fun hashCode(): Int = id
 }
 
+@Serializable
 sealed class CustomAudioItem : StructureItem() {
     final override var data: String? = null
     final override val isDataValid: Boolean
@@ -34,18 +35,23 @@ sealed class CustomAudioItem : StructureItem() {
     val audioUri: Uri?
         get() = data?.let { Uri.parse(it) }
 
+    @Serializable
     class SystemRingtone : CustomAudioItem()
+    @Serializable
     class AudioFile : CustomAudioItem()
 }
 
+@Serializable
 sealed class CustomTextItem : StructureItem() {
     final override var data: String? by mutableStateOf("")
     final override val isDataValid: Boolean
         get() = !data.isNullOrBlank()
 
+    @Serializable
     class CustomText : CustomTextItem()
 }
 
+@Serializable
 sealed class ContactDataItem(
     final override var data: String?,
     @StringRes val textRes: Int
@@ -53,26 +59,37 @@ sealed class ContactDataItem(
 
     final override val isDataValid: Boolean = true
 
+    @Serializable
     class NamePrefix : ContactDataItem(
         Constants.NAME_PREFIX_PLACEHOLDER,
         R.string.label_name_prefix
     )
+
+    @Serializable
     class FirstName : ContactDataItem(
         Constants.FIRST_NAME_PLACEHOLDER,
         R.string.label_first_name
     )
+
+    @Serializable
     class MiddleName : ContactDataItem(
         Constants.MIDDLE_NAME_PLACEHOLDER,
         R.string.label_middle_name
     )
+
+    @Serializable
     class LastName : ContactDataItem(
         Constants.LAST_NAME_PLACEHOLDER,
         R.string.label_last_name
     )
+
+    @Serializable
     class NameSuffix : ContactDataItem(
         Constants.NAME_SUFFIX_PLACEHOLDER,
         R.string.label_name_suffix
     )
+
+    @Serializable
     class Nickname : ContactDataItem(
         Constants.NICKNAME_PLACEHOLDER,
         R.string.label_nickname

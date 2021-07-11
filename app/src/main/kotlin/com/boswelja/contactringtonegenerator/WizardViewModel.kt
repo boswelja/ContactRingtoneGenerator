@@ -51,7 +51,7 @@ class WizardViewModel(application: Application) : AndroidViewModel(application) 
         val request = OneTimeWorkRequestBuilder<RingtoneGeneratorWorker>()
             .setInputData(
                 workDataOf(
-                    RingtoneStructure to serializedStructure,
+                    RingtoneStructure to serializedStructure.toTypedArray(),
                     ContactLookupKeys to selectedContacts.toTypedArray()
                 )
             )
