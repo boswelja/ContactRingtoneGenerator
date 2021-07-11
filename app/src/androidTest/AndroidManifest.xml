@@ -1,5 +1,0 @@
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.boswelja.contactringtonegenerator">
-    <application android:extractNativeLibs="true" />
-</manifest>

@@ -4,14 +4,20 @@ import android.content.Context
 import android.net.Uri
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
+import androidx.work.workDataOf
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.boswelja.contactringtonegenerator.common.MediaStoreHelper
 import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
 import com.boswelja.contactringtonegenerator.ringtonegen.item.Constants
+import com.boswelja.contactringtonegenerator.ringtonegen.item.ContactDataItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomAudioItem
+import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomTextItem
 import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
 import com.boswelja.tts.TextToSpeech
 import com.boswelja.tts.withTextToSpeech
 import java.io.File
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 import timber.log.Timber
 
 class RingtoneGeneratorWorker(
@@ -20,11 +26,18 @@ class RingtoneGeneratorWorker(
 ) : CoroutineWorker(context, params) {
 
     override suspend fun doWork(): Result {
+        setProgress(
+            workDataOf(
+                Outputs.Progress to 0f,
+                Outputs.FailedContactLookupKeys to emptyArray<String>()
+            )
+        )
         // Get input structure
-        val structure = inputData.getStringArray(DATA_RINGTONE_STRUCTURE)?.map { fromString(it) }
-            ?: return Result.failure()
+        val structure = inputData.getStringArray(Inputs.RingtoneStructure)?.map {
+            Json.decodeFromString<StructureItem>(it)
+        } ?: return Result.failure()
         // Get input contacts
-        val contacts = inputData.getStringArray(DATA_CONTACT_LOOKUP_KEYS)
+        val contacts = inputData.getStringArray(Inputs.ContactLookupKeys)
             ?: return Result.failure()
 
         // Fail if creating static parts fails
@@ -46,29 +59,34 @@ class RingtoneGeneratorWorker(
         // Empty cache on finish
         applicationContext.cacheDir.delete()
 
-        return Result.success()
+        return Result.success(
+            workDataOf(
+                Outputs.Result to GeneratorResult.SUCCESSFUL.name,
+                Outputs.Progress to 1f,
+                Outputs.FailedContactLookupKeys to emptyArray<String>()
+            )
+        )
     }
 
     /**
      * Synthesize all static text elements of the ringtone. Currently, this is only
-     * [StructureItem.Text.CustomText].
+     * [CustomTextItem.CustomText].
      * @param ringtoneStructure The structure of the ringtone.
      */
     private suspend fun synthesizeStaticParts(
-        ringtoneStructure: List<Pair<StructureItem.DataType, String?>>
+        ringtoneStructure: List<StructureItem>
     ): Boolean {
         var synthResult = true
         applicationContext.withTextToSpeech {
-            ringtoneStructure.forEach { (type, text) ->
-                when (type) {
-                    StructureItem.DataType.AUDIO_FILE,
-                    StructureItem.DataType.SYSTEM_RINGTONE -> {
-                        val uri = Uri.parse(text!!)
+            ringtoneStructure.forEach { item ->
+                when (item) {
+                    is CustomAudioItem -> {
+                        // TODO Load audio files
                     }
-                    StructureItem.DataType.CUSTOM_TEXT -> {
+                    is CustomTextItem -> {
                         // Get file and start synthesis
-                        val file = getPartFileFor(applicationContext, text!!)
-                        val result = synthesizeToFile(text, file)
+                        val file = getPartFileFor(applicationContext, item.data!!)
+                        val result = synthesizeToFile(item.data!!, file)
                         // If even one synthesis fails, fail the job.
                         if (result != com.boswelja.tts.Result.SUCCESS) {
                             synthResult = false
@@ -138,19 +156,18 @@ class RingtoneGeneratorWorker(
 
     private suspend fun generateRingtoneFor(
         contactLookupKey: String,
-        structure: List<Pair<StructureItem.DataType, String?>>
+        structure: List<StructureItem>
     ): File {
         val parts = mutableListOf<File>()
         applicationContext.withTextToSpeech {
-            structure.forEach { (type, text) ->
-                val file = when (type) {
-                    StructureItem.DataType.DYNAMIC -> {
-                        synthesizeContactName(contactLookupKey, text!!)
+            structure.forEach { item ->
+                val file = when (item) {
+                    is ContactDataItem -> {
+                        synthesizeContactName(contactLookupKey, item.data!!)
                     }
-                    StructureItem.DataType.AUDIO_FILE,
-                    StructureItem.DataType.SYSTEM_RINGTONE,
-                    StructureItem.DataType.CUSTOM_TEXT -> {
-                        getPartFileFor(applicationContext, text!!)
+                    is CustomAudioItem,
+                    is CustomTextItem -> {
+                        getPartFileFor(applicationContext, item.data!!)
                     }
                 }
                 if (file != null) {
@@ -199,20 +216,6 @@ class RingtoneGeneratorWorker(
     }
 
     companion object {
-        const val DATA_RINGTONE_STRUCTURE = "ringtone-structure"
-        const val DATA_CONTACT_LOOKUP_KEYS = "contact-keys"
-
-        fun Array<StructureItem<*>>.toStringArray() = map {
-            "${it.dataType}|${it.engineRepresentation}"
-        }
-
-        private fun fromString(item: String): Pair<StructureItem.DataType, String?> {
-            val parts = item.split('|', limit = 1)
-            val type = StructureItem.DataType.valueOf(parts[0])
-            val engineText = parts.getOrNull(1)
-            return Pair(type, engineText)
-        }
-
         fun getPartFileFor(context: Context, engineRepresentation: String): File {
             val fileName = engineRepresentation.replace(" ", "_") + ".ogg"
             return File(context.cacheDir, fileName)
@@ -222,5 +225,16 @@ class RingtoneGeneratorWorker(
             val fileName = contactName.replace(" ", "_") + ".ogg"
             return File(context.cacheDir, fileName)
         }
+    }
+
+    object Inputs {
+        const val RingtoneStructure = "ringtone-structure"
+        const val ContactLookupKeys = "contact-keys"
+    }
+
+    object Outputs {
+        const val Progress = "progress"
+        const val FailedContactLookupKeys = "failed-keys"
+        const val Result = "result"
     }
 }

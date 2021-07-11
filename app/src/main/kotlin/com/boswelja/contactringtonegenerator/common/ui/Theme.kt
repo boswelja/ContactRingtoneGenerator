@@ -1,35 +1,44 @@
 package com.boswelja.contactringtonegenerator.common.ui
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.shape.CutCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Shapes
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.google.accompanist.systemuicontroller.rememberSystemUiController
 
-private val Green200 = Color(0xff66bb6a)
-private val Green500 = Color(0xff43a047)
+private val Green200 = Color(0xffa5d6a7)
+private val Green500 = Color(0xff4caf50)
 
 private val DarkColors = darkColors(
     primary = Green200,
     primaryVariant = Green200,
     secondary = Green200,
-    secondaryVariant = Green200
+    secondaryVariant = Green200,
+    background = Color.Black,
+    onBackground = Color.White,
+    surface = Color(0xFF212121),
+    onSurface = Color.White
 )
 private val LightColors = lightColors(
     primary = Green500,
     primaryVariant = Green500,
     secondary = Green500,
-    secondaryVariant = Green500
+    secondaryVariant = Green500,
+    background = Color(0xFFF5F5F5),
+    onBackground = Color.Black,
+    surface = Color.White
 )
 
 private val shapes = Shapes(
-    small = RoundedCornerShape(50),
-    medium = RoundedCornerShape(16.dp),
-    large = RoundedCornerShape(32.dp)
+    small = CutCornerShape(8.dp),
+    medium = CutCornerShape(12.dp),
+    large = CutCornerShape(topStart = 24.dp, topEnd = 24.dp)
 )
 
 @Composable
@@ -37,9 +46,18 @@ fun AppTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
+    val systemUiController = rememberSystemUiController()
+
     MaterialTheme(
         colors = if (darkTheme) DarkColors else LightColors,
-        shapes = shapes,
-        content = content
-    )
+        shapes = shapes
+    ) {
+        val statusBarColor = MaterialTheme.colors.background
+        val navBarColor = MaterialTheme.colors.surface
+        LaunchedEffect(darkTheme) {
+            systemUiController.setStatusBarColor(statusBarColor)
+            systemUiController.setNavigationBarColor(navBarColor)
+        }
+        content()
+    }
 }

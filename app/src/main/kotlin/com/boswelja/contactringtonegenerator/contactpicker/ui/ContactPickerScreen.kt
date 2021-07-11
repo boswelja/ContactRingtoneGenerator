@@ -1,25 +1,29 @@
 package com.boswelja.contactringtonegenerator.contactpicker.ui
 
-import android.graphics.BitmapFactory
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Checkbox
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ContentAlpha
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.ListItem
-import androidx.compose.material.OutlinedTextField
+import androidx.compose.material.LocalContentColor
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.Search
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,122 +31,64 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
-import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.WizardViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.boswelja.contactringtonegenerator.common.LocalSearchComposition
+import com.boswelja.contactringtonegenerator.common.ui.NextButton
 import com.boswelja.contactringtonegenerator.contactpicker.Contact
-import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.FlowPreview
-import timber.log.Timber
 
-@FlowPreview
-@ExperimentalMaterialApi
 @ExperimentalCoroutinesApi
+@ExperimentalAnimationApi
+@ExperimentalMaterialApi
 @Composable
 fun ContactPickerScreen(
-    viewModel: WizardViewModel,
-    onNextVisibleChange: (Boolean) -> Unit
+    modifier: Modifier = Modifier,
+    selectedContacts: Collection<String>,
+    onContactSelectionChanged: (Contact, Boolean) -> Unit,
+    onNavigateNext: () -> Unit
 ) {
-    val contacts by viewModel.adapterContacts.collectAsState(
-        emptyList(),
+    val viewModel: ContactPickerViewModel = viewModel()
+    val allContacts by viewModel.allContacts.collectAsState(
+        null,
         Dispatchers.IO
     )
-    val selectedContacts = viewModel.selectedContacts
-    val searchQuery by viewModel.contactsQuery.collectAsState()
 
-    var allSelected by remember { mutableStateOf(false) }
-    // Keep track of the state separately here, and set it's initial value.
-    // This improves typing response
-    var currentQuery by remember { mutableStateOf(searchQuery) }
+    val currentQuery = LocalSearchComposition.current
 
-    Column {
-        ListHeader(
-            searchQuery = currentQuery,
-            onSearchQueryChanged = {
-                currentQuery = it
-                viewModel.contactsQuery.tryEmit(it)
-            },
-            allSelected = allSelected,
-            onAllSelectedChange = {
-                allSelected = it
-                contacts.forEach { contact ->
-                    if (it) {
-                        viewModel.selectedContacts.add(contact)
-                        onNextVisibleChange(true)
-                    } else {
-                        viewModel.selectedContacts.remove(contact)
-                        if (viewModel.selectedContacts.isEmpty())
-                            onNextVisibleChange(false)
-                    }
-                }
-            }
-        )
-        ContactsList(
-            contacts = contacts,
-            selectedContacts = selectedContacts,
-            onContactSelectionChanged = { contact, isSelected ->
-                Timber.d(
-                    "Selection changed for %s, is now %s",
-                    contact,
-                    isSelected
-                )
-                if (isSelected) {
-                    viewModel.selectedContacts.add(contact)
-                    onNextVisibleChange(true)
-                } else {
-                    viewModel.selectedContacts.remove(contact)
-                    if (viewModel.selectedContacts.isEmpty())
-                        onNextVisibleChange(false)
-                }
-            }
-        )
+    val visibleContacts by remember(allContacts, currentQuery) {
+        derivedStateOf {
+            allContacts?.filter { it.second.displayName.contains(currentQuery, ignoreCase = true) }
+        }
     }
-}
 
-@Composable
-fun SearchBar(
-    searchQuery: String,
-    onSearchQueryChanged: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    OutlinedTextField(
-        value = searchQuery,
-        onValueChange = onSearchQueryChanged,
-        placeholder = {
-            Text(stringResource(R.string.search_hint))
-        },
-        leadingIcon = {
-            Icon(Icons.Outlined.Search, stringResource(R.string.search_hint))
-        },
-        modifier = modifier
-    )
-}
+    Box(modifier) {
+        Crossfade(
+            modifier = Modifier.fillMaxSize(),
+            targetState = visibleContacts != null
+        ) {
+            if (it) {
+                ContactsList(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPaddingValues = PaddingValues(top = 16.dp, bottom = 72.dp),
+                    contacts = visibleContacts!!,
+                    selectedContacts = selectedContacts,
+                    onContactSelectionChanged = onContactSelectionChanged
+                )
+            } else {
+                Box(Modifier.fillMaxSize()) {
+                    CircularProgressIndicator(
+                        modifier = Modifier.align(Alignment.Center)
+                    )
+                }
+            }
+        }
 
-@Composable
-fun ListHeader(
-    searchQuery: String,
-    onSearchQueryChanged: (String) -> Unit,
-    allSelected: Boolean,
-    onAllSelectedChange: (Boolean) -> Unit
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(16.dp)
-    ) {
-        SearchBar(
-            searchQuery = searchQuery,
-            onSearchQueryChanged = onSearchQueryChanged,
-            Modifier.weight(1f)
-        )
-        Checkbox(
-            checked = allSelected,
-            onCheckedChange = onAllSelectedChange,
-            modifier = Modifier.padding(start = 8.dp)
+        NextButton(
+            enabled = selectedContacts.isNotEmpty(),
+            onClick = onNavigateNext
         )
     }
 }
@@ -150,32 +96,53 @@ fun ListHeader(
 @ExperimentalMaterialApi
 @Composable
 fun ContactsList(
-    contacts: List<Contact>?,
-    selectedContacts: List<Contact>?,
+    modifier: Modifier = Modifier,
+    contentPaddingValues: PaddingValues = PaddingValues(),
+    contacts: List<Pair<ImageBitmap?, Contact>>,
+    selectedContacts: Collection<String>,
     onContactSelectionChanged: (Contact, Boolean) -> Unit
 ) {
-    val context = LocalContext.current
-    contacts?.let {
-        LazyColumn {
-            items(contacts) { contact ->
-                val selected = selectedContacts?.contains(contact) ?: false
-                ListItem(
-                    text = { Text(contact.displayName) },
-                    icon = {
-                        ContactsHelper.openContactPhotoStream(context, contact)?.let {
-                            val imageBitmap = BitmapFactory.decodeStream(it).asImageBitmap()
-                            it.close()
-                            Image(imageBitmap, null, Modifier.clip(CircleShape))
-                        } ?: Icon(Icons.Outlined.AccountCircle, null)
-                    },
-                    trailing = {
-                        Checkbox(checked = selected, onCheckedChange = null)
-                    },
-                    modifier = Modifier.clickable {
-                        onContactSelectionChanged(contact, !selected)
-                    }
-                )
+    LazyColumn(
+        modifier = modifier,
+        contentPadding = contentPaddingValues
+    ) {
+        items(
+            items = contacts,
+            key = { it.second.lookupKey }
+        ) { (image, contact) ->
+            val iconModifier = Modifier.size(48.dp)
+            val iconTint = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
+
+            var selected by remember {
+                mutableStateOf(selectedContacts.contains(contact.lookupKey))
             }
+
+            ListItem(
+                text = { Text(contact.displayName) },
+                icon = {
+                    if (image != null) {
+                        Image(
+                            bitmap = image,
+                            contentDescription = null,
+                            modifier = iconModifier.clip(CircleShape)
+                        )
+                    } else {
+                        Icon(
+                            Icons.Default.AccountCircle,
+                            null,
+                            modifier = iconModifier,
+                            tint = iconTint
+                        )
+                    }
+                },
+                trailing = {
+                    Checkbox(checked = selected, onCheckedChange = null)
+                },
+                modifier = Modifier.clickable {
+                    selected = !selected
+                    onContactSelectionChanged(contact, selected)
+                }
+            )
         }
     }
 }

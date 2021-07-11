@@ -1,112 +1,97 @@
 package com.boswelja.contactringtonegenerator.ringtonegen.item
 
 import android.net.Uri
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Audiotrack
-import androidx.compose.material.icons.filled.ContactPage
-import androidx.compose.material.icons.filled.TextFields
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.annotation.StringRes
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import com.boswelja.contactringtonegenerator.R
+import java.util.concurrent.atomic.AtomicInteger
+import kotlinx.serialization.Serializable
 
-sealed class StructureItem<T> {
+private val idCounter = AtomicInteger()
 
-    abstract val dataType: DataType
+@Serializable
+sealed class StructureItem {
+    val id: Int = idCounter.incrementAndGet()
     abstract val isDataValid: Boolean
-    abstract val icon: ImageVector
-    abstract val labelRes: Int
-    abstract val engineRepresentation: String
-    abstract var data: T
+    abstract var data: String?
 
-    enum class DataType {
-        DYNAMIC,
-        AUDIO_FILE,
-        SYSTEM_RINGTONE,
-        CUSTOM_TEXT
+    override fun equals(other: Any?): Boolean {
+        if (other !is StructureItem)
+            return false
+        return other.id == id
     }
 
-    sealed class Text : StructureItem<String>() {
+    override fun hashCode(): Int = id
+}
 
-        override var data: String = ""
-        override val isDataValid = true
+@Serializable
+sealed class CustomAudioItem : StructureItem() {
+    final override var data: String? = null
+    final override val isDataValid: Boolean
+        get() = audioUri != null
 
-        class CustomText : Text() {
-            override val dataType = DataType.CUSTOM_TEXT
-            override val engineRepresentation
-                get() = data
-            override val isDataValid: Boolean
-                get() = data.isNotBlank()
+    val audioUri: Uri?
+        get() = data?.let { Uri.parse(it) }
 
-            override val labelRes: Int = R.string.label_custom_text
-            override val icon = Icons.Default.TextFields
-        }
+    @Serializable
+    class SystemRingtone : CustomAudioItem()
+    @Serializable
+    class AudioFile : CustomAudioItem()
+}
 
-        class NamePrefix : Text() {
-            override val dataType = DataType.DYNAMIC
-            override val engineRepresentation = Constants.NAME_PREFIX_PLACEHOLDER
+@Serializable
+sealed class CustomTextItem : StructureItem() {
+    final override var data: String? by mutableStateOf("")
+    final override val isDataValid: Boolean
+        get() = !data.isNullOrBlank()
 
-            override val labelRes: Int = R.string.label_name_prefix
-            override val icon = Icons.Default.ContactPage
-        }
+    @Serializable
+    class CustomText : CustomTextItem()
+}
 
-        class FirstName : Text() {
-            override val dataType = DataType.DYNAMIC
-            override val engineRepresentation = Constants.FIRST_NAME_PLACEHOLDER
+@Serializable
+sealed class ContactDataItem(
+    final override var data: String?,
+    @StringRes val textRes: Int
+) : StructureItem() {
 
-            override val labelRes: Int = R.string.label_first_name
-            override val icon = Icons.Default.ContactPage
-        }
+    final override val isDataValid: Boolean = true
 
-        class MiddleName : Text() {
-            override val dataType = DataType.DYNAMIC
-            override val engineRepresentation = Constants.MIDDLE_NAME_PLACEHOLDER
+    @Serializable
+    class NamePrefix : ContactDataItem(
+        Constants.NAME_PREFIX_PLACEHOLDER,
+        R.string.label_name_prefix
+    )
 
-            override val labelRes: Int = R.string.label_middle_name
-            override val icon = Icons.Default.ContactPage
-        }
+    @Serializable
+    class FirstName : ContactDataItem(
+        Constants.FIRST_NAME_PLACEHOLDER,
+        R.string.label_first_name
+    )
 
-        class LastName : Text() {
-            override val dataType = DataType.DYNAMIC
-            override val engineRepresentation = Constants.LAST_NAME_PLACEHOLDER
+    @Serializable
+    class MiddleName : ContactDataItem(
+        Constants.MIDDLE_NAME_PLACEHOLDER,
+        R.string.label_middle_name
+    )
 
-            override val labelRes: Int = R.string.label_last_name
-            override val icon = Icons.Default.ContactPage
-        }
+    @Serializable
+    class LastName : ContactDataItem(
+        Constants.LAST_NAME_PLACEHOLDER,
+        R.string.label_last_name
+    )
 
-        class NameSuffix : Text() {
-            override val dataType = DataType.DYNAMIC
-            override val engineRepresentation = Constants.NAME_SUFFIX_PLACEHOLDER
+    @Serializable
+    class NameSuffix : ContactDataItem(
+        Constants.NAME_SUFFIX_PLACEHOLDER,
+        R.string.label_name_suffix
+    )
 
-            override val labelRes: Int = R.string.label_name_suffix
-            override val icon = Icons.Default.ContactPage
-        }
-
-        class Nickname : Text() {
-            override val dataType = DataType.DYNAMIC
-            override val engineRepresentation = Constants.NICKNAME_PLACEHOLDER
-
-            override val labelRes: Int = R.string.label_nickname
-            override val icon = Icons.Default.ContactPage
-        }
-    }
-
-    sealed class Audio : StructureItem<Uri?>() {
-
-        override var data: Uri? = null
-        override val isDataValid: Boolean
-            get() = data != null
-        override val engineRepresentation: String
-            get() = data?.toString() ?: ""
-
-        class SystemRingtone : Audio() {
-            override val dataType = DataType.SYSTEM_RINGTONE
-            override val icon = Icons.Default.Audiotrack
-            override val labelRes = R.string.label_system_ringtone
-        }
-
-        class AudioFile : Audio() {
-            override val dataType = DataType.AUDIO_FILE
-            override val icon = Icons.Default.Audiotrack
-            override val labelRes = R.string.label_custom_audio
-        }
-    }
+    @Serializable
+    class Nickname : ContactDataItem(
+        Constants.NICKNAME_PLACEHOLDER,
+        R.string.label_nickname
+    )
 }

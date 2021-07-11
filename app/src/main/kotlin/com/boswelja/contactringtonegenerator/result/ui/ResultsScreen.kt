@@ -2,12 +2,15 @@ package com.boswelja.contactringtonegenerator.result.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.outlined.CheckCircleOutline
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.HelpOutline
@@ -19,28 +22,29 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.ringtonegen.Result
+import com.boswelja.contactringtonegenerator.ringtonegen.GeneratorResult
 
 @Composable
 fun ResultScreen(
-    result: Result?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    generatorResult: GeneratorResult?,
+    onDoneClicked: () -> Unit
 ) {
     // Get result display info
-    val (icon, resultTitle, resultText) = when (result) {
-        Result.FAILED ->
+    val (icon, resultTitle, resultText) = when (generatorResult) {
+        GeneratorResult.FAILED ->
             Triple(
                 Icons.Outlined.ErrorOutline,
                 R.string.result_failed_title,
                 R.string.result_failed_status
             )
-        Result.MIXED ->
+        GeneratorResult.MIXED ->
             Triple(
                 Icons.Outlined.Warning,
                 R.string.result_mixed_title,
                 R.string.result_mixed_status
             )
-        Result.SUCCESSFUL ->
+        GeneratorResult.SUCCESSFUL ->
             Triple(
                 Icons.Outlined.CheckCircleOutline,
                 R.string.result_success_title,
@@ -57,7 +61,7 @@ fun ResultScreen(
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
     ) {
         Icon(
             imageVector = icon,
@@ -73,6 +77,12 @@ fun ResultScreen(
             text = stringResource(resultText),
             style = MaterialTheme.typography.h5,
             textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(32.dp))
+        ExtendedFloatingActionButton(
+            text = { Text(stringResource(R.string.done)) },
+            icon = { Icon(Icons.Default.Done, null) },
+            onClick = onDoneClicked
         )
     }
 }

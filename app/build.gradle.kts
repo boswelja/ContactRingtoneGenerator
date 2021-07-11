@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     kotlin("android")
     kotlin("kapt")
+    kotlin("plugin.serialization") version "1.5.0"
     id("com.squareup.wire")
 }
 
@@ -51,6 +52,7 @@ dependencies {
     implementation(libs.bundles.compose)
     implementation(libs.timber)
     implementation(libs.ffmpeg.audio)
+    implementation(libs.kotlinx.serialization.json)
     implementation(libs.tts.ktx)
 
     testImplementation(libs.androidx.arch.core.test)

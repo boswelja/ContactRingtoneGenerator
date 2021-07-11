@@ -1,6 +1,9 @@
 package com.boswelja.contactringtonegenerator.settings.ui
 
 import android.app.Application
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.boswelja.contactringtonegenerator.common.MediaStoreHelper
@@ -16,15 +19,20 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
 
     private val dataStore = application.settingsDataStore
 
-    val volumeMultiplier = dataStore.data.map { it.volumeMultiplier }
+    var volumeMultiplier by mutableStateOf(1.0f)
+
+    init {
+        viewModelScope.launch {
+            volumeMultiplier = dataStore.data.map { it.volumeMultiplier }.first()
+        }
+    }
 
     @ExperimentalCoroutinesApi
     fun resetContactRingtones() {
         val context = getApplication<Application>()
         viewModelScope.launch(Dispatchers.IO) {
             ContactsHelper.getContacts(
-                context.contentResolver,
-                Int.MAX_VALUE // Collect all contacts
+                context.contentResolver
             ).first().forEach { contact ->
                 ContactsHelper.removeContactRingtone(context, contact)
             }
@@ -32,7 +40,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
         }
     }
 
-    fun setVolumeMultiplier(newMultiplier: Float) {
+    fun saveVolumeMultiplier(newMultiplier: Float) {
         viewModelScope.launch {
             dataStore.updateData { it.copy(volumeMultiplier = newMultiplier) }
         }

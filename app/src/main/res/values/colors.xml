@@ -1,16 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="primaryColor">#43a047</color>
-    <color name="primaryLightColor">#76d275</color>
-    <color name="primaryDarkColor">#00701a</color>
-    <color name="secondaryColor">#43a047</color>
-    <color name="secondaryDarkColor">#00701a</color>
-    <color name="primaryTextColor">#FFFFFF</color>
-    <color name="secondaryTextColor">#FFFFFF</color>
-
-    <color name="windowBackground">#FFFFFF</color>
-
-    <color name="successColor">#4CAF50</color>
-    <color name="failColor">#F44336</color>
-    <color name="mixedColor">#FFEB3B</color>
+    <color name="primaryColor">#4caf50</color>
 </resources>

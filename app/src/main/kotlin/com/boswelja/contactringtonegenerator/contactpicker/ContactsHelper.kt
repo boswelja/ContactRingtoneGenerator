@@ -46,7 +46,6 @@ object ContactsHelper {
     @ExperimentalCoroutinesApi
     fun getContacts(
         contentResolver: ContentResolver,
-        pageSize: Int,
         filter: String? = null
     ): Flow<List<Contact>> = flow {
         val selection = filter?.let {
@@ -62,7 +61,6 @@ object ContactsHelper {
             selectionArgs,
             ContactsContract.Contacts.SORT_KEY_PRIMARY
         )
-        var currentGrowth = 0
         cursor?.let {
             val idColumn = cursor.getColumnIndex(ContactsContract.Contacts._ID)
             val lookupKeyColumn = cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)
@@ -82,15 +80,10 @@ object ContactsHelper {
                             ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id)
                         )
                         contacts.add(contact)
-                        currentGrowth++
-                        if (currentGrowth >= pageSize) {
-                            emit(contacts)
-                            currentGrowth = 0
-                        }
                     }
                 }
             }
-            // Send contacts on finished anyways
+            // Send contacts on finished
             emit(contacts)
             cursor.close()
         }
