@@ -33,12 +33,9 @@ fun ProgressScreen(
     )?.size ?: 0
 
     if (workInfo != null && workInfo.outputData != Data.EMPTY) {
-        // TODO Add support for outright failures
-        val result = if (failCount > 0) {
-            GeneratorResult.MIXED
-        } else {
-            GeneratorResult.SUCCESSFUL
-        }
+        val result = GeneratorResult.valueOf(
+            workInfo.outputData.getString(RingtoneGeneratorWorker.Outputs.Result)!!
+        )
         onFinished(result)
     }
 

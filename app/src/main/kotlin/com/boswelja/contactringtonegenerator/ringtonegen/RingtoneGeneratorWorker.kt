@@ -59,7 +59,13 @@ class RingtoneGeneratorWorker(
         // Empty cache on finish
         applicationContext.cacheDir.delete()
 
-        return Result.success()
+        return Result.success(
+            workDataOf(
+                Outputs.Result to GeneratorResult.SUCCESSFUL.name,
+                Outputs.Progress to 1f,
+                Outputs.FailedContactLookupKeys to emptyArray<String>()
+            )
+        )
     }
 
     /**
@@ -229,5 +235,6 @@ class RingtoneGeneratorWorker(
     object Outputs {
         const val Progress = "progress"
         const val FailedContactLookupKeys = "failed-keys"
+        const val Result = "result"
     }
 }
