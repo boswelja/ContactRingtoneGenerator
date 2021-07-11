@@ -2,12 +2,15 @@ package com.boswelja.contactringtonegenerator.result.ui
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.outlined.CheckCircleOutline
 import androidx.compose.material.icons.outlined.ErrorOutline
 import androidx.compose.material.icons.outlined.HelpOutline
@@ -23,8 +26,9 @@ import com.boswelja.contactringtonegenerator.ringtonegen.GeneratorResult
 
 @Composable
 fun ResultScreen(
+    modifier: Modifier = Modifier,
     generatorResult: GeneratorResult?,
-    modifier: Modifier = Modifier
+    onDoneClicked: () -> Unit
 ) {
     // Get result display info
     val (icon, resultTitle, resultText) = when (generatorResult) {
@@ -57,7 +61,7 @@ fun ResultScreen(
     Column(
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier.fillMaxSize()
+        modifier = modifier
     ) {
         Icon(
             imageVector = icon,
@@ -73,6 +77,12 @@ fun ResultScreen(
             text = stringResource(resultText),
             style = MaterialTheme.typography.h5,
             textAlign = TextAlign.Center
+        )
+        Spacer(Modifier.height(32.dp))
+        ExtendedFloatingActionButton(
+            text = { Text(stringResource(R.string.done)) },
+            icon = { Icon(Icons.Default.Done, null) },
+            onClick = onDoneClicked
         )
     }
 }

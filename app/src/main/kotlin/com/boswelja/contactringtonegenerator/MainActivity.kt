@@ -135,7 +135,9 @@ class MainActivity : AppCompatActivity() {
                         ) {
                             MainScreen(
                                 navController = navController
-                            )
+                            ) {
+                                finish()
+                            }
                         }
                     }
                 )
@@ -211,7 +213,8 @@ fun TopAppBar(
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    navController: NavHostController
+    navController: NavHostController,
+    onFinished: () -> Unit
 ) {
     val viewModel: WizardViewModel = viewModel()
 
@@ -284,7 +287,10 @@ fun MainScreen(
             )
         }
         composable(Destination.RESULT.name) {
-            ResultScreen(generatorResult = viewModel.generatorResult)
+            ResultScreen(
+                generatorResult = viewModel.generatorResult,
+                onDoneClicked = onFinished
+            )
         }
     }
 }
