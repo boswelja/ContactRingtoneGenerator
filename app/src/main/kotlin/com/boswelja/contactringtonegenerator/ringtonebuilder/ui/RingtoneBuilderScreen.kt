@@ -33,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.WizardViewModel
+import com.boswelja.contactringtonegenerator.common.ui.AnimatedVisibilityItem
 import com.boswelja.contactringtonegenerator.common.ui.NextButton
 import com.boswelja.contactringtonegenerator.common.ui.SwipeDismissItem
 import com.boswelja.contactringtonegenerator.ringtonebuilder.Utils
@@ -108,26 +109,35 @@ fun RingtoneStructureList(
             items = structure,
             key = { item -> item.id }
         ) { item ->
+            var remove by remember {
+                mutableStateOf(false)
+            }
             var isActive by remember {
                 mutableStateOf(false)
             }
             val elevation by animateDpAsState(
                 if (isActive) 4.dp else 0.dp
             )
-            SwipeDismissItem(
+            AnimatedVisibilityItem(
+                remove = remove,
                 item = item,
-                onItemDismissed = onItemRemoved,
-                onStateChanged = { isActive = it },
-                content = {
-                    Card(elevation = elevation) {
-                        StructureItem(
-                            item = item,
-                            onDataValidityChanged = onDataValidityChanged,
-                            onActionClicked = onActionClicked
-                        )
+                onItemRemoved = onItemRemoved
+            ) {
+                SwipeDismissItem(
+                    item = item,
+                    onItemDismissed = { remove = true },
+                    onStateChanged = { isActive = it },
+                    content = {
+                        Card(elevation = elevation) {
+                            StructureItem(
+                                item = item,
+                                onDataValidityChanged = onDataValidityChanged,
+                                onActionClicked = onActionClicked
+                            )
+                        }
                     }
-                }
-            )
+                )
+            }
         }
         item {
             if (structure.isNotEmpty()) {
