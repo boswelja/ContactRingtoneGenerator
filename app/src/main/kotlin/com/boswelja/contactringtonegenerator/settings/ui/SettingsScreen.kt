@@ -15,16 +15,15 @@ import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Slider
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.boswelja.contactringtonegenerator.R
+import com.boswelja.contactringtonegenerator.common.ui.SliderSetting
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @ExperimentalCoroutinesApi
@@ -107,28 +106,19 @@ fun VolumeMultiplierSetting(
     onSliderValueChanged: (Float) -> Unit,
     onSliderValueFinished: (Float) -> Unit
 ) {
-    Column(modifier) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                modifier = Modifier.weight(1f),
-                text = stringResource(R.string.volume_boost_title),
-                style = MaterialTheme.typography.subtitle1
-            )
-            Text(
-                text = "%.1fx".format(value),
-                style = MaterialTheme.typography.body2
-            )
-        }
-        Slider(
-            value = value,
-            valueRange = 0.5f..2f,
-            onValueChange = onSliderValueChanged,
-            onValueChangeFinished = { onSliderValueFinished(value) },
-            steps = 15
-        )
-    }
+    SliderSetting(
+        modifier = modifier,
+        value = value,
+        valueRange = 1f..2f,
+        text = {
+            Text(stringResource(R.string.volume_boost_title))
+        },
+        valueText = {
+            Text("%.1fx".format(value))
+        },
+        onValueChanged = onSliderValueChanged,
+        onValueChangeFinished = onSliderValueFinished
+    )
 }
 
 private fun launchTtsSettings(context: Context) {
