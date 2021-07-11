@@ -1,8 +1,12 @@
 package com.boswelja.contactringtonegenerator.common.ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.foundation.background
@@ -24,6 +28,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.rememberDismissState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -46,62 +51,93 @@ fun <T> LazyItemScope.SwipeDismissItem(
     onItemDismissed: (T) -> Unit,
     content: @Composable (LazyItemScope.(T) -> Unit)
 ) {
-    // Pretend like we animate content out
-    val isVisible = remember {
-        MutableTransitionState(true)
+    val dismissState = rememberDismissState {
+        if (it != DismissValue.Default) {
+            onItemDismissed(item)
+        }
+        true
     }
 
-    if (isVisible.isIdle && !isVisible.currentState) {
-        onItemDismissed(item)
+    SwipeToDismiss(
+        modifier = modifier,
+        state = dismissState,
+        directions = directions,
+        dismissThresholds = dismissThresholds,
+        background = {
+            val direction = dismissState.dismissDirection
+
+            if (direction == null) {
+                onStateChanged?.invoke(false)
+                return@SwipeToDismiss
+            }
+            onStateChanged?.invoke(true)
+
+            val iconAlignment = when (direction) {
+                DismissDirection.StartToEnd -> Alignment.CenterStart
+                DismissDirection.EndToStart -> Alignment.CenterEnd
+            }
+
+            Box(
+                Modifier
+                    .fillMaxSize()
+                    .background(backgroundColor)
+                    .padding(horizontal = 32.dp),
+                contentAlignment = iconAlignment
+            ) {
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(36.dp),
+                    tint = MaterialTheme.colors.contentColorFor(backgroundColor)
+                )
+            }
+        }
+    ) {
+        content(item)
+    }
+}
+
+/**
+ * A Composable to handle animating LazyColumn/LazyRow item visibility.
+ * @param modifier A [Modifier] to be applied to the [AnimatedVisibility] wrapping your content.
+ * @param enterAnim The [EnterTransition] to show when animating your content in.
+ * @param exitAnim The [ExitTransition] to show when animating your content out.
+ * @param remove A State to control whether the item is being removed. This should default to false,
+ * and be set to true to start animating your content out.
+ * @param item Your item of type [T].
+ * @param onItemRemoved Called when [remove] has been set to true, and your content has finished
+ * animating out.
+ * @param content Your Composable content.
+ */
+@ExperimentalAnimationApi
+@Composable
+fun <T> LazyItemScope.AnimatedVisibilityItem(
+    modifier: Modifier = Modifier,
+    enterAnim: EnterTransition = fadeIn() + expandVertically(),
+    exitAnim: ExitTransition = fadeOut() + shrinkVertically(),
+    remove: Boolean,
+    item: T,
+    onItemRemoved: (T) -> Unit,
+    content: @Composable LazyItemScope.(T) -> Unit
+) {
+    val visible = remember {
+        MutableTransitionState(false)
+    }
+
+    if (remove && visible.isIdle && !visible.currentState) {
+        onItemRemoved(item)
     }
 
     AnimatedVisibility(
-        visibleState = isVisible,
-        exit = shrinkVertically() + fadeOut()
+        modifier = modifier,
+        visibleState = visible,
+        enter = enterAnim,
+        exit = exitAnim
     ) {
-        val dismissState = rememberDismissState {
-            if (it != DismissValue.Default) {
-                isVisible.targetState = false
-            }
-            true
-        }
+        content(item)
+    }
 
-        SwipeToDismiss(
-            modifier = modifier,
-            state = dismissState,
-            directions = directions,
-            dismissThresholds = dismissThresholds,
-            background = {
-                val direction = dismissState.dismissDirection
-
-                if (direction == null) {
-                    onStateChanged?.invoke(false)
-                    return@SwipeToDismiss
-                }
-                onStateChanged?.invoke(true)
-
-                val iconAlignment = when (direction) {
-                    DismissDirection.StartToEnd -> Alignment.CenterStart
-                    DismissDirection.EndToStart -> Alignment.CenterEnd
-                }
-
-                Box(
-                    Modifier
-                        .fillMaxSize()
-                        .background(backgroundColor)
-                        .padding(horizontal = 32.dp),
-                    contentAlignment = iconAlignment
-                ) {
-                    Icon(
-                        icon,
-                        contentDescription = null,
-                        modifier = Modifier.size(36.dp),
-                        tint = MaterialTheme.colors.contentColorFor(backgroundColor)
-                    )
-                }
-            }
-        ) {
-            content(item)
-        }
+    LaunchedEffect(key1 = remove) {
+        visible.targetState = !remove
     }
 }
