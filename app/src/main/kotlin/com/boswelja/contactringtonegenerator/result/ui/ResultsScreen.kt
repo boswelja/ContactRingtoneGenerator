@@ -19,28 +19,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.ringtonegen.Result
+import com.boswelja.contactringtonegenerator.ringtonegen.GeneratorResult
 
 @Composable
 fun ResultScreen(
-    result: Result?,
+    generatorResult: GeneratorResult?,
     modifier: Modifier = Modifier
 ) {
     // Get result display info
-    val (icon, resultTitle, resultText) = when (result) {
-        Result.FAILED ->
+    val (icon, resultTitle, resultText) = when (generatorResult) {
+        GeneratorResult.FAILED ->
             Triple(
                 Icons.Outlined.ErrorOutline,
                 R.string.result_failed_title,
                 R.string.result_failed_status
             )
-        Result.MIXED ->
+        GeneratorResult.MIXED ->
             Triple(
                 Icons.Outlined.Warning,
                 R.string.result_mixed_title,
                 R.string.result_mixed_status
             )
-        Result.SUCCESSFUL ->
+        GeneratorResult.SUCCESSFUL ->
             Triple(
                 Icons.Outlined.CheckCircleOutline,
                 R.string.result_success_title,

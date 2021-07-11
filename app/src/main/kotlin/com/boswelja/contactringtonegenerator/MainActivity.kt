@@ -284,7 +284,7 @@ fun MainScreen(
             )
         }
         composable(Destination.RESULT.name) {
-            ResultScreen(result = viewModel.generatorResult)
+            ResultScreen(generatorResult = viewModel.generatorResult)
         }
     }
 }

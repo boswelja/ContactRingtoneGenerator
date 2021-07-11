@@ -17,14 +17,14 @@ import androidx.compose.ui.unit.dp
 import androidx.work.Data
 import androidx.work.WorkInfo
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.ringtonegen.Result
+import com.boswelja.contactringtonegenerator.ringtonegen.GeneratorResult
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGeneratorWorker
 
 @Composable
 fun ProgressScreen(
     modifier: Modifier = Modifier,
     workInfo: WorkInfo?,
-    onFinished: (Result) -> Unit
+    onFinished: (GeneratorResult) -> Unit
 ) {
     val progressData = workInfo?.progress ?: Data.EMPTY
     val progress = progressData.getFloat(RingtoneGeneratorWorker.Outputs.Progress, 0f)
@@ -35,9 +35,9 @@ fun ProgressScreen(
     if (workInfo != null && workInfo.outputData != Data.EMPTY) {
         // TODO Add support for outright failures
         val result = if (failCount > 0) {
-            Result.MIXED
+            GeneratorResult.MIXED
         } else {
-            Result.SUCCESSFUL
+            GeneratorResult.SUCCESSFUL
         }
         onFinished(result)
     }

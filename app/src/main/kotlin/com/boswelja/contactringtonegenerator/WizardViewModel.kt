@@ -14,7 +14,7 @@ import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.workDataOf
 import com.boswelja.contactringtonegenerator.contactpicker.Contact
-import com.boswelja.contactringtonegenerator.ringtonegen.Result
+import com.boswelja.contactringtonegenerator.ringtonegen.GeneratorResult
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGeneratorWorker
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGeneratorWorker.Inputs.ContactLookupKeys
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGeneratorWorker.Inputs.RingtoneStructure
@@ -30,7 +30,7 @@ class WizardViewModel(application: Application) : AndroidViewModel(application) 
     var selectedContacts by mutableStateOf(hashSetOf<String>())
         private set
 
-    var generatorResult: Result? = null
+    var generatorResult: GeneratorResult? = null
 
     val ringtoneStructure = mutableStateListOf<StructureItem>()
     val isRingtoneValid: Boolean
