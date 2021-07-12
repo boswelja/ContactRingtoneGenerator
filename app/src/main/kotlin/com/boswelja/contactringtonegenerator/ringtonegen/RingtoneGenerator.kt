@@ -24,7 +24,7 @@ class RingtoneGenerator(
 
     suspend fun generate() {
         contactLookupKeys.forEach { lookupKey ->
-            val ringtoneFile = generateRingtoneFor(lookupKey, ringtoneStructure)
+            val ringtoneFile = generateRingtoneFor(lookupKey)
             val ringtoneUri = saveRingtone(ringtoneFile) ?: return
             ContactsHelper.setContactRingtone(
                 context,
@@ -38,113 +38,62 @@ class RingtoneGenerator(
         context.cacheDir.delete()
     }
 
-    /**
-     * Synthesize all static text elements of the ringtone. Currently, this is only
-     * [CustomTextItem.CustomText].
-     * @param ringtoneStructure The structure of the ringtone.
-     */
-    private suspend fun synthesizeStaticParts(
-        ringtoneStructure: List<StructureItem>
-    ): Boolean {
-        var synthResult = true
-        context.withTextToSpeech {
-            ringtoneStructure.forEach { item ->
-                when (item) {
-                    is CustomAudioItem -> {
-                        // TODO Load audio files
-                    }
-                    is CustomTextItem -> {
-                        // Get file and start synthesis
-                        val file =
-                            getPartFileFor(context, item.data!!)
-                        val result = synthesizeToFile(item.data!!, file)
-                        // If even one synthesis fails, fail the job.
-                        if (result != Result.SUCCESS) {
-                            synthResult = false
-                            return@withTextToSpeech
-                        }
-                    }
-                    else -> { }
-                }
-            }
-        }
-        return synthResult
-    }
-
-    private suspend fun TextToSpeech.synthesizeContactName(
+    private suspend fun TextToSpeech.synthesizeTextForContact(
         contactLookupKey: String,
         text: String
     ): File? {
-        val textToSynthesize = when (text) {
-            Constants.NAME_PREFIX_PLACEHOLDER -> {
-                ContactsHelper.getContactStructuredName(
-                    context.contentResolver,
-                    contactLookupKey
-                )?.prefix
-            }
-            Constants.NAME_SUFFIX_PLACEHOLDER -> {
-                ContactsHelper.getContactStructuredName(
-                    context.contentResolver,
-                    contactLookupKey
-                )?.suffix
-            }
-            Constants.FIRST_NAME_PLACEHOLDER -> {
-                ContactsHelper.getContactStructuredName(
-                    context.contentResolver,
-                    contactLookupKey
-                )?.firstName
-            }
-            Constants.MIDDLE_NAME_PLACEHOLDER -> {
-                ContactsHelper.getContactStructuredName(
-                    context.contentResolver,
-                    contactLookupKey
-                )?.middleName
-            }
-            Constants.LAST_NAME_PLACEHOLDER -> {
-                ContactsHelper.getContactStructuredName(
-                    context.contentResolver,
-                    contactLookupKey
-                )?.lastName
-            }
-            Constants.NICKNAME_PLACEHOLDER -> {
-                ContactsHelper.getContactNickname(
-                    context.contentResolver,
-                    contactLookupKey
-                )
-            }
-            else -> throw IllegalArgumentException("Unrecognised engine text for dynamic data")
-        }
-        return textToSynthesize?.let {
-            val file = getPartFileFor(context, textToSynthesize)
-            val synthResult = synthesizeToFile(
-                textToSynthesize,
-                getPartFileFor(context, textToSynthesize)
-            )
-            require(synthResult == Result.SUCCESS)
-            file
-        }
+        val contactName = ContactsHelper.getContactStructuredName(
+            context.contentResolver,
+            contactLookupKey
+        ) ?: return null
+        val contactNickname = ContactsHelper.getContactNickname(
+            context.contentResolver,
+            contactLookupKey
+        )
+
+        val synthesisText = text
+            .replace(Constants.NAME_PREFIX_PLACEHOLDER, contactName.prefix)
+            .replace(Constants.NAME_SUFFIX_PLACEHOLDER, contactName.suffix)
+            .replace(Constants.FIRST_NAME_PLACEHOLDER, contactName.firstName)
+            .replace(Constants.MIDDLE_NAME_PLACEHOLDER, contactName.middleName)
+            .replace(Constants.LAST_NAME_PLACEHOLDER, contactName.lastName)
+            .replace(Constants.NICKNAME_PLACEHOLDER, contactNickname)
+
+        val file = getPartFileFor(context, synthesisText)
+        val synthResult = synthesizeToFile(
+            synthesisText,
+            getPartFileFor(context, synthesisText)
+        )
+        if (synthResult != Result.SUCCESS) return null
+
+        return file
     }
 
     private suspend fun generateRingtoneFor(
-        contactLookupKey: String,
-        structure: List<StructureItem>
+        contactLookupKey: String
     ): File {
         val parts = mutableListOf<File>()
         context.withTextToSpeech {
-            structure.forEach { item ->
-                val file = when (item) {
+            val workingText = mutableListOf<String>()
+            ringtoneStructure.forEach { item ->
+                when (item) {
+                    is CustomTextItem,
                     is ContactDataItem -> {
-                        synthesizeContactName(contactLookupKey, item.data!!)
+                        workingText.add(item.data!!)
                     }
-                    is CustomAudioItem,
-                    is CustomTextItem -> {
-                        getPartFileFor(context, item.data!!)
+                    is CustomAudioItem -> {
+                        // If we have work to do, do it
+                        if (workingText.isNotEmpty()) {
+                            val file = synthesizeTextForContact(
+                                contactLookupKey, workingText.joinToString(separator = " ")
+                            )
+                            requireNotNull(file)
+                            parts.add(file)
+                        }
+                        // TODO Actually load the file
+                        val file = getPartFileFor(context, item.data!!)
+                        parts.add(file)
                     }
-                }
-                if (file != null) {
-                    parts.add(file)
-                } else {
-                    Timber.w("Failed to generate part")
                 }
             }
         }

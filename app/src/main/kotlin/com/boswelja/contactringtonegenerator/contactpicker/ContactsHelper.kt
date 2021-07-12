@@ -89,7 +89,7 @@ object ContactsHelper {
         }
     }
 
-    suspend fun getContactNickname(contentResolver: ContentResolver, lookupKey: String): String? {
+    suspend fun getContactNickname(contentResolver: ContentResolver, lookupKey: String): String {
         return withContext(Dispatchers.IO) {
             val cursor = contentResolver.query(
                 ContactsContract.Data.CONTENT_URI,
@@ -108,7 +108,7 @@ object ContactsHelper {
                 cursor.close()
             }
 
-            return@withContext nickname
+            return@withContext nickname ?: ""
         }
     }
 
@@ -140,11 +140,11 @@ object ContactsHelper {
                 cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.PREFIX)
             val suffixColumn =
                 cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.SUFFIX)
-            val firstName = cursor.getStringOrNull(firstNameColumn)
-            val middleName = cursor.getStringOrNull(middleNameColumn)
-            val lastName = cursor.getStringOrNull(lastNameColumn)
-            val prefix = cursor.getStringOrNull(prefixColumn)
-            val suffix = cursor.getStringOrNull(suffixColumn)
+            val firstName = cursor.getStringOrNull(firstNameColumn) ?: ""
+            val middleName = cursor.getStringOrNull(middleNameColumn) ?: ""
+            val lastName = cursor.getStringOrNull(lastNameColumn) ?: ""
+            val prefix = cursor.getStringOrNull(prefixColumn) ?: ""
+            val suffix = cursor.getStringOrNull(suffixColumn) ?: ""
             cursor.close()
             return@withContext StructuredName(prefix, firstName, middleName, lastName, suffix)
         }
