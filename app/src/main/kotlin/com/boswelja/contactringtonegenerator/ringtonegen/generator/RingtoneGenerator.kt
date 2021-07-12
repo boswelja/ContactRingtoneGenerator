@@ -98,29 +98,26 @@ class RingtoneGenerator(
     ): File? {
         // Convert blocks to files
         val parts = mutableListOf<File>()
-        context.withTextToSpeech(
+        val success = context.withTextToSpeech(
             voicePitch = voicePitch,
             speechRate = speechRate
         ) {
             blocks.forEach { item ->
                 val file = when (item) {
-                    is TextBlock -> {
-                        synthesizeTextForContact(
-                            contactLookupKey, item.text
-                        )
-                    }
-                    is FileBlock -> {
-                        getPartFileFor(item.uri.toString())
-                    }
-                }
-                requireNotNull(file)
+                    is TextBlock -> synthesizeTextForContact(contactLookupKey, item.text)
+                    is FileBlock -> getPartFileFor(item.uri.toString())
+                } ?: return@withTextToSpeech false
                 parts.add(file)
             }
+            return@withTextToSpeech true
         }
+        if (!success) return null
 
+        // TODO Improve file name logic here
         val contactName = ContactsHelper.getContactStructuredName(
             context.contentResolver, contactLookupKey
         )!!.let { "${it.firstName} ${it.middleName} ${it.lastName}" }
+
         var commandInputs = ""
         var filterInputs = ""
         var filters = ""
@@ -136,8 +133,7 @@ class RingtoneGenerator(
 
         Timber.d("Got $trueFileCount files")
         val output = getContactFileFor(contactName)
-        val command =
-            "$commandInputs -filter_complex '${filterInputs}${filters}concat=n=$trueFileCount:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
+        val command = "$commandInputs -filter_complex '${filterInputs}${filters}concat=n=$trueFileCount:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
         Timber.i("ffmpeg $command")
         val result = FFmpegKit.execute(command)
         val generateSuccess = result.returnCode.isSuccess
@@ -155,8 +151,8 @@ class RingtoneGenerator(
         return uri
     }
 
-    private fun getPartFileFor(engineRepresentation: String): File {
-        val fileName = engineRepresentation.replace(" ", "_")
+    private fun getPartFileFor(key: String): File {
+        val fileName = key.hashCode().toString()
         return File(cacheDir, fileName)
     }
 
