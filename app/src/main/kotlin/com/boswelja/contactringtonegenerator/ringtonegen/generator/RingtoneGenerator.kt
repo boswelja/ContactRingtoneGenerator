@@ -117,25 +117,26 @@ class RingtoneGenerator(
         val contactName = ContactsHelper.getContactStructuredName(
             context.contentResolver, contactLookupKey
         )!!.let { "${it.firstName} ${it.middleName} ${it.lastName}" }
-
-        var commandInputs = ""
-        var filterInputs = ""
-        var filters = ""
-        var trueFileCount = 0
-
-        parts.forEach {
-            val filter = "[a$trueFileCount]"
-            filterInputs += "[$trueFileCount:0]volume=$volumeMultiplier$filter;"
-            filters += filter
-            trueFileCount += 1
-            commandInputs += " -i ${it.absolutePath}"
-        }
-
-        Timber.d("Got $trueFileCount files")
         val output = getContactFileFor(contactName)
-        val command = "$commandInputs -filter_complex '${filterInputs}${filters}concat=n=$trueFileCount:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
-        Timber.i("ffmpeg $command")
-        val result = FFmpegKit.execute(command)
+
+        // Build an array of arguments
+        var arguments = emptyArray<String>()
+        var streamFilters = ""
+        var filters = ""
+        var counter = 0
+        parts.forEach {
+            val filter = "[a$counter]"
+            streamFilters += "[$counter:0]volume=$volumeMultiplier$filter;"
+            filters += filter
+            counter += 1
+            arguments += "-i ${it.absolutePath}"
+        }
+        arguments += "-filter_complex '${streamFilters}${filters}concat=n=$counter:v=0:a=1[out]'"
+        arguments += "-map '[out]' ${output.absolutePath}"
+
+        // Execute FFmpeg command
+        Timber.i("ffmpeg $arguments")
+        val result = FFmpegKit.execute(arguments)
         val generateSuccess = result.returnCode.isSuccess
 
         return if (generateSuccess) output else null
