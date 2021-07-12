@@ -23,7 +23,7 @@ class RingtoneGenerator(
 
     suspend fun generate() {
         contactLookupKeys.forEach { lookupKey ->
-            val ringtoneFile = generateRingtoneFor(lookupKey)
+            val ringtoneFile = generateRingtoneFor(lookupKey) ?: return
             val ringtoneUri = saveRingtone(ringtoneFile) ?: return
             ContactsHelper.setContactRingtone(
                 context,
@@ -70,24 +70,23 @@ class RingtoneGenerator(
 
     private suspend fun generateRingtoneFor(
         contactLookupKey: String
-    ): File {
+    ): File? {
         // Convert blocks to files
         val parts = mutableListOf<File>()
         context.withTextToSpeech {
             blocks.forEach { item ->
-                when (item) {
+                val file = when (item) {
                     is TextBlock -> {
-                        val file = synthesizeTextForContact(
+                        synthesizeTextForContact(
                             contactLookupKey, item.text
                         )
-                        requireNotNull(file)
-                        parts.add(file)
                     }
                     is FileBlock -> {
-                        val file = getPartFileFor(context, item.uri.toString())
-                        parts.add(file)
+                        getPartFileFor(context, item.uri.toString())
                     }
                 }
+                requireNotNull(file)
+                parts.add(file)
             }
         }
 
@@ -115,7 +114,7 @@ class RingtoneGenerator(
         val result = FFmpegKit.execute(command)
         val generateSuccess = result.returnCode.isSuccess
 
-        return output
+        return if (generateSuccess) output else null
     }
 
     private suspend fun saveRingtone(file: File): Uri? {
