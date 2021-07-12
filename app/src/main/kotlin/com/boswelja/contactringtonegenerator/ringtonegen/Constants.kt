@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ringtonegen.item
+package com.boswelja.contactringtonegenerator.ringtonegen
 
 object Constants {
     const val FIRST_NAME_PLACEHOLDER = "[firstName]"

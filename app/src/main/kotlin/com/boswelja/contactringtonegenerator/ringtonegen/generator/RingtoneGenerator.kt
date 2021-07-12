@@ -1,15 +1,15 @@
-package com.boswelja.contactringtonegenerator.ringtonegen
+package com.boswelja.contactringtonegenerator.ringtonegen.generator
 
 import android.content.Context
 import android.net.Uri
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.boswelja.contactringtonegenerator.common.MediaStoreHelper
 import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
-import com.boswelja.contactringtonegenerator.ringtonegen.item.Constants
-import com.boswelja.contactringtonegenerator.ringtonegen.item.ContactDataItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomAudioItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomTextItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
+import com.boswelja.contactringtonegenerator.ringtonebuilder.ContactDataItem
+import com.boswelja.contactringtonegenerator.ringtonebuilder.CustomAudioItem
+import com.boswelja.contactringtonegenerator.ringtonebuilder.CustomTextItem
+import com.boswelja.contactringtonegenerator.ringtonebuilder.StructureItem
+import com.boswelja.contactringtonegenerator.ringtonegen.Constants
 import com.boswelja.tts.Result
 import com.boswelja.tts.TextToSpeech
 import com.boswelja.tts.withTextToSpeech

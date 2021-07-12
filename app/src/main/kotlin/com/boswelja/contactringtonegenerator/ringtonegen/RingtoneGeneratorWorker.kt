@@ -4,7 +4,8 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
-import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
+import com.boswelja.contactringtonegenerator.ringtonebuilder.StructureItem
+import com.boswelja.contactringtonegenerator.ringtonegen.generator.RingtoneGenerator
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 

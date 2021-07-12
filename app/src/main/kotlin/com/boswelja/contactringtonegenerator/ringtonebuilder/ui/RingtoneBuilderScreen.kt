@@ -36,11 +36,11 @@ import com.boswelja.contactringtonegenerator.WizardViewModel
 import com.boswelja.contactringtonegenerator.common.ui.AnimatedVisibilityItem
 import com.boswelja.contactringtonegenerator.common.ui.NextButton
 import com.boswelja.contactringtonegenerator.common.ui.SwipeDismissItem
+import com.boswelja.contactringtonegenerator.ringtonebuilder.ContactDataItem
+import com.boswelja.contactringtonegenerator.ringtonebuilder.CustomAudioItem
+import com.boswelja.contactringtonegenerator.ringtonebuilder.CustomTextItem
+import com.boswelja.contactringtonegenerator.ringtonebuilder.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonebuilder.Utils
-import com.boswelja.contactringtonegenerator.ringtonegen.item.ContactDataItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomAudioItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomTextItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
 
 @ExperimentalAnimationApi
 @ExperimentalMaterialApi
