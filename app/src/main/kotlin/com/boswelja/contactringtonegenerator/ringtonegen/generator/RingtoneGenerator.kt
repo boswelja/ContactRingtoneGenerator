@@ -5,9 +5,6 @@ import android.net.Uri
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.boswelja.contactringtonegenerator.common.MediaStoreHelper
 import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
-import com.boswelja.contactringtonegenerator.ringtonebuilder.ContactDataItem
-import com.boswelja.contactringtonegenerator.ringtonebuilder.CustomAudioItem
-import com.boswelja.contactringtonegenerator.ringtonebuilder.CustomTextItem
 import com.boswelja.contactringtonegenerator.ringtonebuilder.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.Constants
 import com.boswelja.tts.Result
@@ -19,8 +16,10 @@ import timber.log.Timber
 class RingtoneGenerator(
     private val context: Context,
     private val contactLookupKeys: Array<String>,
-    private val ringtoneStructure: List<StructureItem>
+    ringtoneStructure: List<StructureItem>
 ) {
+
+    private val blocks = ringtoneStructure.toBlocks()
 
     suspend fun generate() {
         contactLookupKeys.forEach { lookupKey ->
@@ -72,26 +71,20 @@ class RingtoneGenerator(
     private suspend fun generateRingtoneFor(
         contactLookupKey: String
     ): File {
+        // Convert blocks to files
         val parts = mutableListOf<File>()
         context.withTextToSpeech {
-            val workingText = mutableListOf<String>()
-            ringtoneStructure.forEach { item ->
+            blocks.forEach { item ->
                 when (item) {
-                    is CustomTextItem,
-                    is ContactDataItem -> {
-                        workingText.add(item.data!!)
+                    is TextBlock -> {
+                        val file = synthesizeTextForContact(
+                            contactLookupKey, item.text
+                        )
+                        requireNotNull(file)
+                        parts.add(file)
                     }
-                    is CustomAudioItem -> {
-                        // If we have work to do, do it
-                        if (workingText.isNotEmpty()) {
-                            val file = synthesizeTextForContact(
-                                contactLookupKey, workingText.joinToString(separator = " ")
-                            )
-                            requireNotNull(file)
-                            parts.add(file)
-                        }
-                        // TODO Actually load the file
-                        val file = getPartFileFor(context, item.data!!)
+                    is FileBlock -> {
+                        val file = getPartFileFor(context, item.uri.toString())
                         parts.add(file)
                     }
                 }
