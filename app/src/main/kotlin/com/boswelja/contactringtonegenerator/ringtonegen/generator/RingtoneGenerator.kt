@@ -19,9 +19,18 @@ class RingtoneGenerator(
     ringtoneStructure: List<StructureItem>
 ) {
 
+    private val cacheDir = context.cacheDir
     private val blocks = ringtoneStructure.toBlocks()
 
     suspend fun generate() {
+        // Read FileBlock Uris into cache
+        blocks.filterIsInstance<FileBlock>().forEach { fileBlock ->
+            val inStream = context.contentResolver.openInputStream(fileBlock.uri) ?: return
+            getPartFileFor(fileBlock.uri.toString()).outputStream().use {
+                inStream.copyTo(it)
+            }
+        }
+
         contactLookupKeys.forEach { lookupKey ->
             val ringtoneFile = generateRingtoneFor(lookupKey) ?: return
             val ringtoneUri = saveRingtone(ringtoneFile) ?: return
@@ -34,7 +43,7 @@ class RingtoneGenerator(
         }
 
         // Empty cache on finish
-        context.cacheDir.delete()
+        cacheDir.deleteRecursively()
     }
 
     private suspend fun TextToSpeech.synthesizeTextForContact(
@@ -58,10 +67,10 @@ class RingtoneGenerator(
             .replace(Constants.LAST_NAME_PLACEHOLDER, contactName.lastName)
             .replace(Constants.NICKNAME_PLACEHOLDER, contactNickname)
 
-        val file = getPartFileFor(context, synthesisText)
+        val file = getPartFileFor(synthesisText)
         val synthResult = synthesizeToFile(
             synthesisText,
-            getPartFileFor(context, synthesisText)
+            getPartFileFor(synthesisText)
         )
         if (synthResult != Result.SUCCESS) return null
 
@@ -82,7 +91,7 @@ class RingtoneGenerator(
                         )
                     }
                     is FileBlock -> {
-                        getPartFileFor(context, item.uri.toString())
+                        getPartFileFor(item.uri.toString())
                     }
                 }
                 requireNotNull(file)
@@ -107,7 +116,7 @@ class RingtoneGenerator(
         }
 
         Timber.d("Got $trueFileCount files")
-        val output = getContactFileFor(context, contactName)
+        val output = getContactFileFor(contactName)
         val command =
             "$commandInputs -filter_complex '${filterInputs}${filters}concat=n=$trueFileCount:v=0:a=1[out]' -map '[out]' ${output.absolutePath}"
         Timber.i("ffmpeg $command")
@@ -127,13 +136,13 @@ class RingtoneGenerator(
         return uri
     }
 
-    private fun getPartFileFor(context: Context, engineRepresentation: String): File {
-        val fileName = engineRepresentation.replace(" ", "_") + ".ogg"
-        return File(context.cacheDir, fileName)
+    private fun getPartFileFor(engineRepresentation: String): File {
+        val fileName = engineRepresentation.replace(" ", "_")
+        return File(cacheDir, fileName)
     }
 
-    private fun getContactFileFor(context: Context, contactName: String): File {
+    private fun getContactFileFor(contactName: String): File {
         val fileName = contactName.replace(" ", "_") + ".ogg"
-        return File(context.cacheDir, fileName)
+        return File(cacheDir, fileName)
     }
 }
