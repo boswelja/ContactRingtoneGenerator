@@ -19,6 +19,8 @@ import androidx.work.WorkInfo
 import com.boswelja.contactringtonegenerator.R
 import com.boswelja.contactringtonegenerator.ringtonegen.GeneratorResult
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGeneratorWorker
+import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.json.Json
 
 @Composable
 fun ProgressScreen(
@@ -35,7 +37,7 @@ fun ProgressScreen(
 
     // TODO This probably shouldn't be checked here
     if (workInfo != null && workInfo.outputData != Data.EMPTY) {
-        val result = GeneratorResult.valueOf(
+        val result = Json.decodeFromString<GeneratorResult>(
             workInfo.outputData.getString(RingtoneGeneratorWorker.Outputs.Result)!!
         )
         onFinished(result)

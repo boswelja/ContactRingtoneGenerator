@@ -7,6 +7,7 @@ import androidx.work.workDataOf
 import com.boswelja.contactringtonegenerator.ringtonebuilder.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.generator.RingtoneGenerator
 import kotlinx.serialization.decodeFromString
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
 class RingtoneGeneratorWorker(
@@ -26,7 +27,7 @@ class RingtoneGeneratorWorker(
             Json.decodeFromString<StructureItem>(it)
         } ?: return Result.failure()
         // Get input contacts
-        val contacts = inputData.getStringArray(Inputs.ContactLookupKeys)
+        val contacts = inputData.getStringArray(Inputs.ContactLookupKeys)?.toSet()
             ?: return Result.failure()
 
         val generator = RingtoneGenerator(
@@ -35,11 +36,11 @@ class RingtoneGeneratorWorker(
             structure
         )
 
-        generator.generate()
+        val result = generator.generate()
 
         return Result.success(
             workDataOf(
-                Outputs.Result to GeneratorResult.SUCCESSFUL.name,
+                Outputs.Result to Json.encodeToString(result),
                 Outputs.Progress to 1f,
                 Outputs.FailedContactLookupKeys to emptyArray<String>()
             )

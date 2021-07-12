@@ -27,24 +27,24 @@ import com.boswelja.contactringtonegenerator.ringtonegen.GeneratorResult
 @Composable
 fun ResultScreen(
     modifier: Modifier = Modifier,
-    generatorResult: GeneratorResult?,
+    result: GeneratorResult,
     onDoneClicked: () -> Unit
 ) {
     // Get result display info
-    val (icon, resultTitle, resultText) = when (generatorResult) {
-        GeneratorResult.FAILED ->
+    val (icon, resultTitle, resultText) = when {
+        result.hasFails && !result.hasSuccesses ->
             Triple(
                 Icons.Outlined.ErrorOutline,
                 R.string.result_failed_title,
                 R.string.result_failed_status
             )
-        GeneratorResult.MIXED ->
+        result.hasFails && result.hasSuccesses ->
             Triple(
                 Icons.Outlined.Warning,
                 R.string.result_mixed_title,
                 R.string.result_mixed_status
             )
-        GeneratorResult.SUCCESSFUL ->
+        !result.hasFails && result.hasSuccesses ->
             Triple(
                 Icons.Outlined.CheckCircleOutline,
                 R.string.result_success_title,

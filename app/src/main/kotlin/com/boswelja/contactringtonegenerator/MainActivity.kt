@@ -287,10 +287,12 @@ fun MainScreen(
             )
         }
         composable(Destination.RESULT.name) {
-            ResultScreen(
-                generatorResult = viewModel.generatorResult,
-                onDoneClicked = onFinished
-            )
+            viewModel.generatorResult?.let { result ->
+                ResultScreen(
+                    result = result,
+                    onDoneClicked = onFinished
+                )
+            }
         }
     }
 }

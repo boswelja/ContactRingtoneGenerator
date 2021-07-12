@@ -1,10 +1,6 @@
 package com.boswelja.contactringtonegenerator.ringtonegen
 
-enum class GeneratorResult {
-    FAILED,
-    MIXED,
-    SUCCESSFUL
-}
+import kotlinx.serialization.Serializable
 
 /**
  * A data class containing two sets of
@@ -13,7 +9,11 @@ enum class GeneratorResult {
  * @param successfulContacts The [Set] of lookupKeys for contacts whose ringtone was generated.
  * @param failedContacts The [Set] of lookupKeys for contacts whose ringtone was not generated.
  */
-data class GeneratorResultData(
-    val successfulContacts: Set<String>,
-    val failedContacts: Set<String>
-)
+@Serializable
+data class GeneratorResult(
+    val successfulContacts: Set<String> = emptySet(),
+    val failedContacts: Set<String> = emptySet()
+) {
+    val hasSuccesses = successfulContacts.isNotEmpty()
+    val hasFails = failedContacts.isNotEmpty()
+}

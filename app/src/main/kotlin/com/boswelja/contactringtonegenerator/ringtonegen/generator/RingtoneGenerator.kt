@@ -7,6 +7,7 @@ import com.boswelja.contactringtonegenerator.common.MediaStoreHelper
 import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
 import com.boswelja.contactringtonegenerator.ringtonebuilder.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.Constants
+import com.boswelja.contactringtonegenerator.ringtonegen.GeneratorResult
 import com.boswelja.contactringtonegenerator.settings.settingsDataStore
 import com.boswelja.tts.Result
 import com.boswelja.tts.TextToSpeech
@@ -18,14 +19,14 @@ import timber.log.Timber
 
 class RingtoneGenerator(
     private val context: Context,
-    private val contactLookupKeys: Array<String>,
+    private val contactLookupKeys: Set<String>,
     ringtoneStructure: List<StructureItem>
 ) {
 
     private val cacheDir = context.cacheDir
     private val blocks = ringtoneStructure.toBlocks()
 
-    suspend fun generate() {
+    suspend fun generate(): GeneratorResult {
         // Load settings
         val speechRate = context.settingsDataStore.data.map { it.ttsSpeechRate }.first()
         val voicePitch = context.settingsDataStore.data.map { it.ttsPitch }.first()
@@ -33,30 +34,41 @@ class RingtoneGenerator(
 
         // Read FileBlock Uris into cache
         blocks.filterIsInstance<FileBlock>().forEach { fileBlock ->
-            val inStream = context.contentResolver.openInputStream(fileBlock.uri) ?: return
+            val inStream = context.contentResolver.openInputStream(fileBlock.uri)
+                ?: return GeneratorResult(failedContacts = contactLookupKeys)
             getPartFileFor(fileBlock.uri.toString()).outputStream().use {
                 inStream.copyTo(it)
             }
         }
 
+        val failedContactKeys = mutableSetOf<String>()
         contactLookupKeys.forEach { lookupKey ->
             val ringtoneFile = generateRingtoneFor(
                 lookupKey,
                 voicePitch,
                 speechRate,
                 volumeMultiplier
-            ) ?: return
-            val ringtoneUri = saveRingtone(ringtoneFile) ?: return
-            ContactsHelper.setContactRingtone(
-                context,
-                ContactsHelper.getContactUri(context, lookupKey)!!,
-                ringtoneUri
             )
-            ringtoneFile.delete()
+            val ringtoneUri = ringtoneFile?.let { saveRingtone(ringtoneFile) }
+            if (ringtoneUri != null) {
+                ContactsHelper.setContactRingtone(
+                    context,
+                    ContactsHelper.getContactUri(context, lookupKey)!!,
+                    ringtoneUri
+                )
+                ringtoneFile.delete()
+            } else {
+                failedContactKeys.add(lookupKey)
+            }
         }
 
         // Empty cache on finish
         cacheDir.deleteRecursively()
+
+        return GeneratorResult(
+            successfulContacts = contactLookupKeys.minus(failedContactKeys),
+            failedContacts = failedContactKeys
+        )
     }
 
     private suspend fun TextToSpeech.synthesizeTextForContact(
