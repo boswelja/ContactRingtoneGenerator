@@ -7,10 +7,13 @@ import com.boswelja.contactringtonegenerator.common.MediaStoreHelper
 import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
 import com.boswelja.contactringtonegenerator.ringtonebuilder.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.Constants
+import com.boswelja.contactringtonegenerator.settings.settingsDataStore
 import com.boswelja.tts.Result
 import com.boswelja.tts.TextToSpeech
 import com.boswelja.tts.withTextToSpeech
 import java.io.File
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import timber.log.Timber
 
 class RingtoneGenerator(
@@ -23,6 +26,11 @@ class RingtoneGenerator(
     private val blocks = ringtoneStructure.toBlocks()
 
     suspend fun generate() {
+        // Load settings
+        val speechRate = context.settingsDataStore.data.map { it.ttsSpeechRate }.first()
+        val voicePitch = context.settingsDataStore.data.map { it.ttsPitch }.first()
+        val volumeMultiplier = context.settingsDataStore.data.map { it.volumeMultiplier }.first()
+
         // Read FileBlock Uris into cache
         blocks.filterIsInstance<FileBlock>().forEach { fileBlock ->
             val inStream = context.contentResolver.openInputStream(fileBlock.uri) ?: return
@@ -32,7 +40,12 @@ class RingtoneGenerator(
         }
 
         contactLookupKeys.forEach { lookupKey ->
-            val ringtoneFile = generateRingtoneFor(lookupKey) ?: return
+            val ringtoneFile = generateRingtoneFor(
+                lookupKey,
+                voicePitch,
+                speechRate,
+                volumeMultiplier
+            ) ?: return
             val ringtoneUri = saveRingtone(ringtoneFile) ?: return
             ContactsHelper.setContactRingtone(
                 context,
@@ -78,11 +91,17 @@ class RingtoneGenerator(
     }
 
     private suspend fun generateRingtoneFor(
-        contactLookupKey: String
+        contactLookupKey: String,
+        voicePitch: Float,
+        speechRate: Float,
+        volumeMultiplier: Float
     ): File? {
         // Convert blocks to files
         val parts = mutableListOf<File>()
-        context.withTextToSpeech {
+        context.withTextToSpeech(
+            voicePitch = voicePitch,
+            speechRate = speechRate
+        ) {
             blocks.forEach { item ->
                 val file = when (item) {
                     is TextBlock -> {
@@ -109,7 +128,7 @@ class RingtoneGenerator(
 
         parts.forEach {
             val filter = "[a$trueFileCount]"
-            filterInputs += "[$trueFileCount:0]volume=1.0$filter;"
+            filterInputs += "[$trueFileCount:0]volume=$volumeMultiplier$filter;"
             filters += filter
             trueFileCount += 1
             commandInputs += " -i ${it.absolutePath}"
