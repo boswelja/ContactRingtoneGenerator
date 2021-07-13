@@ -7,10 +7,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
@@ -122,6 +125,10 @@ fun ContactsList(
     searchQuery: String,
     onSearchQueryChanged: (String) -> Unit
 ) {
+    var allSelected by remember {
+        mutableStateOf(false)
+    }
+
     LazyColumn(
         modifier = modifier,
         contentPadding = contentPaddingValues
@@ -132,7 +139,18 @@ fun ContactsList(
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp, vertical = 16.dp),
                 searchQuery = searchQuery,
-                onQueryChanged = onSearchQueryChanged
+                onQueryChanged = {
+                    // Clear allSelected when search query changes
+                    allSelected = false
+                    onSearchQueryChanged(it)
+                },
+                allSelected = allSelected,
+                onAllSelectedChanged = {
+                    allSelected = it
+                    contacts.forEach { (_, contact) ->
+                        onContactSelectionChanged(contact, allSelected)
+                    }
+                }
             )
         }
         items(
@@ -142,9 +160,7 @@ fun ContactsList(
             val iconModifier = Modifier.size(48.dp)
             val iconTint = LocalContentColor.current.copy(alpha = ContentAlpha.medium)
 
-            var selected by remember {
-                mutableStateOf(selectedContacts.contains(contact.lookupKey))
-            }
+            val selected = selectedContacts.contains(contact.lookupKey)
 
             ListItem(
                 text = { Text(contact.displayName) },
@@ -168,8 +184,7 @@ fun ContactsList(
                     Checkbox(checked = selected, onCheckedChange = null)
                 },
                 modifier = Modifier.clickable {
-                    selected = !selected
-                    onContactSelectionChanged(contact, selected)
+                    onContactSelectionChanged(contact, !selected)
                 }
             )
         }
@@ -181,28 +196,40 @@ fun SearchBar(
     modifier: Modifier = Modifier,
     elevation: Dp = 2.dp,
     searchQuery: String,
-    onQueryChanged: (String) -> Unit
+    onQueryChanged: (String) -> Unit,
+    allSelected: Boolean,
+    onAllSelectedChanged: (Boolean) -> Unit
 ) {
     val focusManager = LocalFocusManager.current
     Surface(
         elevation = elevation
     ) {
-        OutlinedTextField(
+        Row(
             modifier = modifier,
-            value = searchQuery,
-            onValueChange = onQueryChanged,
-            singleLine = true,
-            keyboardActions = KeyboardActions {
-                // Clear focus on action
-                focusManager.clearFocus()
-            },
-            placeholder = { Text(stringResource(R.string.search_hint)) },
-            leadingIcon = { Icon(Icons.Default.Search, null) },
-            trailingIcon = {
-                IconButton(onClick = { onQueryChanged("") }) {
-                    Icon(Icons.Default.Clear, stringResource(R.string.search_clear))
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            OutlinedTextField(
+                modifier = Modifier.weight(1f),
+                value = searchQuery,
+                onValueChange = onQueryChanged,
+                singleLine = true,
+                keyboardActions = KeyboardActions {
+                    // Clear focus on action
+                    focusManager.clearFocus()
+                },
+                placeholder = { Text(stringResource(R.string.search_hint)) },
+                leadingIcon = { Icon(Icons.Default.Search, null) },
+                trailingIcon = {
+                    IconButton(onClick = { onQueryChanged("") }) {
+                        Icon(Icons.Default.Clear, stringResource(R.string.search_clear))
+                    }
                 }
-            }
-        )
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Checkbox(
+                checked = allSelected,
+                onCheckedChange = onAllSelectedChanged
+            )
+        }
     }
 }
