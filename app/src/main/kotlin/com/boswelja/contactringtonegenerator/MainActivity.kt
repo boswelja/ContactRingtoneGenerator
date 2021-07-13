@@ -3,43 +3,30 @@ package com.boswelja.contactringtonegenerator
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.material.BackdropScaffold
 import androidx.compose.material.BackdropValue
-import androidx.compose.material.Divider
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.LocalContentColor
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.rememberBackdropScaffoldState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.livedata.observeAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -49,9 +36,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.work.ExperimentalExpeditedWork
-import com.boswelja.contactringtonegenerator.common.LocalSearchComposition
 import com.boswelja.contactringtonegenerator.common.ui.AppTheme
-import com.boswelja.contactringtonegenerator.common.ui.outlinedTextFieldColors
 import com.boswelja.contactringtonegenerator.confirmation.ui.ConfirmationScreen
 import com.boswelja.contactringtonegenerator.contactpicker.ui.ContactPickerScreen
 import com.boswelja.contactringtonegenerator.entry.ui.GetStartedScreen
@@ -64,6 +49,7 @@ import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
+    @ExperimentalFoundationApi
     @ExperimentalCoroutinesApi
     @ExperimentalAnimationApi
     @ExperimentalMaterialApi
@@ -76,14 +62,6 @@ class MainActivity : AppCompatActivity() {
             val coroutineScope = rememberCoroutineScope()
             val navController = rememberNavController()
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
-            val focusManager = LocalFocusManager.current
-
-            var searchQuery by remember {
-                mutableStateOf("")
-            }
-            val isSearchVisible = currentBackStackEntry?.destination?.route ==
-                Destination.CONTACT_PICKER.name
-            val searchFocusRequester = FocusRequester()
 
             AppTheme {
                 BackdropScaffold(
@@ -91,17 +69,6 @@ class MainActivity : AppCompatActivity() {
                     appBar = {
                         TopAppBar(
                             title = destinationTitle(currentBackStackEntry?.destination?.route),
-                            isSearchVisible = isSearchVisible,
-                            onShowSearch = {
-                                coroutineScope.launch {
-                                    if (scaffoldState.isRevealed) {
-                                        scaffoldState.conceal()
-                                    } else {
-                                        scaffoldState.reveal()
-                                        searchFocusRequester.requestFocus()
-                                    }
-                                }
-                            },
                             onShowSettings = {
                                 coroutineScope.launch {
                                     if (scaffoldState.isConcealed) {
@@ -116,29 +83,14 @@ class MainActivity : AppCompatActivity() {
                     backLayerBackgroundColor = MaterialTheme.colors.background,
                     backLayerContent = {
                         BackdropContent(
-                            modifier = Modifier.fillMaxWidth(),
-                            searchModifier = Modifier.focusRequester(searchFocusRequester),
-                            searchQuery = searchQuery,
-                            onSearchQueryChanged = { searchQuery = it },
-                            onSearchQuerySubmitted = {
-                                coroutineScope.launch {
-                                    focusManager.clearFocus()
-                                    scaffoldState.conceal()
-                                }
-                            },
-                            isSearchVisible = isSearchVisible
+                            modifier = Modifier.fillMaxWidth()
                         )
                     },
                     frontLayerContent = {
-                        CompositionLocalProvider(
-                            LocalSearchComposition provides searchQuery
-                        ) {
-                            MainScreen(
-                                navController = navController
-                            ) {
-                                finish()
-                            }
-                        }
+                        MainScreen(
+                            navController = navController,
+                            onFinished = { finish() }
+                        )
                     }
                 )
             }
@@ -173,8 +125,6 @@ fun destinationTitle(destinationRoute: String?): String {
 fun TopAppBar(
     modifier: Modifier = Modifier,
     title: String,
-    isSearchVisible: Boolean,
-    onShowSearch: () -> Unit,
     onShowSettings: () -> Unit
 ) {
     TopAppBar(
@@ -185,14 +135,6 @@ fun TopAppBar(
             }
         },
         actions = {
-            AnimatedVisibility(isSearchVisible) {
-                IconButton(onShowSearch) {
-                    Icon(
-                        Icons.Default.Search,
-                        contentDescription = stringResource(R.string.search_hint)
-                    )
-                }
-            }
             IconButton(onShowSettings) {
                 Icon(
                     Icons.Default.Settings,
@@ -206,6 +148,7 @@ fun TopAppBar(
     )
 }
 
+@ExperimentalFoundationApi
 @ExperimentalExpeditedWork
 @ExperimentalCoroutinesApi
 @ExperimentalAnimationApi
@@ -302,38 +245,7 @@ fun MainScreen(
 @ExperimentalMaterialApi
 @Composable
 fun BackdropContent(
-    modifier: Modifier = Modifier,
-    searchModifier: Modifier = Modifier,
-    searchQuery: String,
-    onSearchQueryChanged: (String) -> Unit,
-    onSearchQuerySubmitted: () -> Unit,
-    isSearchVisible: Boolean
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier) {
-        SettingsScreen(Modifier.fillMaxWidth())
-        if (isSearchVisible) {
-            Divider()
-            OutlinedTextField(
-                value = searchQuery,
-                onValueChange = onSearchQueryChanged,
-                placeholder = {
-                    Text(stringResource(R.string.search_hint))
-                },
-                leadingIcon = {
-                    Icon(
-                        Icons.Default.Search,
-                        stringResource(R.string.search_hint)
-                    )
-                },
-                keyboardActions = KeyboardActions {
-                    onSearchQuerySubmitted()
-                },
-                singleLine = true,
-                modifier = searchModifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                colors = outlinedTextFieldColors()
-            )
-        }
-    }
+    SettingsScreen(modifier)
 }

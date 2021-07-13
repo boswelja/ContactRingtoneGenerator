@@ -33,6 +33,7 @@
     <string name="result_unknown_status">Status unknown</string>
 
     <string name="search_hint">Search</string>
+    <string name="search_clear">Clear Search</string>
 
     <string name="permission_missing_title">We need your permission to:</string>
     <string name="permission_missing_read_contacts">\u2802 Get the names and nicknames of your contacts</string>
