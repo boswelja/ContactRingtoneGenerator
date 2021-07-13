@@ -8,10 +8,8 @@ import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
 import com.boswelja.contactringtonegenerator.ringtonebuilder.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.Constants
 import com.boswelja.contactringtonegenerator.ringtonegen.GeneratorResult
+import com.boswelja.contactringtonegenerator.ringtonegen.tts.TTSProvider
 import com.boswelja.contactringtonegenerator.settings.settingsDataStore
-import com.boswelja.tts.Result
-import com.boswelja.tts.TextToSpeech
-import com.boswelja.tts.withTextToSpeech
 import java.io.File
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
@@ -19,6 +17,7 @@ import timber.log.Timber
 
 class RingtoneGenerator(
     private val context: Context,
+    private val ttsProvider: TTSProvider,
     private val contactLookupKeys: Set<String>,
     ringtoneStructure: List<StructureItem>
 ) {
@@ -31,6 +30,10 @@ class RingtoneGenerator(
         val speechRate = context.settingsDataStore.data.map { it.ttsSpeechRate }.first()
         val voicePitch = context.settingsDataStore.data.map { it.ttsPitch }.first()
         val volumeMultiplier = context.settingsDataStore.data.map { it.volumeMultiplier }.first()
+
+        // Init TTS
+        val initSuccess = ttsProvider.initialise(context, speechRate, voicePitch)
+        if (!initSuccess) return GeneratorResult(failedContacts = contactLookupKeys)
 
         // Read FileBlock Uris into cache
         blocks.filterIsInstance<FileBlock>().forEach { fileBlock ->
@@ -45,8 +48,6 @@ class RingtoneGenerator(
         contactLookupKeys.forEach { lookupKey ->
             val ringtoneFile = generateRingtoneFor(
                 lookupKey,
-                voicePitch,
-                speechRate,
                 volumeMultiplier
             )
             val ringtoneUri = ringtoneFile?.let { saveRingtone(ringtoneFile) }
@@ -71,7 +72,7 @@ class RingtoneGenerator(
         )
     }
 
-    private suspend fun TextToSpeech.synthesizeTextForContact(
+    private suspend fun synthesizeTextForContact(
         contactLookupKey: String,
         text: String
     ): File? {
@@ -93,37 +94,28 @@ class RingtoneGenerator(
             .replace(Constants.NICKNAME_PLACEHOLDER, contactNickname)
 
         val file = getPartFileFor(synthesisText)
-        val synthResult = synthesizeToFile(
+        val synthResult = ttsProvider.synthesizeToFile(
             synthesisText,
             getPartFileFor(synthesisText)
         )
-        if (synthResult != Result.SUCCESS) return null
+        if (!synthResult) return null
 
         return file
     }
 
     private suspend fun generateRingtoneFor(
         contactLookupKey: String,
-        voicePitch: Float,
-        speechRate: Float,
         volumeMultiplier: Float
     ): File? {
         // Convert blocks to files
         val parts = mutableListOf<File>()
-        val success = context.withTextToSpeech(
-            voicePitch = voicePitch,
-            speechRate = speechRate
-        ) {
-            blocks.forEach { item ->
-                val file = when (item) {
-                    is TextBlock -> synthesizeTextForContact(contactLookupKey, item.text)
-                    is FileBlock -> getPartFileFor(item.uri.toString())
-                } ?: return@withTextToSpeech false
-                parts.add(file)
-            }
-            return@withTextToSpeech true
+        blocks.forEach { item ->
+            val file = when (item) {
+                is TextBlock -> synthesizeTextForContact(contactLookupKey, item.text)
+                is FileBlock -> getPartFileFor(item.uri.toString())
+            } ?: return null
+            parts.add(file)
         }
-        if (!success) return null
 
         // TODO Improve file name logic here
         val contactName = ContactsHelper.getContactStructuredName(
