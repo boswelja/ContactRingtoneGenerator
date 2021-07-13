@@ -6,6 +6,7 @@ import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.boswelja.contactringtonegenerator.ringtonebuilder.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.generator.RingtoneGenerator
+import com.boswelja.contactringtonegenerator.ringtonegen.tts.SystemTTSProvider
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -32,6 +33,7 @@ class RingtoneGeneratorWorker(
 
         val generator = RingtoneGenerator(
             applicationContext,
+            SystemTTSProvider(),
             contacts,
             structure
         )
