@@ -34,7 +34,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.boswelja.contactringtonegenerator.common.LocalSearchComposition
 import com.boswelja.contactringtonegenerator.common.ui.NextButton
 import com.boswelja.contactringtonegenerator.contactpicker.Contact
 import kotlinx.coroutines.Dispatchers
@@ -56,7 +55,9 @@ fun ContactPickerScreen(
         Dispatchers.IO
     )
 
-    val currentQuery = LocalSearchComposition.current
+    val currentQuery by remember {
+        mutableStateOf("")
+    }
 
     val visibleContacts by remember(allContacts, currentQuery) {
         derivedStateOf {
