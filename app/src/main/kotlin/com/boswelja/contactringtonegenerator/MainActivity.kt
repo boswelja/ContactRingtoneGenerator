@@ -3,6 +3,7 @@ package com.boswelja.contactringtonegenerator
 import android.os.Bundle
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -63,12 +64,17 @@ class MainActivity : AppCompatActivity() {
             val navController = rememberNavController()
             val currentBackStackEntry by navController.currentBackStackEntryAsState()
 
+            val isSettingsAvailable =
+                currentBackStackEntry?.destination?.route != Destination.PROGRESS.name
+
             AppTheme {
                 BackdropScaffold(
                     scaffoldState = scaffoldState,
+                    gesturesEnabled = isSettingsAvailable,
                     appBar = {
                         TopAppBar(
                             title = destinationTitle(currentBackStackEntry?.destination?.route),
+                            isSettingsAvailable = isSettingsAvailable,
                             onShowSettings = {
                                 coroutineScope.launch {
                                     if (scaffoldState.isConcealed) {
@@ -125,6 +131,7 @@ fun destinationTitle(destinationRoute: String?): String {
 fun TopAppBar(
     modifier: Modifier = Modifier,
     title: String,
+    isSettingsAvailable: Boolean,
     onShowSettings: () -> Unit
 ) {
     TopAppBar(
@@ -135,11 +142,13 @@ fun TopAppBar(
             }
         },
         actions = {
-            IconButton(onShowSettings) {
-                Icon(
-                    Icons.Default.Settings,
-                    contentDescription = stringResource(R.string.settings_title)
-                )
+            AnimatedVisibility(isSettingsAvailable) {
+                IconButton(onShowSettings) {
+                    Icon(
+                        Icons.Default.Settings,
+                        contentDescription = stringResource(R.string.settings_title)
+                    )
+                }
             }
         },
         backgroundColor = Color.Transparent,
