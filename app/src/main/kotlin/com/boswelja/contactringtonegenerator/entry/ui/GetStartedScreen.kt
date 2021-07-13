@@ -73,6 +73,7 @@ fun GetStartedScreen(
             icon = {
                 Icon(Icons.Default.NavigateNext, stringResource(R.string.next))
             },
+            shape = MaterialTheme.shapes.small,
             onClick = {
                 if (hasContactsPermission(context)) {
                     onNavigateNext()

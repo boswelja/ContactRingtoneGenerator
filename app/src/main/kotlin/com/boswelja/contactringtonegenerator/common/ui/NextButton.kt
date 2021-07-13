@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExtendedFloatingActionButton
 import androidx.compose.material.Icon
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.NavigateNext
@@ -36,6 +37,7 @@ fun BoxScope.NextButton(
             icon = {
                 Icon(Icons.Default.NavigateNext, null)
             },
+            shape = MaterialTheme.shapes.small,
             onClick = onClick
         )
     }

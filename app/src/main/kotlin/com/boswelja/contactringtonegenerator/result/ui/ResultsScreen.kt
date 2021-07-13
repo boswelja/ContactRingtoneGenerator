@@ -82,6 +82,7 @@ fun ResultScreen(
         ExtendedFloatingActionButton(
             text = { Text(stringResource(R.string.done)) },
             icon = { Icon(Icons.Default.Done, null) },
+            shape = MaterialTheme.shapes.small,
             onClick = onDoneClicked
         )
     }
