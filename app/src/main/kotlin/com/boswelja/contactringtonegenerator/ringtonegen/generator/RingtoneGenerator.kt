@@ -63,6 +63,9 @@ class RingtoneGenerator(
             }
         }
 
+        // Shut down TTS
+        ttsProvider.shutdown()
+
         // Empty cache on finish
         cacheDir.deleteRecursively()
 
