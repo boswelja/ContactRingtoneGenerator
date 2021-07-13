@@ -2,10 +2,6 @@ package com.boswelja.contactringtonegenerator.ringtonebuilder
 
 import androidx.annotation.StringRes
 import com.boswelja.contactringtonegenerator.R
-import com.boswelja.contactringtonegenerator.ringtonegen.item.ContactDataItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomAudioItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.CustomTextItem
-import com.boswelja.contactringtonegenerator.ringtonegen.item.StructureItem
 
 abstract class Choice(
     @StringRes val textRes: Int

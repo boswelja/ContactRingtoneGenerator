@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.ringtonegen.item
+package com.boswelja.contactringtonegenerator.ringtonebuilder
 
 import android.net.Uri
 import androidx.annotation.StringRes
@@ -6,6 +6,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import com.boswelja.contactringtonegenerator.R
+import com.boswelja.contactringtonegenerator.ringtonegen.Constants
 import java.util.concurrent.atomic.AtomicInteger
 import kotlinx.serialization.Serializable
 
