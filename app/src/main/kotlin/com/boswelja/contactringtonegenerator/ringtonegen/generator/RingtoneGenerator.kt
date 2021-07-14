@@ -88,9 +88,9 @@ class RingtoneGenerator(
         val synthesisText = text
             .replace(Constants.NAME_PREFIX_PLACEHOLDER, contactName.prefix)
             .replace(Constants.NAME_SUFFIX_PLACEHOLDER, contactName.suffix)
-            .replace(Constants.FIRST_NAME_PLACEHOLDER, contactName.firstName)
+            .replace(Constants.FIRST_NAME_PLACEHOLDER, contactName.givenName)
             .replace(Constants.MIDDLE_NAME_PLACEHOLDER, contactName.middleName)
-            .replace(Constants.LAST_NAME_PLACEHOLDER, contactName.lastName)
+            .replace(Constants.LAST_NAME_PLACEHOLDER, contactName.familyName)
             .replace(Constants.NICKNAME_PLACEHOLDER, contactNickname)
 
         val file = getPartFileFor(synthesisText)
@@ -119,7 +119,7 @@ class RingtoneGenerator(
 
         // TODO Improve file name logic here
         val contactName = context.contentResolver.getContactStructuredName(contactLookupKey)!!
-            .let { "${it.firstName} ${it.middleName} ${it.lastName}" }
+            .let { "${it.givenName} ${it.middleName} ${it.familyName}" }
         val output = getContactFileFor(contactName)
 
         // Build an array of arguments
