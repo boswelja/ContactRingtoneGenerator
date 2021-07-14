@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.boswelja.contactringtonegenerator.common.MediaStoreHelper
+import com.boswelja.contactringtonegenerator.common.mediastore.deleteGeneratedRingtones
 import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
 import com.boswelja.contactringtonegenerator.settings.settingsDataStore
 import kotlinx.coroutines.Dispatchers
@@ -43,7 +43,7 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
             ).first().forEach { contact ->
                 ContactsHelper.removeContactRingtone(context, contact)
             }
-            MediaStoreHelper.deleteAllRingtones(context)
+            context.contentResolver.deleteGeneratedRingtones()
         }
     }
 

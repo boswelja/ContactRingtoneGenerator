@@ -95,7 +95,8 @@ object ContactsHelper {
                 ContactsContract.Data.CONTENT_URI,
                 CONTACT_NICKNAME_PROJECTION,
                 "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.Nickname.MIMETYPE} = ?",
-                arrayOf(lookupKey, ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE), null
+                arrayOf(lookupKey, ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE),
+                null
             )
 
             var nickname: String? = null
