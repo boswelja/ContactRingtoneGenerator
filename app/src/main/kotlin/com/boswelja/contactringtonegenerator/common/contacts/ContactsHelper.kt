@@ -14,7 +14,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 
 private const val ContactDataTypeLookupSelection =
     "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.Nickname.MIMETYPE} = ?" // ktlint-disable max-line-length
@@ -40,15 +39,22 @@ private val CONTACT_NICKNAME_PROJECTION = arrayOf(
     ContactsContract.CommonDataKinds.Nickname.NAME
 )
 
+/**
+ * Flow all contacts whose [ContactsContract.Contacts.DISPLAY_NAME_PRIMARY] contains [filter].
+ * @param filter The filter string to match contacts to, or null if there is no filter.
+ * @return a [Flow] of contacts matching the input filter.
+ */
 @ExperimentalCoroutinesApi
 fun ContentResolver.getContacts(
     filter: String? = null
 ): Flow<List<Contact>> = flow {
+    // Build selection parameters
     val selection = filter?.let {
         "${ContactsContract.Contacts.DISPLAY_NAME_PRIMARY} LIKE ?"
     }
     val selectionArgs = filter?.let { arrayOf("%$filter%") }
-    Timber.d("Getting all contacts where %s matches %s", selection, filter)
+
+    // Collect all contacts
     val contacts = mutableListOf<Contact>()
     query(
         ContactsContract.Contacts.CONTENT_URI,
@@ -78,11 +84,17 @@ fun ContentResolver.getContacts(
                 }
             }
         }
-        // Send contacts on finished
-        emit(contacts)
     }
+
+    // Send contacts on finished
+    emit(contacts)
 }
 
+/**
+ * Get a contact's nickname, or empty of the contact has no nickname set.
+ * @param lookupKey See [Contact.lookupKey].
+ * @return The contact's nickname, or an empty string if the contact has no nickname.
+ */
 suspend fun ContentResolver.getContactNickname(lookupKey: String): String {
     return withContext(Dispatchers.IO) {
         val cursor = query(
@@ -107,6 +119,11 @@ suspend fun ContentResolver.getContactNickname(lookupKey: String): String {
     }
 }
 
+/**
+ * Get the [StructuredName] for a contact.
+ * @param lookupKey See [Contact.lookupKey].
+ * @return A [StructuredName] for the contact, or null if the contact couldn't be found.
+ */
 suspend fun ContentResolver.getContactStructuredName(
     lookupKey: String
 ): StructuredName? {
@@ -142,6 +159,11 @@ suspend fun ContentResolver.getContactStructuredName(
     }
 }
 
+/**
+ * Sets a contact's custom ringtone.
+ * @param contactUri See [Contact.uri].
+ * @param ringtoneUri The [Uri] of the ringtone stored in MediaStore.
+ */
 suspend fun ContentResolver.setContactRingtone(
     contactUri: Uri,
     ringtoneUri: Uri
@@ -153,6 +175,11 @@ suspend fun ContentResolver.setContactRingtone(
     }
 }
 
+/**
+ * Get a lookup Uri for a contact.
+ * @param contactLookupKey See [Contact.lookupKey].
+ * @return The lookup Uri for the contact, or null if the contact wasn't found.
+ */
 suspend fun ContentResolver.getContactUri(
     contactLookupKey: String
 ): Uri? {
@@ -165,6 +192,10 @@ suspend fun ContentResolver.getContactUri(
     }
 }
 
+/**
+ * Clear a contact's custom ringtone.
+ * @param contact The [Contact] to clear the custom ringtone for.
+ */
 suspend fun ContentResolver.removeRingtoneFor(contact: Contact) {
     withContext(Dispatchers.IO) {
         val contactUri = ContactsContract.Contacts.getLookupUri(contact.id, contact.lookupKey)
@@ -174,6 +205,11 @@ suspend fun ContentResolver.removeRingtoneFor(contact: Contact) {
     }
 }
 
+/**
+ * Open an [InputStream] for the contact's photo, if there is one.
+ * @param contact The [Contact] whose photo we should open.
+ * @return The [InputStream] for the contact photo, or null if there is no photo.
+ */
 fun ContentResolver.openContactPhotoStream(contact: Contact): InputStream? {
     return ContactsContract.Contacts.openContactPhotoInputStream(
         this,
