@@ -16,6 +16,9 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
+private const val ContactDataTypeLookupSelection =
+    "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.Nickname.MIMETYPE} = ?"
+
 private val CONTACTS_PROJECTION = arrayOf(
     ContactsContract.Contacts._ID,
     ContactsContract.Contacts.LOOKUP_KEY,
@@ -47,14 +50,13 @@ fun ContentResolver.getContacts(
     val selectionArgs = filter?.let { arrayOf("%$filter%") }
     Timber.d("Getting all contacts where %s matches %s", selection, filter)
     val contacts = mutableListOf<Contact>()
-    val cursor = query(
+    query(
         ContactsContract.Contacts.CONTENT_URI,
         CONTACTS_PROJECTION,
         selection,
         selectionArgs,
         ContactsContract.Contacts.SORT_KEY_PRIMARY
-    )
-    cursor?.let {
+    )?.use { cursor ->
         val idColumn = cursor.getColumnIndex(ContactsContract.Contacts._ID)
         val lookupKeyColumn = cursor.getColumnIndex(ContactsContract.Contacts.LOOKUP_KEY)
         val displayNameColumn =
@@ -78,7 +80,6 @@ fun ContentResolver.getContacts(
         }
         // Send contacts on finished
         emit(contacts)
-        cursor.close()
     }
 }
 
@@ -87,7 +88,7 @@ suspend fun ContentResolver.getContactNickname(lookupKey: String): String {
         val cursor = query(
             ContactsContract.Data.CONTENT_URI,
             CONTACT_NICKNAME_PROJECTION,
-            "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.Nickname.MIMETYPE} = ?",
+            ContactDataTypeLookupSelection,
             arrayOf(lookupKey, ContactsContract.CommonDataKinds.Nickname.CONTENT_ITEM_TYPE),
             null
         )
@@ -110,36 +111,34 @@ suspend fun ContentResolver.getContactStructuredName(
     lookupKey: String
 ): StructuredName? {
     return withContext(Dispatchers.IO) {
-        val cursor = query(
+        query(
             ContactsContract.Data.CONTENT_URI,
             CONTACT_NAME_PROJECTION,
-            "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.StructuredName.MIMETYPE} = ?",
+            ContactDataTypeLookupSelection,
             arrayOf(
                 lookupKey,
                 ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE
             ),
             null
-        )
-        if (cursor == null || !cursor.moveToFirst()) {
-            return@withContext null
+        )?.use { cursor ->
+            if (!cursor.moveToFirst()) return@use null
+            val firstNameColumn =
+                cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME)
+            val middleNameColumn =
+                cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME)
+            val lastNameColumn =
+                cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME)
+            val prefixColumn =
+                cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.PREFIX)
+            val suffixColumn =
+                cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.SUFFIX)
+            val firstName = cursor.getStringOrNull(firstNameColumn) ?: ""
+            val middleName = cursor.getStringOrNull(middleNameColumn) ?: ""
+            val lastName = cursor.getStringOrNull(lastNameColumn) ?: ""
+            val prefix = cursor.getStringOrNull(prefixColumn) ?: ""
+            val suffix = cursor.getStringOrNull(suffixColumn) ?: ""
+            return@use StructuredName(prefix, firstName, middleName, lastName, suffix)
         }
-        val firstNameColumn =
-            cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.GIVEN_NAME)
-        val middleNameColumn =
-            cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.MIDDLE_NAME)
-        val lastNameColumn =
-            cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.FAMILY_NAME)
-        val prefixColumn =
-            cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.PREFIX)
-        val suffixColumn =
-            cursor.getColumnIndex(ContactsContract.CommonDataKinds.StructuredName.SUFFIX)
-        val firstName = cursor.getStringOrNull(firstNameColumn) ?: ""
-        val middleName = cursor.getStringOrNull(middleNameColumn) ?: ""
-        val lastName = cursor.getStringOrNull(lastNameColumn) ?: ""
-        val prefix = cursor.getStringOrNull(prefixColumn) ?: ""
-        val suffix = cursor.getStringOrNull(suffixColumn) ?: ""
-        cursor.close()
-        return@withContext StructuredName(prefix, firstName, middleName, lastName, suffix)
     }
 }
 
