@@ -1,7 +1,7 @@
 package com.boswelja.contactringtonegenerator.common.mediastore
 
+import android.content.ContentResolver
 import android.content.ContentValues
-import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -25,13 +25,11 @@ private val RINGTONE_COLLECTION = if (Build.VERSION.SDK_INT >= Build.VERSION_COD
 
 /**
  * Scan a ringtone file into the [MediaStore].
- * @param context [Context].
  * @param file The [File] to scan.
  * @return The [Uri] for the scanned file, or null if scanning failed.
  */
-suspend fun scanNewFile(context: Context, file: File): Uri? {
+suspend fun ContentResolver.scanRingtone(file: File): Uri? {
     return withContext(Dispatchers.IO) {
-        val contentResolver = context.contentResolver
         val values = ContentValues().apply {
             put(MediaStore.Audio.Media.DISPLAY_NAME, file.name)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -43,13 +41,13 @@ suspend fun scanNewFile(context: Context, file: File): Uri? {
         }
 
         // Delete the ringtone if it already exists
-        deleteRingtones(context, arrayOf(file.name))
+        deleteRingtones(arrayOf(file.name))
 
         return@withContext try {
-            val uri = contentResolver.insert(RINGTONE_COLLECTION, values)
+            val uri = insert(RINGTONE_COLLECTION, values)
             uri?.let {
                 FileInputStream(file).use { inStream ->
-                    contentResolver.openOutputStream(it)?.use { outStream ->
+                    openOutputStream(it)?.use { outStream ->
                         var byte = inStream.read()
                         while (byte != -1) {
                             outStream.write(byte)
@@ -62,7 +60,7 @@ suspend fun scanNewFile(context: Context, file: File): Uri? {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     values.clear()
                     values.put(MediaStore.Audio.Media.IS_PENDING, 0)
-                    contentResolver.update(it, values, null, null)
+                    update(it, values, null, null)
                 }
             }
 
@@ -76,14 +74,12 @@ suspend fun scanNewFile(context: Context, file: File): Uri? {
 
 /**
  * Deletes all ringtones created by this app.
- * @param context [Context].
  */
-suspend fun deleteAllRingtones(context: Context) {
+suspend fun ContentResolver.deleteGeneratedRingtones() {
     Timber.d("deleteAllRingtones() called")
     withContext(Dispatchers.IO) {
-        val contentResolver = context.contentResolver
         val displayNameArray = ArrayList<String>()
-        val query = contentResolver.query(
+        val query = query(
             RINGTONE_COLLECTION,
             DELETE_RINGTONE_PROJECTION,
             null,
@@ -95,6 +91,7 @@ suspend fun deleteAllRingtones(context: Context) {
             do {
                 val displayName = query.getString(displayNameCol)
                 Timber.d("Inspecting $displayName")
+                // TODO This isn't right
                 if (displayName.endsWith("-generated-ringtone.ogg")) {
                     displayNameArray.add(displayName)
                 }
@@ -103,20 +100,19 @@ suspend fun deleteAllRingtones(context: Context) {
         } else {
             Timber.w("Query null or empty")
         }
-        deleteRingtones(context, displayNameArray.toTypedArray())
+        deleteRingtones(displayNameArray.toTypedArray())
     }
 }
 
 /**
- * Delete a single ringtone.
- * @param context [Context].
+ * Delete an array of ringtones.
  * @param fileNames The file names of all the ringtones to delete.
  */
-suspend fun deleteRingtones(context: Context, fileNames: Array<String>) {
+suspend fun ContentResolver.deleteRingtones(fileNames: Array<String>) {
     withContext(Dispatchers.IO) {
         Timber.d("Deleting ${fileNames.count()} ringtones")
         try {
-            context.contentResolver.delete(
+            delete(
                 RINGTONE_COLLECTION,
                 "${MediaStore.Audio.Media.DISPLAY_NAME} = ?",
                 fileNames

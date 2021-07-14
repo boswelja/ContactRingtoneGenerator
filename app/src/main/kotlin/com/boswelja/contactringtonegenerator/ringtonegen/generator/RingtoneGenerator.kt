@@ -3,7 +3,7 @@ package com.boswelja.contactringtonegenerator.ringtonegen.generator
 import android.content.Context
 import android.net.Uri
 import com.arthenica.ffmpegkit.FFmpegKit
-import com.boswelja.contactringtonegenerator.common.mediastore.scanNewFile
+import com.boswelja.contactringtonegenerator.common.mediastore.scanRingtone
 import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
 import com.boswelja.contactringtonegenerator.ringtonebuilder.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.Constants
@@ -150,7 +150,7 @@ class RingtoneGenerator(
     }
 
     private suspend fun saveRingtone(file: File): Uri? {
-        val uri = scanNewFile(context, file)
+        val uri = context.contentResolver.scanRingtone(file)
         if (uri != null) {
             file.delete()
         } else {
