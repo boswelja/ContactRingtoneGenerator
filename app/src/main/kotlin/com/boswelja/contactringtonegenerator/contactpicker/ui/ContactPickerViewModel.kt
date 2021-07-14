@@ -4,7 +4,7 @@ import android.app.Application
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.AndroidViewModel
-import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
+import com.boswelja.contactringtonegenerator.common.contacts.ContactsHelper
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
 

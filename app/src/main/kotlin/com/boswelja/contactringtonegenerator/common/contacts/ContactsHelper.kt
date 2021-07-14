@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.contactpicker
+package com.boswelja.contactringtonegenerator.common.contacts
 
 import android.content.ContentResolver
 import android.content.ContentUris

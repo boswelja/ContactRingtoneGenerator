@@ -1,4 +1,4 @@
-package com.boswelja.contactringtonegenerator.contactpicker
+package com.boswelja.contactringtonegenerator.common.contacts
 
 data class StructuredName(
     val prefix: String = "",

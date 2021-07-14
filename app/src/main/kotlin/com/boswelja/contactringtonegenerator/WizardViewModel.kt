@@ -13,7 +13,7 @@ import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
 import androidx.work.workDataOf
-import com.boswelja.contactringtonegenerator.contactpicker.Contact
+import com.boswelja.contactringtonegenerator.common.contacts.Contact
 import com.boswelja.contactringtonegenerator.ringtonebuilder.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.GeneratorResult
 import com.boswelja.contactringtonegenerator.ringtonegen.RingtoneGeneratorWorker

@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import com.arthenica.ffmpegkit.FFmpegKit
 import com.boswelja.contactringtonegenerator.common.mediastore.scanRingtone
-import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
+import com.boswelja.contactringtonegenerator.common.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.ringtonebuilder.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.Constants
 import com.boswelja.contactringtonegenerator.ringtonegen.GeneratorResult

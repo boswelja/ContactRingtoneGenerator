@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.boswelja.contactringtonegenerator.common.mediastore.deleteGeneratedRingtones
-import com.boswelja.contactringtonegenerator.contactpicker.ContactsHelper
+import com.boswelja.contactringtonegenerator.common.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.settings.settingsDataStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
