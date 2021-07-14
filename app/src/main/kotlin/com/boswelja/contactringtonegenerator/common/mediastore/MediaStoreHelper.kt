@@ -7,7 +7,7 @@ import android.os.Build
 import android.os.Environment
 import android.provider.MediaStore
 import java.io.File
-import java.io.FileInputStream
+import java.io.FileOutputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -29,41 +29,42 @@ private val RINGTONE_COLLECTION = if (Build.VERSION.SDK_INT >= Build.VERSION_COD
  * @return The [Uri] for the scanned file, or null if scanning failed.
  */
 suspend fun ContentResolver.scanRingtone(file: File): Uri? {
-    return withContext(Dispatchers.IO) {
-        val values = ContentValues().apply {
-            put(MediaStore.Audio.Media.DISPLAY_NAME, file.name)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                put(MediaStore.Audio.Media.IS_PENDING, 1)
-                put(MediaStore.Audio.Media.RELATIVE_PATH, Environment.DIRECTORY_RINGTONES)
-            }
-            put(MediaStore.Audio.Media.MIME_TYPE, "audio/ogg")
-            put(MediaStore.Audio.Media.IS_RINGTONE, true)
+    // Create ContentValues for this ringtone
+    val values = ContentValues().apply {
+        put(MediaStore.Audio.Media.DISPLAY_NAME, file.name)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            put(MediaStore.Audio.Media.IS_PENDING, 1)
+            put(MediaStore.Audio.Media.RELATIVE_PATH, Environment.DIRECTORY_RINGTONES)
         }
+        put(MediaStore.Audio.Media.MIME_TYPE, "audio/ogg")
+        put(MediaStore.Audio.Media.IS_RINGTONE, true)
+    }
 
+    // Move to IO dispatcher
+    return withContext(Dispatchers.IO) {
         // Delete the ringtone if it already exists
         deleteRingtones(arrayOf(file.name))
 
-        return@withContext try {
-            val uri = insert(RINGTONE_COLLECTION, values)
-            uri?.let {
-                FileInputStream(file).use { inStream ->
-                    openOutputStream(it)?.use { outStream ->
-                        var byte = inStream.read()
-                        while (byte != -1) {
-                            outStream.write(byte)
-                            byte = inStream.read()
-                        }
-                        outStream.close()
+        try {
+            // Try inserting ringtone into MediaStore
+            val uri = insert(RINGTONE_COLLECTION, values) ?: return@withContext null
+            // TOD OWhat can we do about this blocking call
+            openFileDescriptor(uri, "w").use { descriptor ->
+                // TODO Let the provider know about any errors
+                if (descriptor == null) return@withContext null
+                FileOutputStream(descriptor.fileDescriptor).use { outStream ->
+                    file.inputStream().use { inStream ->
+                        inStream.copyTo(outStream)
                     }
-                    inStream.close()
-                }
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    values.clear()
-                    values.put(MediaStore.Audio.Media.IS_PENDING, 0)
-                    update(it, values, null, null)
                 }
             }
 
+            // Clear pending flag if necessary
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                values.clear()
+                values.put(MediaStore.Audio.Media.IS_PENDING, 0)
+                update(uri, values, null, null)
+            }
             uri
         } catch (e: Exception) {
             Timber.w(e)
@@ -109,8 +110,8 @@ suspend fun ContentResolver.deleteGeneratedRingtones() {
  * @param fileNames The file names of all the ringtones to delete.
  */
 suspend fun ContentResolver.deleteRingtones(fileNames: Array<String>) {
+    Timber.d("Deleting ${fileNames.count()} ringtones")
     withContext(Dispatchers.IO) {
-        Timber.d("Deleting ${fileNames.count()} ringtones")
         try {
             delete(
                 RINGTONE_COLLECTION,
