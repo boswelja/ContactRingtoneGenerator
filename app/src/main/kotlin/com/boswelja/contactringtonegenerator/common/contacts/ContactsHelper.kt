@@ -3,7 +3,6 @@ package com.boswelja.contactringtonegenerator.common.contacts
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.ContentValues
-import android.content.Context
 import android.net.Uri
 import android.provider.ContactsContract
 import androidx.core.database.getStringOrNull
@@ -39,8 +38,7 @@ private val CONTACT_NICKNAME_PROJECTION = arrayOf(
 )
 
 @ExperimentalCoroutinesApi
-fun getContacts(
-    contentResolver: ContentResolver,
+fun ContentResolver.getContacts(
     filter: String? = null
 ): Flow<List<Contact>> = flow {
     val selection = filter?.let {
@@ -49,7 +47,7 @@ fun getContacts(
     val selectionArgs = filter?.let { arrayOf("%$filter%") }
     Timber.d("Getting all contacts where %s matches %s", selection, filter)
     val contacts = mutableListOf<Contact>()
-    val cursor = contentResolver.query(
+    val cursor = query(
         ContactsContract.Contacts.CONTENT_URI,
         CONTACTS_PROJECTION,
         selection,
@@ -84,9 +82,9 @@ fun getContacts(
     }
 }
 
-suspend fun getContactNickname(contentResolver: ContentResolver, lookupKey: String): String {
+suspend fun ContentResolver.getContactNickname(lookupKey: String): String {
     return withContext(Dispatchers.IO) {
-        val cursor = contentResolver.query(
+        val cursor = query(
             ContactsContract.Data.CONTENT_URI,
             CONTACT_NICKNAME_PROJECTION,
             "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.Nickname.MIMETYPE} = ?",
@@ -108,12 +106,11 @@ suspend fun getContactNickname(contentResolver: ContentResolver, lookupKey: Stri
     }
 }
 
-suspend fun getContactStructuredName(
-    contentResolver: ContentResolver,
+suspend fun ContentResolver.getContactStructuredName(
     lookupKey: String
 ): StructuredName? {
     return withContext(Dispatchers.IO) {
-        val cursor = contentResolver.query(
+        val cursor = query(
             ContactsContract.Data.CONTENT_URI,
             CONTACT_NAME_PROJECTION,
             "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.StructuredName.MIMETYPE} = ?",
@@ -146,41 +143,39 @@ suspend fun getContactStructuredName(
     }
 }
 
-suspend fun setContactRingtone(
-    context: Context,
+suspend fun ContentResolver.setContactRingtone(
     contactUri: Uri,
     ringtoneUri: Uri
 ) {
     withContext(Dispatchers.IO) {
         val values = ContentValues()
         values.put(ContactsContract.Contacts.CUSTOM_RINGTONE, ringtoneUri.toString())
-        context.contentResolver.update(contactUri, values, null, null)
+        update(contactUri, values, null, null)
     }
 }
 
-suspend fun getContactUri(
-    context: Context,
+suspend fun ContentResolver.getContactUri(
     contactLookupKey: String
 ): Uri? {
     val lookupUri = Uri.withAppendedPath(
         ContactsContract.Contacts.CONTENT_LOOKUP_URI, contactLookupKey
     )
 
-    return ContactsContract.Contacts.lookupContact(context.contentResolver, lookupUri)
+    return ContactsContract.Contacts.lookupContact(this, lookupUri)
 }
 
-suspend fun removeContactRingtone(context: Context, contact: Contact) {
+suspend fun ContentResolver.removeRingtoneFor(contact: Contact) {
     withContext(Dispatchers.IO) {
         val contactUri = ContactsContract.Contacts.getLookupUri(contact.id, contact.lookupKey)
         val values = ContentValues()
         values.putNull(ContactsContract.Contacts.CUSTOM_RINGTONE)
-        context.contentResolver.update(contactUri, values, null, null)
+        update(contactUri, values, null, null)
     }
 }
 
-fun openContactPhotoStream(context: Context, contact: Contact): InputStream? {
+fun ContentResolver.openContactPhotoStream(contact: Contact): InputStream? {
     return ContactsContract.Contacts.openContactPhotoInputStream(
-        context.contentResolver,
+        this,
         contact.uri,
         false
     )

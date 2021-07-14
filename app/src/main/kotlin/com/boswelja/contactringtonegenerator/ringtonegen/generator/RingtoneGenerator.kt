@@ -55,9 +55,8 @@ class RingtoneGenerator(
             )
             val ringtoneUri = ringtoneFile?.let { saveRingtone(ringtoneFile) }
             if (ringtoneUri != null) {
-                setContactRingtone(
-                    context,
-                    getContactUri(context, lookupKey)!!,
+                context.contentResolver.setContactRingtone(
+                    context.contentResolver.getContactUri(lookupKey)!!,
                     ringtoneUri
                 )
                 ringtoneFile.delete()
@@ -82,14 +81,9 @@ class RingtoneGenerator(
         contactLookupKey: String,
         text: String
     ): File? {
-        val contactName = getContactStructuredName(
-            context.contentResolver,
-            contactLookupKey
-        ) ?: return null
-        val contactNickname = getContactNickname(
-            context.contentResolver,
-            contactLookupKey
-        )
+        val contactName = context.contentResolver.getContactStructuredName(contactLookupKey)
+            ?: return null
+        val contactNickname = context.contentResolver.getContactNickname(contactLookupKey)
 
         val synthesisText = text
             .replace(Constants.NAME_PREFIX_PLACEHOLDER, contactName.prefix)
@@ -124,9 +118,8 @@ class RingtoneGenerator(
         }
 
         // TODO Improve file name logic here
-        val contactName = getContactStructuredName(
-            context.contentResolver, contactLookupKey
-        )!!.let { "${it.firstName} ${it.middleName} ${it.lastName}" }
+        val contactName = context.contentResolver.getContactStructuredName(contactLookupKey)!!
+            .let { "${it.firstName} ${it.middleName} ${it.lastName}" }
         val output = getContactFileFor(contactName)
 
         // Build an array of arguments

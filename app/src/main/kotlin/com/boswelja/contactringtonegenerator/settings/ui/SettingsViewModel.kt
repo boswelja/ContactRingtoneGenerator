@@ -7,7 +7,7 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.boswelja.contactringtonegenerator.common.contacts.getContacts
-import com.boswelja.contactringtonegenerator.common.contacts.removeContactRingtone
+import com.boswelja.contactringtonegenerator.common.contacts.removeRingtoneFor
 import com.boswelja.contactringtonegenerator.common.mediastore.deleteGeneratedRingtones
 import com.boswelja.contactringtonegenerator.settings.settingsDataStore
 import kotlinx.coroutines.Dispatchers
@@ -39,10 +39,8 @@ class SettingsViewModel(application: Application) : AndroidViewModel(application
     fun resetContactRingtones() {
         val context = getApplication<Application>()
         viewModelScope.launch(Dispatchers.IO) {
-            getContacts(
-                context.contentResolver
-            ).first().forEach { contact ->
-                removeContactRingtone(context, contact)
+            context.contentResolver.getContacts().first().forEach { contact ->
+                context.contentResolver.removeRingtoneFor(contact)
             }
             context.contentResolver.deleteGeneratedRingtones()
         }
