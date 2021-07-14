@@ -17,7 +17,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 
 private const val ContactDataTypeLookupSelection =
-    "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.Nickname.MIMETYPE} = ?"
+    "${ContactsContract.Data.LOOKUP_KEY} = ? AND ${ContactsContract.CommonDataKinds.Nickname.MIMETYPE} = ?" // ktlint-disable max-line-length
 
 private val CONTACTS_PROJECTION = arrayOf(
     ContactsContract.Contacts._ID,
