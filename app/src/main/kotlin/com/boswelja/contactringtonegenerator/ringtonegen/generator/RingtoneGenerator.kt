@@ -3,8 +3,11 @@ package com.boswelja.contactringtonegenerator.ringtonegen.generator
 import android.content.Context
 import android.net.Uri
 import com.arthenica.ffmpegkit.FFmpegKit
+import com.boswelja.contactringtonegenerator.common.contacts.getContactNickname
+import com.boswelja.contactringtonegenerator.common.contacts.getContactStructuredName
+import com.boswelja.contactringtonegenerator.common.contacts.getContactUri
+import com.boswelja.contactringtonegenerator.common.contacts.setContactRingtone
 import com.boswelja.contactringtonegenerator.common.mediastore.scanRingtone
-import com.boswelja.contactringtonegenerator.common.contacts.ContactsHelper
 import com.boswelja.contactringtonegenerator.ringtonebuilder.StructureItem
 import com.boswelja.contactringtonegenerator.ringtonegen.Constants
 import com.boswelja.contactringtonegenerator.ringtonegen.GeneratorResult
@@ -52,9 +55,9 @@ class RingtoneGenerator(
             )
             val ringtoneUri = ringtoneFile?.let { saveRingtone(ringtoneFile) }
             if (ringtoneUri != null) {
-                ContactsHelper.setContactRingtone(
+                setContactRingtone(
                     context,
-                    ContactsHelper.getContactUri(context, lookupKey)!!,
+                    getContactUri(context, lookupKey)!!,
                     ringtoneUri
                 )
                 ringtoneFile.delete()
@@ -79,11 +82,11 @@ class RingtoneGenerator(
         contactLookupKey: String,
         text: String
     ): File? {
-        val contactName = ContactsHelper.getContactStructuredName(
+        val contactName = getContactStructuredName(
             context.contentResolver,
             contactLookupKey
         ) ?: return null
-        val contactNickname = ContactsHelper.getContactNickname(
+        val contactNickname = getContactNickname(
             context.contentResolver,
             contactLookupKey
         )
@@ -121,7 +124,7 @@ class RingtoneGenerator(
         }
 
         // TODO Improve file name logic here
-        val contactName = ContactsHelper.getContactStructuredName(
+        val contactName = getContactStructuredName(
             context.contentResolver, contactLookupKey
         )!!.let { "${it.firstName} ${it.middleName} ${it.lastName}" }
         val output = getContactFileFor(contactName)

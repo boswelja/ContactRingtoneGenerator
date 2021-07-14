@@ -4,7 +4,8 @@ import android.app.Application
 import android.graphics.BitmapFactory
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.lifecycle.AndroidViewModel
-import com.boswelja.contactringtonegenerator.common.contacts.ContactsHelper
+import com.boswelja.contactringtonegenerator.common.contacts.getContacts
+import com.boswelja.contactringtonegenerator.common.contacts.openContactPhotoStream
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
 
@@ -13,9 +14,9 @@ class ContactPickerViewModel(
 ) : AndroidViewModel(application) {
 
     @ExperimentalCoroutinesApi
-    val allContacts = ContactsHelper.getContacts(application.contentResolver).mapLatest {
+    val allContacts = getContacts(application.contentResolver).mapLatest {
         it.map { contact ->
-            val stream = ContactsHelper.openContactPhotoStream(getApplication(), contact)
+            val stream = openContactPhotoStream(getApplication(), contact)
             val imageBitmap = stream?.let {
                 BitmapFactory.decodeStream(it).asImageBitmap()
             }
