@@ -12,10 +12,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 
-private val DELETE_RINGTONE_PROJECTION = arrayOf(
-    MediaStore.Audio.Media.DISPLAY_NAME,
-    MediaStore.Audio.Media.IS_RINGTONE
-)
+private const val RingtoneNameSuffix = "(Generated)"
+private const val RingtoneNameSelection =
+    "${MediaStore.Audio.Media.IS_RINGTONE} = 1 AND ${MediaStore.Audio.Media.DISPLAY_NAME} LIKE ?"
 
 private val RINGTONE_COLLECTION = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
     MediaStore.Audio.Media.getContentUri(MediaStore.VOLUME_EXTERNAL_PRIMARY)
@@ -29,9 +28,10 @@ private val RINGTONE_COLLECTION = if (Build.VERSION.SDK_INT >= Build.VERSION_COD
  * @return The [Uri] for the scanned file, or null if scanning failed.
  */
 suspend fun ContentResolver.scanRingtone(file: File): Uri? {
+    val displayName = "${file.nameWithoutExtension} $RingtoneNameSuffix.${file.extension}"
     // Create ContentValues for this ringtone
     val values = ContentValues().apply {
-        put(MediaStore.Audio.Media.DISPLAY_NAME, file.name)
+        put(MediaStore.Audio.Media.DISPLAY_NAME, displayName)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             put(MediaStore.Audio.Media.IS_PENDING, 1)
             put(MediaStore.Audio.Media.RELATIVE_PATH, Environment.DIRECTORY_RINGTONES)
@@ -43,7 +43,7 @@ suspend fun ContentResolver.scanRingtone(file: File): Uri? {
     // Move to IO dispatcher
     return withContext(Dispatchers.IO) {
         // Delete the ringtone if it already exists
-        deleteRingtones(arrayOf(file.name))
+        deleteRingtoneIfStored(displayName)
 
         try {
             // Try inserting ringtone into MediaStore
@@ -77,52 +77,36 @@ suspend fun ContentResolver.scanRingtone(file: File): Uri? {
  * Deletes all ringtones created by this app.
  */
 suspend fun ContentResolver.deleteGeneratedRingtones() {
-    Timber.d("deleteAllRingtones() called")
     withContext(Dispatchers.IO) {
-        val displayNameArray = ArrayList<String>()
-        val query = query(
-            RINGTONE_COLLECTION,
-            DELETE_RINGTONE_PROJECTION,
-            null,
-            null,
-            null
-        )
-        if (query != null && query.moveToFirst()) {
-            val displayNameCol = query.getColumnIndex(MediaStore.Audio.Media.DISPLAY_NAME)
-            do {
-                val displayName = query.getString(displayNameCol)
-                Timber.d("Inspecting $displayName")
-                // TODO This isn't right
-                if (displayName.endsWith("-generated-ringtone.ogg")) {
-                    displayNameArray.add(displayName)
-                }
-            } while (query.moveToNext())
-            query.close()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            // If we're on API Q, we can just delete all from our package
+            delete(
+                RINGTONE_COLLECTION,
+                "${MediaStore.Audio.Media.OWNER_PACKAGE_NAME} = ?",
+                arrayOf("com.boswelja.contactringtonegenerator")
+            )
         } else {
-            Timber.w("Query null or empty")
+            delete(
+                RINGTONE_COLLECTION,
+                RingtoneNameSelection,
+                arrayOf(RingtoneNameSuffix)
+            )
         }
-        deleteRingtones(displayNameArray.toTypedArray())
     }
 }
 
 /**
- * Delete an array of ringtones.
- * @param fileNames The file names of all the ringtones to delete.
+ * Delete a single ringtone, if it exists in the media store.
+ * @param displayName The display name of the ringtone to try delete.
  */
-suspend fun ContentResolver.deleteRingtones(fileNames: Array<String>) {
-    Timber.d("Deleting ${fileNames.count()} ringtones")
+suspend fun ContentResolver.deleteRingtoneIfStored(displayName: String) {
     withContext(Dispatchers.IO) {
         try {
             delete(
                 RINGTONE_COLLECTION,
-                "${MediaStore.Audio.Media.DISPLAY_NAME} = ?",
-                fileNames
+                RingtoneNameSelection,
+                arrayOf(displayName)
             )
-            fileNames.map { File(it) }.forEach {
-                try {
-                    it.delete()
-                } catch (ignored: Exception) {}
-            }
         } catch (e: Exception) {
             Timber.w(e)
         }
