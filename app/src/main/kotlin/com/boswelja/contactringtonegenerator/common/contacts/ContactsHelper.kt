@@ -156,11 +156,13 @@ suspend fun ContentResolver.setContactRingtone(
 suspend fun ContentResolver.getContactUri(
     contactLookupKey: String
 ): Uri? {
-    val lookupUri = Uri.withAppendedPath(
-        ContactsContract.Contacts.CONTENT_LOOKUP_URI, contactLookupKey
-    )
+    return withContext(Dispatchers.IO) {
+        val lookupUri = Uri.withAppendedPath(
+            ContactsContract.Contacts.CONTENT_LOOKUP_URI, contactLookupKey
+        )
 
-    return ContactsContract.Contacts.lookupContact(this, lookupUri)
+        ContactsContract.Contacts.lookupContact(this@getContactUri, lookupUri)
+    }
 }
 
 suspend fun ContentResolver.removeRingtoneFor(contact: Contact) {
