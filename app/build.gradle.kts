@@ -55,7 +55,6 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.tts.ktx)
 
-    testImplementation(libs.androidx.arch.core.test)
     testImplementation(libs.androidx.test.corektx)
     testImplementation(libs.androidx.test.ext.junit)
     testImplementation(libs.kotlinx.coroutines.test)
@@ -65,7 +64,6 @@ dependencies {
     testImplementation(libs.mockk.core)
     testImplementation(libs.robolectric)
 
-    androidTestImplementation(libs.androidx.arch.core.test)
     androidTestImplementation(libs.androidx.test.espresso)
     androidTestImplementation(libs.androidx.test.runner)
     androidTestImplementation(libs.androidx.test.rules)
